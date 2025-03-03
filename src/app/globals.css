@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Urbanist", sans-serif;
+  --font-mono: var(--font-geist-mono);
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #000000;
+  --accent: #888888;
+  --font-heading: var(--font-urbanist), "Urbanist", sans-serif;
+  --font-body: var(--font-urbanist), "Urbanist", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #000000;
+    --foreground: #ffffff;
+    --accent: #888888;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-body);
+  letter-spacing: 0.02em;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+/* Luxury styling */
+.luxury-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.luxury-text {
+  letter-spacing: 0.05em;
+  line-height: 1.6;
+}
+
+.luxury-border {
+  border: 1px solid var(--accent);
+}
+
+.luxury-button {
+  background-color: var(--foreground);
+  color: var(--background);
+  padding: 0.75rem 2rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+.luxury-button:hover {
+  background-color: var(--background);
+  color: var(--foreground);
+  border: 1px solid var(--foreground);
+}
+
+/* Brand Typography Classes */
+.brand-title {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.brand-subtitle {
+  font-family: var(--font-body);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+.brand-body {
+  font-family: var(--font-body);
+  letter-spacing: 0.02em;
+  line-height: 1.8;
+}
+
+.brand-accent {
+  font-family: var(--font-heading);
+  font-style: italic;
+  letter-spacing: 0.03em;
+}

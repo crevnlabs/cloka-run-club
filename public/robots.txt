@@ -1,0 +1,14 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://cloka.in/sitemap.xml
+
+# Disallow admin area
+User-agent: *
+Disallow: /admin/
+
+# Disallow API routes
+User-agent: *
+Disallow: /api/ 
