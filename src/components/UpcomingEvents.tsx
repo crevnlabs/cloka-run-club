@@ -110,7 +110,7 @@ const EventCard = ({ event }: { event: EventProps }) => {
             <div className="flex flex-wrap gap-3">
                 <button
                     onClick={handleRevealLocation}
-                    className="luxury-button text-sm inline-block"
+                    className="hover:cursor-pointer luxury-button text-sm inline-block"
                 >
                     Reveal Location
                 </button>
@@ -212,14 +212,14 @@ const EventCard = ({ event }: { event: EventProps }) => {
                                 <div className="flex justify-end space-x-3 mt-6">
                                     <button
                                         onClick={closeModal}
-                                        className="px-4 py-2 border border-black text-black rounded hover:bg-zinc-100 transition-colors"
+                                        className="hover:cursor-pointer px-4 py-2 border border-black text-black rounded hover:bg-zinc-100 transition-colors"
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         onClick={verifySecret}
                                         disabled={isVerifying}
-                                        className="luxury-button text-sm"
+                                        className="hover:cursor-pointer luxury-button text-sm"
                                     >
                                         {isVerifying ? 'Verifying...' : 'Verify & Reveal'}
                                     </button>
