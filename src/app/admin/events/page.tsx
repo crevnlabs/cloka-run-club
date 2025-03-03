@@ -151,11 +151,11 @@ export default function AdminEventsPage() {
             isEdit,
             event: isEdit && event ? {
                 ...event,
-                date: new Date(event.date).toISOString().split('T')[0]
+                date: new Date(event.date).toISOString().slice(0, 16)
             } : {
                 title: '',
                 description: '',
-                date: new Date().toISOString().split('T')[0],
+                date: new Date().toISOString().slice(0, 16),
                 location: '',
                 secret: '',
                 exactLocation: ''

@@ -29,13 +29,13 @@ export default function Error({ error, reset }: ErrorProps) {
                 <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 justify-center">
                     <button
                         onClick={reset}
-                        className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                        className="hover:cursor-pointer px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                     >
                         Try Again
                     </button>
                     <Link
                         href="/"
-                        className="px-4 py-2 text-sm font-medium text-primary bg-white border border-primary rounded-md hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary text-center"
+                        className="hover:cursor-pointer px-4 py-2 text-sm font-medium text-primary bg-white border border-primary rounded-md hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary text-center"
                     >
                         Go Home
                     </Link>

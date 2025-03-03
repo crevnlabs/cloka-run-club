@@ -152,7 +152,7 @@ const EventCard = ({ event }: { event: EventProps }) => {
                                 <div className="flex justify-end">
                                     <button
                                         onClick={closeModal}
-                                        className="luxury-button text-sm"
+                                        className="hover:cursor-pointer luxury-button text-sm"
                                     >
                                         Close
                                     </button>

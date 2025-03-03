@@ -58,11 +58,11 @@ const Header = () => {
 
                 {/* Desktop Navigation - Right Side */}
                 <nav className="hidden md:flex w-full md:w-1/3 justify-end space-x-8">
-                    <Link href="/events" className="luxury-text hover:text-accent transition-colors">
+                    <Link href="/events" className="luxury-text hover:text-accent transition-colors hover:underline">
                         Events
                     </Link>
-                    <Link href="/register" className="luxury-text hover:text-accent transition-colors">
-                        Register for Runs
+                    <Link href="/register" className="luxury-text hover:text-accent transition-colors hover:underline">
+                        Join
                     </Link>
                 </nav>
             </div>
