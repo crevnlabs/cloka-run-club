@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { getApiUrl } from '@/lib/apiUtils';
+import { fetchApi } from '@/lib/apiUtils';
 
 type EventProps = {
     id: string;
@@ -246,12 +246,7 @@ const UpcomingEvents = ({ serverEvents }: UpcomingEventsProps) => {
         const fetchEvents = async () => {
             setLoading(true);
             try {
-                const response = await fetch(getApiUrl('/api/events'));
-                if (!response.ok) {
-                    throw new Error('Failed to fetch events');
-                }
-
-                const data = await response.json();
+                const data = await fetchApi<{ events: ApiEventData[] }>('/api/events');
 
                 // Transform API data to component format
                 const formattedEvents = data.events.map((event: ApiEventData) => {

@@ -1,9 +1,15 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { defaultFetchOptions, fetchApi } from "@/lib/apiUtils";
 
 interface FetchOptions extends RequestInit {
   skipLoading?: boolean;
+}
+
+interface MutationOptions<T> extends RequestInit {
+  onSuccess?: (data: T) => void;
+  onError?: (error: Error) => void;
 }
 
 interface UseFetchResult<T> {
@@ -11,6 +17,13 @@ interface UseFetchResult<T> {
   isLoading: boolean;
   error: Error | null;
   refetch: () => Promise<void>;
+}
+
+interface UseMutationResult<T, P> {
+  mutate: (payload: P) => Promise<void>;
+  data: T | null;
+  isLoading: boolean;
+  error: Error | null;
 }
 
 export function useDataFetching<T>(
@@ -28,24 +41,12 @@ export function useDataFetching<T>(
     setError(null);
 
     try {
-      const response = await fetch(url, {
+      const fetchOptions = {
+        ...defaultFetchOptions,
         ...options,
-        headers: {
-          "Content-Type": "application/json",
-          ...options?.headers,
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.message || `Request failed with status ${response.status}`
-        );
-      }
-
-      const data = await response.json();
-      setData(data);
-      return data;
+      };
+      const result = await fetchApi<T>(url, fetchOptions);
+      setData(result);
     } catch (err) {
       setError(
         err instanceof Error ? err : new Error("An unknown error occurred")
@@ -66,18 +67,6 @@ export function useDataFetching<T>(
   return { data, isLoading, error, refetch };
 }
 
-interface MutationOptions<T> extends RequestInit {
-  onSuccess?: (data: T) => void;
-  onError?: (error: Error) => void;
-}
-
-interface UseMutationResult<T, P> {
-  mutate: (payload: P) => Promise<void>;
-  data: T | null;
-  isLoading: boolean;
-  error: Error | null;
-}
-
 export function useMutation<T, P = unknown>(
   url: string,
   method: "POST" | "PUT" | "DELETE" | "PATCH" = "POST",
@@ -92,21 +81,14 @@ export function useMutation<T, P = unknown>(
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          ...options?.headers,
-        },
-        body: JSON.stringify(payload),
+      const fetchOptions = {
+        ...defaultFetchOptions,
         ...options,
-      });
+        method,
+        body: JSON.stringify(payload),
+      };
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const result = await response.json();
+      const result = await fetchApi<T>(url, fetchOptions);
       setData(result);
       options?.onSuccess?.(result);
     } catch (err) {
