@@ -20,7 +20,38 @@ interface RazorpayResponse {
 
 interface OrderData {
     id: string;
-    [key: string]: any;
+    amount: number;
+    currency: string;
+    receipt?: string;
+}
+
+// Define Razorpay type
+interface RazorpayOptions {
+    key: string | undefined;
+    amount: number;
+    currency: string;
+    name: string;
+    description: string;
+    order_id: string;
+    handler: (response: RazorpayResponse) => void;
+    prefill: {
+        name: string;
+        email: string;
+        contact: string;
+    };
+    theme: {
+        color: string;
+    };
+}
+
+interface RazorpayInstance {
+    open: () => void;
+}
+
+declare global {
+    interface Window {
+        Razorpay: new (options: RazorpayOptions) => RazorpayInstance;
+    }
 }
 
 const ProductCard = ({ product, onBuyNow }: { product: ProductProps; onBuyNow: (product: ProductProps) => void }) => {
@@ -106,8 +137,8 @@ const Shop = ({ products }: { products: ProductProps[] }) => {
                 },
             };
 
-            // Type assertion for Razorpay
-            const razorpay = new (window as any).Razorpay(options);
+            // Type-safe Razorpay initialization
+            const razorpay = new window.Razorpay(options);
             razorpay.open();
 
         } catch (error) {

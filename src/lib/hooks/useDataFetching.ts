@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 interface FetchOptions extends RequestInit {
   skipLoading?: boolean;
@@ -21,21 +21,31 @@ export function useDataFetching<T>(
   const [isLoading, setIsLoading] = useState<boolean>(!options?.skipLoading);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchData = async () => {
-    try {
-      if (!options?.skipLoading) {
-        setIsLoading(true);
-      }
-      setError(null);
+  const fetchData = useCallback(async () => {
+    if (!options?.skipLoading) {
+      setIsLoading(true);
+    }
+    setError(null);
 
-      const response = await fetch(url, options);
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          "Content-Type": "application/json",
+          ...options?.headers,
+        },
+      });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || `Request failed with status ${response.status}`
+        );
       }
 
-      const result = await response.json();
-      setData(result);
+      const data = await response.json();
+      setData(data);
+      return data;
     } catch (err) {
       setError(
         err instanceof Error ? err : new Error("An unknown error occurred")
@@ -43,11 +53,11 @@ export function useDataFetching<T>(
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [url, options]);
 
   useEffect(() => {
     fetchData();
-  }, [url]);
+  }, [fetchData]);
 
   const refetch = async () => {
     await fetchData();

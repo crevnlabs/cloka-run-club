@@ -3,6 +3,9 @@ import UpcomingEvents from '@/components/UpcomingEvents';
 import Footer from '@/components/Footer';
 import { getApiUrl } from '@/lib/apiUtils';
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic';
+
 // Define the event type for the client component
 interface EventProps {
     id: string;

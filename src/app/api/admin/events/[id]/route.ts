@@ -1,15 +1,20 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Event from "@/models/Event";
 
+interface Params {
+  id: string;
+}
+
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<Params> }
 ) {
   try {
     // Connect to the database
     await dbConnect();
 
+    const params = await context.params;
     const eventId = params.id;
 
     // Find the event by ID
@@ -40,14 +45,16 @@ export async function GET(
 }
 
 export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<Params> }
 ) {
   try {
     // Connect to the database
     await dbConnect();
 
+    const params = await context.params;
     const eventId = params.id;
+
     const body = await request.json();
     const { title, description, date, location, image, registrationLink } =
       body;
@@ -100,13 +107,14 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<Params> }
 ) {
   try {
     // Connect to the database
     await dbConnect();
 
+    const params = await context.params;
     const eventId = params.id;
 
     // Find and delete the event

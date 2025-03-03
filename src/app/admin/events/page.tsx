@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
@@ -54,11 +54,7 @@ export default function AdminEventsPage() {
 
     const router = useRouter();
 
-    useEffect(() => {
-        fetchEvents();
-    }, []);
-
-    const fetchEvents = async () => {
+    const fetchEvents = useCallback(async () => {
         setLoading(true);
         setError('');
 
@@ -71,20 +67,23 @@ export default function AdminEventsPage() {
                 return;
             }
 
-            const data = await response.json();
-
-            if (response.ok) {
-                setEvents(data.events);
-            } else {
-                setError(data.message || 'Failed to fetch events');
+            if (!response.ok) {
+                throw new Error('Failed to fetch events');
             }
+
+            const data = await response.json();
+            setEvents(data);
         } catch (error) {
+            setError('Failed to load events. Please try again.');
             console.error('Error fetching events:', error);
-            setError('An error occurred while fetching events');
         } finally {
             setLoading(false);
         }
-    };
+    }, [router]);
+
+    useEffect(() => {
+        fetchEvents();
+    }, [fetchEvents]);
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -325,11 +324,12 @@ export default function AdminEventsPage() {
                                 {events.map((event) => (
                                     <div key={event._id} className="bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden shadow-md">
                                         {event.image && (
-                                            <div className="h-48 overflow-hidden">
-                                                <img
+                                            <div className="h-48 overflow-hidden relative">
+                                                <Image
                                                     src={event.image}
                                                     alt={event.title}
-                                                    className="w-full h-full object-cover"
+                                                    fill
+                                                    className="object-cover"
                                                 />
                                             </div>
                                         )}

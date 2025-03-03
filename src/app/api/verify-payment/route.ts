@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import dbConnect from "@/lib/mongodb";
 import Order from "@/models/Order";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     // Connect to the database
     await dbConnect();

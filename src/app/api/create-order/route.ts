@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import Razorpay from "razorpay";
 import dbConnect from "@/lib/mongodb";
 import Order from "@/models/Order";
@@ -10,7 +10,7 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET || "",
 });
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     // Connect to the database
     await dbConnect();

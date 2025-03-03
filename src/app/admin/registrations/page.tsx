@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
@@ -63,15 +63,7 @@ export default function AdminRegistrationsPage() {
 
     const router = useRouter();
 
-    useEffect(() => {
-        fetchStats();
-    }, []);
-
-    useEffect(() => {
-        fetchRegistrations();
-    }, [pagination.page, filters]);
-
-    const fetchStats = async () => {
+    const fetchStats = useCallback(async () => {
         try {
             const response = await fetch('/api/admin/registrations/stats');
 
@@ -80,22 +72,22 @@ export default function AdminRegistrationsPage() {
                 return;
             }
 
-            const data = await response.json();
-
-            if (response.ok) {
-                setStats(data.stats);
+            if (!response.ok) {
+                throw new Error('Failed to fetch stats');
             }
+
+            const data = await response.json();
+            setStats(data);
         } catch (error) {
             console.error('Error fetching stats:', error);
         }
-    };
+    }, [router]);
 
-    const fetchRegistrations = async () => {
+    const fetchRegistrations = useCallback(async () => {
         setLoading(true);
         setError('');
 
         try {
-            // Build query string
             const queryParams = new URLSearchParams({
                 page: pagination.page.toString(),
                 limit: pagination.limit.toString()
@@ -116,26 +108,36 @@ export default function AdminRegistrationsPage() {
             const response = await fetch(`/api/admin/registrations?${queryParams.toString()}`);
 
             if (response.status === 401) {
-                // Redirect to login if unauthorized
                 router.push('/admin/login');
                 return;
             }
 
-            const data = await response.json();
-
-            if (response.ok) {
-                setRegistrations(data.registrations);
-                setPagination(data.pagination);
-            } else {
-                setError(data.message || 'Failed to fetch registrations');
+            if (!response.ok) {
+                throw new Error('Failed to fetch registrations');
             }
+
+            const data = await response.json();
+            setRegistrations(data.registrations);
+            setPagination(prev => ({
+                ...prev,
+                total: data.total,
+                pages: Math.ceil(data.total / prev.limit)
+            }));
         } catch (error) {
+            setError('Failed to load registrations. Please try again.');
             console.error('Error fetching registrations:', error);
-            setError('An error occurred while fetching registrations');
         } finally {
             setLoading(false);
         }
-    };
+    }, [pagination.page, pagination.limit, filters, router]);
+
+    useEffect(() => {
+        fetchStats();
+    }, [fetchStats]);
+
+    useEffect(() => {
+        fetchRegistrations();
+    }, [fetchRegistrations]);
 
     const handlePageChange = (newPage: number) => {
         setPagination(prev => ({ ...prev, page: newPage }));

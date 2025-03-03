@@ -2,6 +2,9 @@ import Header from '@/components/Header';
 import Shop from '@/components/Shop';
 import Footer from '@/components/Footer';
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic';
+
 // Define the product type for the API response
 interface ApiProduct {
     _id: string;

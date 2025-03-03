@@ -4,6 +4,9 @@ import Footer from '@/components/Footer';
 import { motion } from 'framer-motion';
 import { getApiUrl } from '@/lib/apiUtils';
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
     title: 'Runner of the Week - CLOKA',
     description: 'Spotlighting standout community members from the CLOKA Run Club.',
@@ -24,7 +27,7 @@ interface ApiRunner {
 async function getRunnerOfTheWeek(): Promise<ApiRunner | null> {
     try {
         const url = getApiUrl('/api/runner-of-the-week');
-        
+
         const res = await fetch(url, {
             cache: 'no-store', // Don't cache this data
             next: { revalidate: 60 } // Revalidate every 60 seconds
@@ -46,7 +49,7 @@ async function getRunnerOfTheWeek(): Promise<ApiRunner | null> {
 async function getPastRunners(): Promise<ApiRunner[]> {
     try {
         const url = getApiUrl('/api/runner-of-the-week');
-        
+
         const res = await fetch(url, {
             cache: 'no-store',
             next: { revalidate: 60 }

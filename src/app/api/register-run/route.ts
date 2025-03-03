@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Registration from "@/models/Registration";
 
 // In a real application, you would connect to a database here
 // This is a simplified example that just returns a success response
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     // Connect to the database
     await dbConnect();

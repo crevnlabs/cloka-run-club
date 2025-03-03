@@ -2,9 +2,22 @@
 
 import Script from 'next/script';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 
-export default function GoogleAnalytics() {
+// Declare gtag as a global function
+declare global {
+    interface Window {
+        gtag: (
+            command: string,
+            targetId: string,
+            config?: Record<string, unknown>
+        ) => void;
+        dataLayer: unknown[];
+    }
+}
+
+// Component that uses useSearchParams
+function GoogleAnalyticsContent() {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
@@ -45,5 +58,13 @@ export default function GoogleAnalytics() {
                 }}
             />
         </>
+    );
+}
+
+export default function GoogleAnalytics() {
+    return (
+        <Suspense fallback={null}>
+            <GoogleAnalyticsContent />
+        </Suspense>
     );
 }
