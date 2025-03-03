@@ -51,7 +51,7 @@ export default function Loader({
         return (
             <div className="fixed inset-0 flex flex-col items-center justify-center bg-white bg-opacity-80 z-50">
                 {renderLoader()}
-                {text && <p className="mt-4 text-gray-700">{text}</p>}
+                {text && <p className="mt-4 text-zinc-700">{text}</p>}
             </div>
         );
     }
@@ -59,7 +59,7 @@ export default function Loader({
     return (
         <div className="flex flex-col items-center justify-center">
             {renderLoader()}
-            {text && <p className="mt-2 text-sm text-gray-600">{text}</p>}
+            {text && <p className="mt-2 text-sm text-zinc-600">{text}</p>}
         </div>
     );
 } 

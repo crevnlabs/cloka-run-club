@@ -74,7 +74,7 @@ const ProductCard = ({ product, onBuyNow }: { product: ProductProps; onBuyNow: (
             <div className="p-4">
                 <h3 className="text-xl font-bold mb-1">{product.name}</h3>
                 <p className="text-lg font-medium mb-2">₹{product.price}</p>
-                <p className="luxury-text text-sm mb-4 text-gray-700">{product.description}</p>
+                <p className="luxury-text text-sm mb-4 text-zinc-700">{product.description}</p>
                 <button
                     onClick={() => onBuyNow(product)}
                     className="luxury-button w-full"
@@ -180,19 +180,6 @@ const Shop = ({ products }: { products: ProductProps[] }) => {
     return (
         <section className="py-16 bg-white text-black">
             <div className="luxury-container">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                    viewport={{ once: true }}
-                    className="text-center mb-12"
-                >
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4 tracking-wider">Official Cloka Merch</h2>
-                    <div className="w-20 h-1 bg-black mx-auto"></div>
-                    <p className="luxury-text mt-6 max-w-2xl mx-auto">
-                        Exclusive, limited-edition merchandise that embodies the CLOKA spirit.
-                    </p>
-                </motion.div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {products.map((product) => (

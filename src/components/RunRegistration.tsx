@@ -28,7 +28,7 @@ const registrationSchema = z.object({
         errorMap: () => ({ message: 'Please select a gender' }),
     }),
     emergencyContact: z.string().min(10, { message: 'Please enter a valid emergency contact' }),
-    instagramUsername: z.string().optional(),
+    instagramUsername: z.string().min(1, { message: 'Please enter your Instagram username' }),
     eventId: z.string().min(1, { message: 'Please select an event' }),
     joinCrew: z.boolean().default(false),
     acceptTerms: z.boolean().refine(val => val === true, {
@@ -37,11 +37,11 @@ const registrationSchema = z.object({
 }).refine((data) => {
     // Age restriction based on gender
     if (data.gender === 'male') {
-        return Number(data.age) < 30;
+        return Number(data.age) < 35;
     }
     return true;
 }, {
-    message: "Age restriction: Registration is only available for those under 30 with current gender selection",
+    message: "Age restriction: Registration is only available for those under 35 with current gender selection",
     path: ["age"]
 });
 
@@ -257,7 +257,7 @@ const RunRegistration = ({ eventId }: { eventId?: string }) => {
                                 {errors.age && (
                                     <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.age.message}</p>
                                 )}
-                                {selectedGender === 'male' && ageValue && Number(ageValue) >= 30 && !errors.age && (
+                                {selectedGender === 'male' && ageValue && Number(ageValue) >= 35 && !errors.age && (
                                     <p className="mt-1 text-sm text-red-600 dark:text-red-400">Age restriction: Registration not available for current selection</p>
                                 )}
                             </div>
@@ -280,7 +280,7 @@ const RunRegistration = ({ eventId }: { eventId?: string }) => {
 
                             <div>
                                 <label htmlFor="instagramUsername" className="block text-sm font-medium mb-1 text-black dark:text-white">
-                                    Instagram Username <span className="text-xs font-medium text-black dark:text-white">(Optional)</span>
+                                    Instagram Username *
                                 </label>
                                 <div className="relative">
                                     <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-black dark:text-white">@</span>

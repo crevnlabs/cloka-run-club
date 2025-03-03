@@ -135,14 +135,14 @@ const EventCard = ({ event }: { event: EventProps }) => {
                                             href={exactLocation}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-2 bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 transition-colors"
+                                            className="inline-flex items-center gap-2 bg-black text-white px-4 py-2 rounded-md hover:bg-zinc-800 transition-colors"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                 <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                                             </svg>
                                             Open in Google Maps
                                         </a>
-                                        <p className="text-xs text-gray-600 mt-2">
+                                        <p className="text-xs text-zinc-600 mt-2">
                                             Click the button above to view the exact location in Google Maps
                                         </p>
                                     </div>
@@ -163,7 +163,7 @@ const EventCard = ({ event }: { event: EventProps }) => {
                                 <p className="mb-4 text-black">
                                     Enter your Instagram username and the event secret to reveal the exact location.
                                 </p>
-                                <p className="mb-4 text-sm text-gray-600">
+                                <p className="mb-4 text-sm text-zinc-600">
                                     <strong>Note:</strong> If you have an approved registration with your Instagram username, you&apos;ll be verified automatically.
                                 </p>
 
@@ -203,7 +203,7 @@ const EventCard = ({ event }: { event: EventProps }) => {
                                             className="w-full p-3 border border-black rounded-md focus:outline-none focus:ring-2 focus:ring-black text-black bg-white"
                                             placeholder="Enter event secret"
                                         />
-                                        <p className="text-xs text-gray-600 mt-1">
+                                        <p className="text-xs text-zinc-600 mt-1">
                                             Required only if you don&apos;t have an approved registration
                                         </p>
                                     </div>
@@ -212,7 +212,7 @@ const EventCard = ({ event }: { event: EventProps }) => {
                                 <div className="flex justify-end space-x-3 mt-6">
                                     <button
                                         onClick={closeModal}
-                                        className="px-4 py-2 border border-black text-black rounded hover:bg-gray-100 transition-colors"
+                                        className="px-4 py-2 border border-black text-black rounded hover:bg-zinc-100 transition-colors"
                                     >
                                         Cancel
                                     </button>

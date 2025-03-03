@@ -36,7 +36,7 @@ const Hero = () => {
                                 />
                             </span>
                         </h1>
-                        <p className="luxury-text text-lg mb-8 text-gray-300">
+                        <p className="luxury-text text-lg mb-8 text-zinc-300">
                             This isn’t just a run club—it’s your weekend crew. We hit the pavement, then unwind at our favourite café, sharing stories and good vibes. Big things are coming—don’t miss out. See you Saturday?
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4">

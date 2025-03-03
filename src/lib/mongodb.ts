@@ -40,6 +40,7 @@ async function dbConnect() {
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
+      dbName: "cloka",
     };
 
     cached.promise = mongoose

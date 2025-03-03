@@ -45,7 +45,7 @@ export function LoadingProvider({ children }: LoadingProviderProps) {
                     <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
                         <Loader size="large" variant="spinner" />
                         {loadingMessage && (
-                            <p className="mt-4 text-gray-700">{loadingMessage}</p>
+                            <p className="mt-4 text-zinc-700">{loadingMessage}</p>
                         )}
                     </div>
                 </div>

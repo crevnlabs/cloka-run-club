@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
+
 
 interface Registration {
     _id: string;
@@ -55,7 +55,8 @@ export default function AdminRegistrationsPage() {
         gender: '',
         joinCrew: '',
         approved: '',
-        eventId: ''
+        eventId: '',
+        search: ''
     });
     const [isUpdating, setIsUpdating] = useState<string | null>(null);
     const [updateError, setUpdateError] = useState('');
@@ -127,6 +128,10 @@ export default function AdminRegistrationsPage() {
                 queryParams.append('eventId', filters.eventId);
             }
 
+            if (filters.search) {
+                queryParams.append('search', filters.search);
+            }
+
             const response = await fetch(`/api/admin/registrations?${queryParams.toString()}`);
 
             if (response.status === 401) {
@@ -184,7 +189,7 @@ export default function AdminRegistrationsPage() {
         setPagination(prev => ({ ...prev, page: newPage }));
     };
 
-    const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
         const { name, value } = e.target;
         setFilters(prev => ({ ...prev, [name]: value }));
         setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page on filter change
@@ -261,43 +266,7 @@ export default function AdminRegistrationsPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
-            <div className="bg-black text-white p-4 shadow-md">
-                <div className="container mx-auto flex justify-between items-center">
-                    <div className="flex items-center space-x-2">
-                        <Image
-                            src="/logo.png"
-                            alt="CLOKA Logo"
-                            width={30}
-                            height={30}
-                            className="h-auto invert"
-                        />
-                        <Image
-                            src="/logo-text-mark.PNG"
-                            alt="CLOKA Text"
-                            width={80}
-                            height={25}
-                            className="h-auto invert"
-                        />
-                        <h1 className="text-xl font-bold ml-2">Admin</h1>
-                    </div>
-                    <div className="flex space-x-4">
-                        <button
-                            onClick={() => router.push('/admin/events')}
-                            className="text-sm bg-gray-800 text-white px-3 py-1 rounded hover:bg-gray-700 transition-colors"
-                        >
-                            Events
-                        </button>
-                        <button
-                            onClick={() => router.push('/')}
-                            className="text-sm bg-white text-black px-3 py-1 rounded hover:bg-gray-200 transition-colors"
-                        >
-                            Back to Site
-                        </button>
-                    </div>
-                </div>
-            </div>
-
+        <div className="min-h-screen bg-white dark:bg-black">
             <div className="container mx-auto py-8 px-4">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -305,50 +274,65 @@ export default function AdminRegistrationsPage() {
                     transition={{ duration: 0.5 }}
                 >
                     {/* Registration Stats */}
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
-                        <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Registration Summary</h2>
+                    <div className="bg-white dark:bg-black rounded-lg shadow-md p-6 mb-6">
+                        <h2 className="text-xl font-bold mb-4 text-black dark:text-white">Registration Summary</h2>
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                                <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total}</div>
-                                <div className="text-sm text-gray-500 dark:text-gray-400">Total Registrations</div>
+                            <div className="bg-white dark:bg-black border border-black dark:border-zinc-700 p-4 rounded-lg">
+                                <div className="text-2xl font-bold text-black dark:text-white">{stats.total}</div>
+                                <div className="text-sm text-black dark:text-white">Total Registrations</div>
                             </div>
-                            <div className="bg-green-50 dark:bg-green-900 p-4 rounded-lg">
-                                <div className="text-2xl font-bold text-green-800 dark:text-green-100">{stats.approved}</div>
-                                <div className="text-sm text-green-600 dark:text-green-300">Approved</div>
+                            <div className="bg-white dark:bg-black border border-black dark:border-zinc-700 p-4 rounded-lg">
+                                <div className="text-2xl font-bold text-black dark:text-white">{stats.approved}</div>
+                                <div className="text-sm text-black dark:text-white">Approved</div>
                             </div>
-                            <div className="bg-red-50 dark:bg-red-900 p-4 rounded-lg">
-                                <div className="text-2xl font-bold text-red-800 dark:text-red-100">{stats.rejected}</div>
-                                <div className="text-sm text-red-600 dark:text-red-300">Rejected</div>
+                            <div className="bg-white dark:bg-black border border-black dark:border-zinc-700 p-4 rounded-lg">
+                                <div className="text-2xl font-bold text-black dark:text-white">{stats.rejected}</div>
+                                <div className="text-sm text-black dark:text-white">Rejected</div>
                             </div>
-                            <div className="bg-yellow-50 dark:bg-yellow-900 p-4 rounded-lg">
-                                <div className="text-2xl font-bold text-yellow-800 dark:text-yellow-100">{stats.pending}</div>
-                                <div className="text-sm text-yellow-600 dark:text-yellow-300">Pending</div>
+                            <div className="bg-white dark:bg-black border border-black dark:border-zinc-700 p-4 rounded-lg">
+                                <div className="text-2xl font-bold text-black dark:text-white">{stats.pending}</div>
+                                <div className="text-sm text-black dark:text-white">Pending</div>
                             </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="bg-purple-50 dark:bg-purple-900 p-4 rounded-lg">
-                                <div className="text-2xl font-bold text-purple-800 dark:text-purple-100">{stats.withEvent}</div>
-                                <div className="text-sm text-purple-600 dark:text-purple-300">With Event</div>
+                            <div className="bg-white dark:bg-black border border-black dark:border-zinc-700 p-4 rounded-lg">
+                                <div className="text-2xl font-bold text-black dark:text-white">{stats.withEvent}</div>
+                                <div className="text-sm text-black dark:text-white">With Event</div>
                             </div>
-                            <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
-                                <div className="text-2xl font-bold text-blue-800 dark:text-blue-100">{stats.withoutEvent}</div>
-                                <div className="text-sm text-blue-600 dark:text-blue-300">Without Event</div>
+                            <div className="bg-white dark:bg-black border border-black dark:border-zinc-700 p-4 rounded-lg">
+                                <div className="text-2xl font-bold text-black dark:text-white">{stats.withoutEvent}</div>
+                                <div className="text-sm text-black dark:text-white">Without Event</div>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
-                        <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Run Registrations</h2>
+                    <div className="bg-white dark:bg-black rounded-lg shadow-md p-6 mb-6">
+                        <h2 className="text-2xl font-bold mb-6 text-black dark:text-white">Run Registrations</h2>
 
                         {error && (
-                            <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-100 p-4 rounded-md mb-4">
+                            <div className="bg-white dark:bg-black border border-black dark:border-white text-black dark:text-white p-4 rounded-md mb-4">
                                 {error}
                             </div>
                         )}
 
                         <div className="flex flex-wrap gap-4 mb-6">
+                            <div className="w-full">
+                                <label htmlFor="search" className="block text-sm font-medium mb-1 text-black dark:text-white">
+                                    Search by Name, Email, Phone, or Instagram
+                                </label>
+                                <input
+                                    type="text"
+                                    id="search"
+                                    name="search"
+                                    value={filters.search}
+                                    onChange={handleFilterChange}
+                                    placeholder="Search..."
+                                    className="w-full p-2 border border-black dark:border-white rounded-md bg-white dark:bg-black text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                                />
+                            </div>
+
                             <div className="w-full md:w-auto">
-                                <label htmlFor="gender" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                                <label htmlFor="gender" className="block text-sm font-medium mb-1 text-black dark:text-white">
                                     Filter by Gender
                                 </label>
                                 <select
@@ -356,7 +340,7 @@ export default function AdminRegistrationsPage() {
                                     name="gender"
                                     value={filters.gender}
                                     onChange={handleFilterChange}
-                                    className="w-full md:w-40 p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                    className="w-full md:w-40 p-2 border border-black dark:border-white rounded-md bg-white dark:bg-black text-black dark:text-white"
                                 >
                                     <option value="">All Genders</option>
                                     <option value="male">Male</option>
@@ -366,7 +350,7 @@ export default function AdminRegistrationsPage() {
                             </div>
 
                             <div className="w-full md:w-auto">
-                                <label htmlFor="joinCrew" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                                <label htmlFor="joinCrew" className="block text-sm font-medium mb-1 text-black dark:text-white">
                                     Filter by Crew Status
                                 </label>
                                 <select
@@ -374,7 +358,7 @@ export default function AdminRegistrationsPage() {
                                     name="joinCrew"
                                     value={filters.joinCrew}
                                     onChange={handleFilterChange}
-                                    className="w-full md:w-40 p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                    className="w-full md:w-40 p-2 border border-black dark:border-white rounded-md bg-white dark:bg-black text-black dark:text-white"
                                 >
                                     <option value="">All</option>
                                     <option value="true">Joined Crew</option>
@@ -383,7 +367,7 @@ export default function AdminRegistrationsPage() {
                             </div>
 
                             <div className="w-full md:w-auto">
-                                <label htmlFor="approved" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                                <label htmlFor="approved" className="block text-sm font-medium mb-1 text-black dark:text-white">
                                     Filter by Approval Status
                                 </label>
                                 <select
@@ -391,7 +375,7 @@ export default function AdminRegistrationsPage() {
                                     name="approved"
                                     value={filters.approved}
                                     onChange={handleFilterChange}
-                                    className="w-full md:w-40 p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                    className="w-full md:w-40 p-2 border border-black dark:border-white rounded-md bg-white dark:bg-black text-black dark:text-white"
                                 >
                                     <option value="">All</option>
                                     <option value="true">Approved</option>
@@ -401,7 +385,7 @@ export default function AdminRegistrationsPage() {
                             </div>
 
                             <div className="w-full md:w-auto">
-                                <label htmlFor="eventId" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                                <label htmlFor="eventId" className="block text-sm font-medium mb-1 text-black dark:text-white">
                                     Filter by Event
                                 </label>
                                 <select
@@ -409,7 +393,7 @@ export default function AdminRegistrationsPage() {
                                     name="eventId"
                                     value={filters.eventId}
                                     onChange={handleFilterChange}
-                                    className="w-full md:w-40 p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                    className="w-full md:w-40 p-2 border border-black dark:border-white rounded-md bg-white dark:bg-black text-black dark:text-white"
                                 >
                                     <option value="">All Events</option>
                                     {events.map((event) => (
@@ -422,86 +406,88 @@ export default function AdminRegistrationsPage() {
                         </div>
 
                         {loading ? (
-                            <div className="text-center py-8 text-gray-700 dark:text-gray-300">
+                            <div className="text-center py-8 text-black dark:text-white">
                                 <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-black dark:border-white border-r-transparent"></div>
                                 <p className="mt-2">Loading registrations...</p>
                             </div>
                         ) : registrations.length === 0 ? (
-                            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                            <div className="text-center py-8 text-black dark:text-white">
                                 No registrations found.
                             </div>
                         ) : (
                             <>
                                 <div className="overflow-x-auto">
-                                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                        <thead className="bg-gray-50 dark:bg-gray-700">
+                                    <table className="min-w-full divide-y divide-black dark:divide-zinc-700">
+                                        <thead className="bg-white dark:bg-black border-b border-black dark:border-zinc-700">
                                             <tr>
-                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-black dark:text-white uppercase tracking-wider">
                                                     Name
                                                 </th>
-                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-black dark:text-white uppercase tracking-wider">
                                                     Email
                                                 </th>
-                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-black dark:text-white uppercase tracking-wider">
                                                     Phone
                                                 </th>
-                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-black dark:text-white uppercase tracking-wider">
                                                     Age
                                                 </th>
-                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-black dark:text-white uppercase tracking-wider">
                                                     Gender
                                                 </th>
-                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-black dark:text-white uppercase tracking-wider">
                                                     Instagram
                                                 </th>
-                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-black dark:text-white uppercase tracking-wider">
                                                     Crew
                                                 </th>
-                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-black dark:text-white uppercase tracking-wider">
                                                     Event
                                                 </th>
-                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-black dark:text-white uppercase tracking-wider">
                                                     Registered
                                                 </th>
-                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-black dark:text-white uppercase tracking-wider">
                                                     Status
                                                 </th>
-                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-black dark:text-white uppercase tracking-wider">
                                                     Actions
                                                 </th>
                                             </tr>
                                         </thead>
-                                        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                        <tbody className="bg-white dark:bg-black divide-y divide-black dark:divide-zinc-700">
                                             {registrations.map((registration) => (
-                                                <tr key={registration._id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                                <tr key={registration._id} className="group hover:bg-black dark:hover:bg-zinc-300">
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="text-sm font-medium text-gray-900 dark:text-white">{registration.name}</div>
+                                                        <div className="text-sm font-medium text-black dark:text-white group-hover:text-white dark:group-hover:text-black">{registration.name}</div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="text-sm text-gray-500 dark:text-gray-300">{registration.email}</div>
+                                                        <div className="text-sm text-black dark:text-white group-hover:text-white dark:group-hover:text-black">{registration.email}</div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="text-sm text-gray-500 dark:text-gray-300">{registration.phone}</div>
+                                                        <div className="text-sm text-black dark:text-white group-hover:text-white dark:group-hover:text-black">{registration.phone}</div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="text-sm text-gray-500 dark:text-gray-300">{registration.age}</div>
+                                                        <div className="text-sm text-black dark:text-white group-hover:text-white dark:group-hover:text-black">{registration.age}</div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${registration.gender === 'male' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100' :
-                                                            registration.gender === 'female' ? 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-100' :
-                                                                'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100'
-                                                            }`}>
+                                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${registration.gender === 'male'
+                                                            ? 'bg-black text-white border-2 border-white dark:bg-white dark:text-black dark:border-black'
+                                                            : registration.gender === 'female'
+                                                                ? 'bg-white text-black border-2 border-black dark:bg-black dark:text-white dark:border-white'
+                                                                : 'bg-white text-black border border-black dark:bg-black dark:text-white dark:border-white'
+                                                            } group-hover:bg-white group-hover:text-black group-hover:border-black dark:group-hover:bg-black dark:group-hover:text-white dark:group-hover:border-white`}>
                                                             {registration.gender}
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="text-sm text-gray-500 dark:text-gray-300">
+                                                        <div className="text-sm text-black dark:text-white group-hover:text-white dark:group-hover:text-black">
                                                             {registration.instagramUsername ? (
                                                                 <a
                                                                     href={`https://instagram.com/${registration.instagramUsername}`}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    className="hover:underline"
+                                                                    className="hover:underline group-hover:text-white dark:group-hover:text-black"
                                                                 >
                                                                     @{registration.instagramUsername}
                                                                 </a>
@@ -509,29 +495,31 @@ export default function AdminRegistrationsPage() {
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="text-sm text-gray-500 dark:text-gray-300">
+                                                        <div className="text-sm text-black dark:text-white group-hover:text-white dark:group-hover:text-black">
                                                             {registration.joinCrew ? 'Yes' : 'No'}
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="text-sm text-gray-500 dark:text-gray-300">
+                                                        <div className="text-sm text-black dark:text-white group-hover:text-white dark:group-hover:text-black">
                                                             {registration.event ? (
-                                                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100">
+                                                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-white text-black border border-black dark:bg-black dark:text-white dark:border-white group-hover:bg-white group-hover:text-black dark:group-hover:bg-black dark:group-hover:text-white">
                                                                     {registration.event.title}
                                                                 </span>
                                                             ) : (
-                                                                <span className="text-xs text-gray-400">No event</span>
+                                                                <span className="text-xs text-black dark:text-white group-hover:text-white dark:group-hover:text-black">No event</span>
                                                             )}
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="text-sm text-gray-500 dark:text-gray-300">{formatDate(registration.createdAt)}</div>
+                                                        <div className="text-sm text-black dark:text-white group-hover:text-white dark:group-hover:text-black">{formatDate(registration.createdAt)}</div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${registration.approved === true ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100' :
-                                                            registration.approved === false ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100' :
-                                                                'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100'
-                                                            }`}>
+                                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${registration.approved === true
+                                                            ? 'bg-white text-black border-2 border-dashed border-black dark:bg-black dark:text-white dark:border-white'
+                                                            : registration.approved === false
+                                                                ? 'bg-black text-white border-2 border-dashed border-white dark:bg-white dark:text-black dark:border-black'
+                                                                : 'bg-white text-black border border-dotted border-black dark:bg-black dark:text-white dark:border-white'
+                                                            } group-hover:bg-white group-hover:text-black group-hover:border-black dark:group-hover:bg-black dark:group-hover:text-white dark:group-hover:border-white`}>
                                                             {registration.approved === true ? 'Approved' :
                                                                 registration.approved === false ? 'Rejected' :
                                                                     'Pending'}
@@ -543,9 +531,9 @@ export default function AdminRegistrationsPage() {
                                                                 onClick={() => openConfirmDialog(registration._id, registration.name, 'approve')}
                                                                 disabled={isUpdating === registration._id || registration.approved === true}
                                                                 className={`px-3 py-1 rounded-md text-xs font-medium ${registration.approved === true
-                                                                    ? 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400 cursor-not-allowed'
-                                                                    : 'bg-green-600 text-white hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 transition-colors'
-                                                                    }`}
+                                                                    ? 'bg-white text-black border border-black dark:bg-black dark:text-white dark:border-white cursor-not-allowed'
+                                                                    : 'bg-black text-white hover:bg-white hover:text-black hover:border hover:border-black dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white dark:hover:border-white transition-colors'
+                                                                    } group-hover:bg-white group-hover:text-black dark:group-hover:bg-black dark:group-hover:text-white`}
                                                             >
                                                                 {isUpdating === registration._id ? 'Processing...' : 'Approve'}
                                                             </button>
@@ -553,9 +541,9 @@ export default function AdminRegistrationsPage() {
                                                                 onClick={() => openConfirmDialog(registration._id, registration.name, 'reject')}
                                                                 disabled={isUpdating === registration._id || registration.approved === false}
                                                                 className={`px-3 py-1 rounded-md text-xs font-medium ${registration.approved === false
-                                                                    ? 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400 cursor-not-allowed'
-                                                                    : 'bg-red-600 text-white hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 transition-colors'
-                                                                    }`}
+                                                                    ? 'bg-white text-black border border-black dark:bg-black dark:text-white dark:border-white cursor-not-allowed'
+                                                                    : 'bg-black text-white hover:bg-white hover:text-black hover:border hover:border-black dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white dark:hover:border-white transition-colors'
+                                                                    } group-hover:bg-white group-hover:text-black dark:group-hover:bg-black dark:group-hover:text-white`}
                                                             >
                                                                 {isUpdating === registration._id ? 'Processing...' : 'Reject'}
                                                             </button>
@@ -570,7 +558,7 @@ export default function AdminRegistrationsPage() {
                                 {/* Pagination */}
                                 {pagination.pages > 1 && (
                                     <div className="flex justify-between items-center mt-6">
-                                        <div className="text-sm text-gray-700 dark:text-gray-300">
+                                        <div className="text-sm text-black dark:text-white">
                                             Showing <span className="font-medium">{(pagination.page - 1) * pagination.limit + 1}</span> to{' '}
                                             <span className="font-medium">
                                                 {Math.min(pagination.page * pagination.limit, pagination.total)}
@@ -582,8 +570,8 @@ export default function AdminRegistrationsPage() {
                                                 onClick={() => handlePageChange(pagination.page - 1)}
                                                 disabled={pagination.page === 1}
                                                 className={`px-3 py-1 rounded ${pagination.page === 1
-                                                    ? 'bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500 cursor-not-allowed'
-                                                    : 'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500'
+                                                    ? 'bg-white text-black border border-black dark:bg-black dark:text-white dark:border-white cursor-not-allowed'
+                                                    : 'bg-black text-white hover:bg-white hover:text-black hover:border hover:border-black dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white dark:hover:border-white'
                                                     }`}
                                             >
                                                 Previous
@@ -594,7 +582,7 @@ export default function AdminRegistrationsPage() {
                                                     onClick={() => handlePageChange(page)}
                                                     className={`px-3 py-1 rounded ${pagination.page === page
                                                         ? 'bg-black text-white dark:bg-white dark:text-black'
-                                                        : 'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500'
+                                                        : 'bg-white text-black border border-black hover:bg-black hover:text-white dark:bg-black dark:text-white dark:border-white dark:hover:bg-white dark:hover:text-black'
                                                         }`}
                                                 >
                                                     {page}
@@ -604,8 +592,8 @@ export default function AdminRegistrationsPage() {
                                                 onClick={() => handlePageChange(pagination.page + 1)}
                                                 disabled={pagination.page === pagination.pages}
                                                 className={`px-3 py-1 rounded ${pagination.page === pagination.pages
-                                                    ? 'bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500 cursor-not-allowed'
-                                                    : 'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500'
+                                                    ? 'bg-white text-black border border-black dark:bg-black dark:text-white dark:border-white cursor-not-allowed'
+                                                    : 'bg-black text-white hover:bg-white hover:text-black hover:border hover:border-black dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white dark:hover:border-white'
                                                     }`}
                                             >
                                                 Next
@@ -615,7 +603,7 @@ export default function AdminRegistrationsPage() {
                                 )}
 
                                 {updateError && (
-                                    <div className="mt-4 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-100 p-4 rounded-md">
+                                    <div className="mt-4 bg-white dark:bg-black border border-black dark:border-white text-black dark:text-white p-4 rounded-md">
                                         {updateError}
                                     </div>
                                 )}
@@ -628,26 +616,23 @@ export default function AdminRegistrationsPage() {
             {/* Confirmation Dialog */}
             {confirmDialog.show && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full">
-                        <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+                    <div className="bg-white dark:bg-black rounded-lg p-6 max-w-md w-full border border-black dark:border-white">
+                        <h3 className="text-xl font-bold mb-4 text-black dark:text-white">
                             {confirmDialog.action === 'approve' ? 'Approve Registration' : 'Reject Registration'}
                         </h3>
-                        <p className="mb-6 text-gray-700 dark:text-gray-300">
+                        <p className="mb-6 text-black dark:text-white">
                             Are you sure you want to {confirmDialog.action === 'approve' ? 'approve' : 'reject'} the registration for <span className="font-semibold">{confirmDialog.name}</span>?
                         </p>
                         <div className="flex justify-end space-x-3">
                             <button
                                 onClick={closeConfirmDialog}
-                                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                                className="px-4 py-2 bg-white dark:bg-black text-black dark:text-white border border-black dark:border-white rounded hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={confirmAction}
-                                className={`px-4 py-2 rounded text-white transition-colors ${confirmDialog.action === 'approve'
-                                    ? 'bg-green-600 hover:bg-green-700'
-                                    : 'bg-red-600 hover:bg-red-700'
-                                    }`}
+                                className={`px-4 py-2 rounded text-white bg-black hover:bg-white hover:text-black hover:border hover:border-black dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white dark:hover:border-white transition-colors`}
                             >
                                 {isUpdating === confirmDialog.registrationId ? 'Processing...' : confirmDialog.action === 'approve' ? 'Approve' : 'Reject'}
                             </button>

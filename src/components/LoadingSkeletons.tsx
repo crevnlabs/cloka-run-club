@@ -6,19 +6,19 @@ interface SkeletonProps {
 
 export function TextSkeleton({ className = '' }: SkeletonProps) {
     return (
-        <div className={`animate-pulse bg-gray-200 rounded h-4 ${className}`}></div>
+        <div className={`animate-pulse bg-zinc-200 rounded h-4 ${className}`}></div>
     );
 }
 
 export function CircleSkeleton({ className = '' }: SkeletonProps) {
     return (
-        <div className={`animate-pulse bg-gray-200 rounded-full ${className}`}></div>
+        <div className={`animate-pulse bg-zinc-200 rounded-full ${className}`}></div>
     );
 }
 
 export function RectangleSkeleton({ className = '' }: SkeletonProps) {
     return (
-        <div className={`animate-pulse bg-gray-200 rounded ${className}`}></div>
+        <div className={`animate-pulse bg-zinc-200 rounded ${className}`}></div>
     );
 }
 

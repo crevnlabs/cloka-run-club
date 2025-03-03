@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
-import Registration from "@/models/Registration";
-import Event from "@/models/Event";
+import Registration, { IRegistration } from "@/models/Registration";
+import Event, { IEvent } from "@/models/Event";
+import { Document, Types } from "mongoose";
+
+interface EventDocument extends IEvent, Document {
+  _id: Types.ObjectId;
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,9 +25,10 @@ export async function GET(request: NextRequest) {
     const joinCrew = url.searchParams.get("joinCrew");
     const approved = url.searchParams.get("approved");
     const eventId = url.searchParams.get("eventId");
+    const search = url.searchParams.get("search");
 
     // Build query
-    const query: Record<string, any> = {};
+    const query: Record<string, unknown> = {};
 
     if (gender) {
       query.gender = gender;
@@ -44,6 +50,17 @@ export async function GET(request: NextRequest) {
       query.eventId = eventId;
     }
 
+    // Add search functionality
+    if (search) {
+      const searchRegex = new RegExp(search, "i"); // Case-insensitive search
+      query.$or = [
+        { name: searchRegex },
+        { email: searchRegex },
+        { phone: searchRegex },
+        { instagramUsername: searchRegex },
+      ];
+    }
+
     // Calculate pagination
     const skip = (page - 1) * limit;
 
@@ -58,27 +75,28 @@ export async function GET(request: NextRequest) {
 
     // Fetch events for the registrations that have eventId
     const eventIds = registrations
-      .filter((reg: any) => reg.eventId)
-      .map((reg: any) => reg.eventId);
+      .filter((reg: IRegistration) => reg.eventId)
+      .map((reg: IRegistration) => reg.eventId);
 
     const events =
       eventIds.length > 0 ? await Event.find({ _id: { $in: eventIds } }) : [];
 
     // Create a map of events by ID for easy lookup
-    const eventMap: Record<string, any> = {};
-    events.forEach((event: any) => {
+    const eventMap: Record<string, EventDocument> = {};
+    events.forEach((event) => {
       eventMap[event._id.toString()] = event;
     });
 
     // Add event information to registrations
-    const registrationsWithEvents = registrations.map((reg: any) => {
+    const registrationsWithEvents = registrations.map((reg: IRegistration) => {
       const regObj = reg.toObject();
       if (reg.eventId && eventMap[reg.eventId.toString()]) {
+        const event = eventMap[reg.eventId.toString()];
         regObj.event = {
-          _id: eventMap[reg.eventId.toString()]._id,
-          title: eventMap[reg.eventId.toString()].title,
-          date: eventMap[reg.eventId.toString()].date,
-          location: eventMap[reg.eventId.toString()].location,
+          _id: event._id,
+          title: event.title,
+          date: event.date,
+          location: event.location,
         };
       }
       return regObj;

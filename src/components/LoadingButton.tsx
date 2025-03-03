@@ -30,7 +30,7 @@ export default function LoadingButton({
 
     const variantClasses = {
         primary: 'bg-primary text-white hover:bg-primary-dark focus:ring-primary',
-        secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-300',
+        secondary: 'bg-zinc-200 text-zinc-800 hover:bg-zinc-300 focus:ring-zinc-300',
         outline: 'bg-transparent text-primary border border-primary hover:bg-primary/10 focus:ring-primary',
         danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
     };
