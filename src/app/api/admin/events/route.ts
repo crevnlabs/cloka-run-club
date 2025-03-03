@@ -36,10 +36,9 @@ export async function POST(request: NextRequest) {
     // Connect to the database
     await dbConnect();
 
-    // Get request body
-    const body = await request.json();
-    const { title, description, date, location, image, registrationLink } =
-      body;
+    // Parse the request body
+    const { title, description, date, location, secret, exactLocation } =
+      await request.json();
 
     // Validate required fields
     if (!title || !description || !date || !location) {
@@ -49,14 +48,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create new event
+    // Create a new event
     const event = await Event.create({
       title,
       description,
       date: new Date(date),
       location,
-      image: image || null,
-      registrationLink: registrationLink || null,
+      secret: secret || null,
+      exactLocation: exactLocation || null,
       createdAt: new Date(),
     });
 

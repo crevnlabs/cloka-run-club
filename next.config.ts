@@ -6,7 +6,16 @@ const nextConfig: NextConfig = {
   compress: true,
   productionBrowserSourceMaps: false,
   images: {
-    domains: ["cloka.in"],
+    domains: [
+      "cloka.in",
+      "upload.wikimedia.org",
+      "images.unsplash.com",
+      "source.unsplash.com",
+      "picsum.photos",
+      "cloudinary.com",
+      "res.cloudinary.com",
+      "images.pexels.com",
+    ],
     formats: ["image/avif", "image/webp"],
   },
   experimental: {

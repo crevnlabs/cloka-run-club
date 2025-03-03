@@ -14,7 +14,6 @@ interface EventProps {
     time: string;
     location: string;
     description: string;
-    registrationLink?: string;
 }
 
 export const metadata = {
@@ -29,8 +28,6 @@ interface ApiEvent {
     description: string;
     date: Date;
     location: string;
-    image?: string;
-    registrationLink?: string;
     createdAt: Date;
 }
 
@@ -56,23 +53,18 @@ async function getEvents(): Promise<ApiEvent[]> {
     }
 }
 
-// Format date to a readable string
-function formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-}
-
-// Format time to a readable string
-function formatTime(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true
+// Update the transformEvents function
+function transformEvents(events: ApiEvent[]): EventProps[] {
+    return events.map(event => {
+        const eventDate = new Date(event.date);
+        return {
+            id: event._id,
+            title: event.title,
+            date: eventDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+            time: eventDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+            location: event.location,
+            description: event.description,
+        };
     });
 }
 
@@ -81,15 +73,7 @@ export default async function EventsPage() {
     const apiEvents = await getEvents();
 
     // Format the events for the UpcomingEvents component
-    const formattedEvents: EventProps[] = apiEvents.map(event => ({
-        id: event._id,
-        title: event.title,
-        date: formatDate(event.date.toString()),
-        time: formatTime(event.date.toString()),
-        location: event.location,
-        description: event.description,
-        registrationLink: event.registrationLink
-    }));
+    const formattedEvents: EventProps[] = transformEvents(apiEvents);
 
     return (
         <main>

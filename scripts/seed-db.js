@@ -39,9 +39,9 @@ const EventSchema = new mongoose.Schema({
   description: { type: String, required: true },
   date: { type: Date, required: true },
   location: { type: String, required: true },
-  image: { type: String },
-  registrationLink: { type: String },
   createdAt: { type: Date, default: Date.now },
+  secret: { type: String },
+  exactLocation: { type: String },
 });
 
 // Create models
@@ -142,30 +142,33 @@ const runnerOfTheWeek = {
   weekOf: new Date(),
 };
 
-const events = [
+const sampleEvents = [
   {
-    title: "Morning Run - Cubbon Park",
+    title: "Morning Run Club",
     description:
-      "Join us for a refreshing morning run through Cubbon Park. All levels welcome!",
-    date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
-    location: "Cubbon Park Main Gate",
-    registrationLink: "/register",
-  },
-  {
-    title: "Evening Run - Lalbagh",
-    description:
-      "Evening run through the beautiful Lalbagh Botanical Gardens. Perfect for beginners!",
-    date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
-    location: "Lalbagh West Gate",
-    registrationLink: "/register",
-  },
-  {
-    title: "Weekend Long Run",
-    description:
-      "Build your endurance with our weekend long run. Routes vary from 10km to 21km.",
+      "Join us for a refreshing morning run through the city. All levels welcome!",
     date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-    location: "Cubbon Park Main Gate",
-    registrationLink: "/register",
+    location: "Central Park",
+    secret: "morningrun2023",
+    exactLocation: "https://maps.app.goo.gl/example1",
+  },
+  {
+    title: "Evening Trail Run",
+    description:
+      "Experience the beauty of nature with our evening trail run. Bring headlamps!",
+    date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
+    location: "Mountain Trails",
+    secret: "trailrun2023",
+    exactLocation: "https://maps.app.goo.gl/example2",
+  },
+  {
+    title: "Weekend Marathon Training",
+    description:
+      "Prepare for upcoming marathons with our structured training session.",
+    date: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000), // 21 days from now
+    location: "City Stadium",
+    secret: "marathon2023",
+    exactLocation: "https://maps.app.goo.gl/example3",
   },
 ];
 
@@ -189,7 +192,7 @@ async function seedDatabase() {
     await RunnerOfTheWeek.create(runnerOfTheWeek);
     console.log("Runner of the Week seeded");
 
-    await Event.insertMany(events);
+    await Event.insertMany(sampleEvents);
     console.log("Events seeded");
 
     console.log("Database seeded successfully!");

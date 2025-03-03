@@ -11,9 +11,9 @@ interface Event {
     description: string;
     date: string;
     location: string;
-    image?: string;
-    registrationLink?: string;
     createdAt: string;
+    secret?: string;
+    exactLocation?: string;
 }
 
 export default function AdminEventsPage() {
@@ -45,8 +45,8 @@ export default function AdminEventsPage() {
             description: '',
             date: new Date().toISOString().split('T')[0],
             location: '',
-            image: '',
-            registrationLink: ''
+            secret: '',
+            exactLocation: ''
         }
     });
     const [formError, setFormError] = useState('');
@@ -158,8 +158,8 @@ export default function AdminEventsPage() {
                 description: '',
                 date: new Date().toISOString().split('T')[0],
                 location: '',
-                image: '',
-                registrationLink: ''
+                secret: '',
+                exactLocation: ''
             }
         });
         setFormError('');
@@ -174,8 +174,8 @@ export default function AdminEventsPage() {
                 description: '',
                 date: new Date().toISOString().split('T')[0],
                 location: '',
-                image: '',
-                registrationLink: ''
+                secret: '',
+                exactLocation: ''
             }
         });
         setFormError('');
@@ -190,6 +190,28 @@ export default function AdminEventsPage() {
                 [name]: value
             }
         }));
+
+        // Clear form error when user types
+        if (formError) {
+            setFormError('');
+        }
+    };
+
+    // Validate if a URL is a Google Maps link
+    const isValidGoogleMapsLink = (url: string): boolean => {
+        if (!url) return true; // Empty is valid (not required)
+
+        // Check if it's a URL
+        try {
+            new URL(url);
+        } catch {
+            return false;
+        }
+
+        // Check if it's a Google Maps URL
+        return url.includes('maps.google.com') ||
+            url.includes('goo.gl/maps') ||
+            url.includes('maps.app.goo.gl');
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -202,6 +224,13 @@ export default function AdminEventsPage() {
         // Validate form
         if (!event.title || !event.description || !event.date || !event.location) {
             setFormError('Please fill in all required fields');
+            setIsSubmitting(false);
+            return;
+        }
+
+        // Validate Google Maps link if provided
+        if (event.exactLocation && !isValidGoogleMapsLink(event.exactLocation)) {
+            setFormError('Please enter a valid Google Maps link for the exact location');
             setIsSubmitting(false);
             return;
         }
@@ -324,16 +353,6 @@ export default function AdminEventsPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {events.map((event) => (
                                     <div key={event._id} className="bg-white dark:bg-black rounded-lg overflow-hidden shadow-md border border-gray-200 dark:border-gray-800">
-                                        {event.image && (
-                                            <div className="h-48 overflow-hidden relative">
-                                                <Image
-                                                    src={event.image}
-                                                    alt={event.title}
-                                                    fill
-                                                    className="object-cover"
-                                                />
-                                            </div>
-                                        )}
                                         <div className="p-4">
                                             <h3 className="text-xl font-bold mb-2 text-black dark:text-white">{event.title}</h3>
                                             <p className="text-black dark:text-white mb-2">
@@ -444,7 +463,7 @@ export default function AdminEventsPage() {
 
                             <div>
                                 <label htmlFor="location" className="block text-sm font-medium mb-1 text-black dark:text-white">
-                                    Location *
+                                    Location * (General Area)
                                 </label>
                                 <input
                                     id="location"
@@ -454,7 +473,11 @@ export default function AdminEventsPage() {
                                     onChange={handleFormChange}
                                     className="w-full p-2 border border-black dark:border-white rounded-md bg-white dark:bg-black text-black dark:text-white"
                                     required
+                                    placeholder="e.g. Downtown Miami"
                                 />
+                                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                                    Enter a general location that will be publicly visible
+                                </p>
                             </div>
 
                             <div>
@@ -473,31 +496,51 @@ export default function AdminEventsPage() {
                             </div>
 
                             <div>
-                                <label htmlFor="image" className="block text-sm font-medium mb-1 text-black dark:text-white">
-                                    Image URL
+                                <label htmlFor="secret" className="block text-sm font-medium mb-1 text-black dark:text-white">
+                                    Event Secret (for location verification)
                                 </label>
                                 <input
-                                    id="image"
-                                    name="image"
+                                    id="secret"
+                                    name="secret"
                                     type="text"
-                                    value={eventForm.event.image || ''}
+                                    value={eventForm.event.secret || ''}
                                     onChange={handleFormChange}
                                     className="w-full p-2 border border-black dark:border-white rounded-md bg-white dark:bg-black text-black dark:text-white"
                                 />
+                                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                                    This secret will be used to verify users who want to see the exact location
+                                </p>
                             </div>
 
                             <div>
-                                <label htmlFor="registrationLink" className="block text-sm font-medium mb-1 text-black dark:text-white">
-                                    Registration Link
+                                <label htmlFor="exactLocation" className="block text-sm font-medium mb-1 text-black dark:text-white">
+                                    Exact Location (Google Maps Link)
                                 </label>
-                                <input
-                                    id="registrationLink"
-                                    name="registrationLink"
-                                    type="text"
-                                    value={eventForm.event.registrationLink || ''}
-                                    onChange={handleFormChange}
-                                    className="w-full p-2 border border-black dark:border-white rounded-md bg-white dark:bg-black text-black dark:text-white"
-                                />
+                                <div className="flex gap-2">
+                                    <input
+                                        id="exactLocation"
+                                        name="exactLocation"
+                                        type="text"
+                                        value={eventForm.event.exactLocation || ''}
+                                        onChange={handleFormChange}
+                                        className="w-full p-2 border border-black dark:border-white rounded-md bg-white dark:bg-black text-black dark:text-white"
+                                        placeholder="https://maps.app.goo.gl/..."
+                                    />
+                                    <a
+                                        href="https://www.google.com/maps"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="px-3 py-2 bg-black text-white rounded hover:bg-gray-900 transition-colors flex items-center"
+                                        title="Open Google Maps to get a location link"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                                        </svg>
+                                    </a>
+                                </div>
+                                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                                    Paste a Google Maps link that will be revealed only to verified users. To get a link: open Google Maps, find your location, click Share, and copy the link.
+                                </p>
                             </div>
 
                             <div className="flex justify-end space-x-3 pt-4">

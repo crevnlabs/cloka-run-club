@@ -56,8 +56,7 @@ export async function PUT(
     const eventId = params.id;
 
     const body = await request.json();
-    const { title, description, date, location, image, registrationLink } =
-      body;
+    const { title, description, date, location, secret, exactLocation } = body;
 
     // Validate required fields
     if (!title || !description || !date || !location) {
@@ -75,8 +74,8 @@ export async function PUT(
         description,
         date: new Date(date),
         location,
-        image: image || null,
-        registrationLink: registrationLink || null,
+        secret: secret || null,
+        exactLocation: exactLocation || null,
       },
       { new: true } // Return the updated document
     );

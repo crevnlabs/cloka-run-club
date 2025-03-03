@@ -5,9 +5,9 @@ export interface IEvent extends Document {
   description: string;
   date: Date;
   location: string;
-  image?: string;
-  registrationLink?: string;
   createdAt: Date;
+  secret?: string;
+  exactLocation?: string;
 }
 
 const EventSchema: Schema = new Schema({
@@ -15,9 +15,9 @@ const EventSchema: Schema = new Schema({
   description: { type: String, required: true },
   date: { type: Date, required: true },
   location: { type: String, required: true },
-  image: { type: String },
-  registrationLink: { type: String },
   createdAt: { type: Date, default: Date.now },
+  secret: { type: String },
+  exactLocation: { type: String },
 });
 
 // Check if the model already exists to prevent overwriting during hot reloads
