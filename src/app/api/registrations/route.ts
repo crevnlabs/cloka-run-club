@@ -7,8 +7,16 @@ export async function GET() {
     // Connect to the database
     await dbConnect();
 
-    // Get all registrations without pagination
-    const registrations = await Registration.find({}).sort({ createdAt: -1 });
+    // Get all registrations sorted with approved ones first, then by createdAt
+    const registrations = await Registration.aggregate([
+      {
+        $sort: {
+          // Sort by approved status (true values first) and then by createdAt descending
+          approved: -1, // -1 puts true values first, then false, then null
+          createdAt: -1, // Most recent first
+        },
+      },
+    ]);
 
     return NextResponse.json(
       {
