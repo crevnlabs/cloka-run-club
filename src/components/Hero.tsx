@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
 const Hero = () => {
-    const [registrationCount, setRegistrationCount] = useState<number>(100);
+    const [registrationCount, setRegistrationCount] = useState<number>(600);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
@@ -68,7 +68,7 @@ const Hero = () => {
                             </Link>
                             <p className="luxury-text text-lg text-zinc-300">
                                 {isLoading ? (
-                                    <span className="text-white font-bold">100+</span>
+                                    <span className="text-white font-bold">600+</span>
                                 ) : (
                                     <motion.span
                                         className="text-white font-bold"
