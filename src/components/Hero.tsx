@@ -3,8 +3,30 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useState, useEffect } from 'react';
 
 const Hero = () => {
+    const [registrationCount, setRegistrationCount] = useState<number>(100);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        const fetchRegistrationCount = async () => {
+            try {
+                const response = await fetch('/api/registrations/count');
+                if (response.ok) {
+                    const data = await response.json();
+                    setRegistrationCount(data.count);
+                }
+            } catch (error) {
+                console.error('Error fetching registration count:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchRegistrationCount();
+    }, []);
+
     return (
         <section className="bg-black text-white">
             <div className="luxury-container">
@@ -37,12 +59,27 @@ const Hero = () => {
                             </span>
                         </h1>
                         <p className="luxury-text text-lg mb-8 text-zinc-300">
-                            This isn’t just a run club—it’s your weekend crew. We hit the pavement, then unwind at our favourite café, sharing stories and good vibes. Big things are coming—don’t miss out. See you Saturday?
+                            This isn&apos;t just a run club—it&apos;s your weekend crew. We hit the pavement, then unwind at our favourite café, sharing stories and good vibes. Big things are coming—don&apos;t miss out. See you Saturday?
                         </p>
-                        <div className="flex flex-col sm:flex-row gap-4">
+
+                        <div className="flex flex-col sm:flex-row justify-start items-center gap-4">
                             <Link href="/register" className="luxury-button bg-transparent border border-white inline-block text-center">
                                 Join Cloka Club
                             </Link>
+                            <p className="luxury-text text-lg text-zinc-300">
+                                {isLoading ? (
+                                    <span className="text-white font-bold">100+</span>
+                                ) : (
+                                    <motion.span
+                                        className="text-white font-bold"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ duration: 0.5 }}
+                                    >
+                                        {registrationCount}+
+                                    </motion.span>
+                                )} registrations
+                            </p>
                         </div>
                     </motion.div>
 

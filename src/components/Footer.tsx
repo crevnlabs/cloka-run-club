@@ -17,7 +17,7 @@ const Footer = () => {
                             />
                         </div>
                         {/* <p className="luxury-text mb-4">
-                            A premium clothing brand rooted in the soul of India, dedicated to rekindling pride in our heritage.
+                            This isn’t just a run club—it’s your weekend crew. We hit the pavement, then unwind at our favorite café, sharing stories and good vibes. Big things are coming—don’t miss out. See you Saturday?
                         </p> */}
                         <p className="luxury-text">
                             &copy; {new Date().getFullYear()} CLOKA. All rights reserved.

@@ -27,7 +27,7 @@ const About = () => {
                     >
                         <h3 className="text-2xl font-bold mb-4">Our Journey</h3>
                         <p className="luxury-text mb-4">
-                            At CLOKA, luxury transcends fabric—it&apos;s woven into the stories we unveil. We are a premium clothing brand rooted in the soul of India, dedicated to rekindling pride in our heritage.
+                            At CLOKA, luxury transcends fabric—it&apos;s woven into the stories we unveil. We are This isn’t just a run club—it’s your weekend crew. We hit the pavement, then unwind at our favorite café, sharing stories and good vibes. Big things are coming—don’t miss out. See you Saturday?
                         </p>
                         <p className="luxury-text mb-4">
                             Our designs are more than garments; they are journeys into the hidden narratives cloaked within our culture, brought to life through artistry and craftsmanship. Each piece is a numbered, limited-edition creation, a testament to its uniqueness without rigid boundaries—because true legacy knows no limits.

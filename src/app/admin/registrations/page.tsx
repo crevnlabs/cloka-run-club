@@ -72,7 +72,7 @@ export default function AdminRegistrationsPage() {
         show: boolean;
         registrationId: string;
         name: string;
-        action: 'approve' | 'reject';
+        action: 'approve' | 'reject' | 'delete';
     }>({
         show: false,
         registrationId: '',
@@ -223,7 +223,7 @@ export default function AdminRegistrationsPage() {
         });
     };
 
-    const openConfirmDialog = (registrationId: string, name: string, action: 'approve' | 'reject') => {
+    const openConfirmDialog = (registrationId: string, name: string, action: 'approve' | 'reject' | 'delete') => {
         setConfirmDialog({
             show: true,
             registrationId,
@@ -243,7 +243,11 @@ export default function AdminRegistrationsPage() {
 
     const confirmAction = async () => {
         const { registrationId, action } = confirmDialog;
-        await handleApproval(registrationId, action === 'approve');
+        if (action === 'delete') {
+            await handleDelete(registrationId);
+        } else {
+            await handleApproval(registrationId, action === 'approve');
+        }
         closeConfirmDialog();
     };
 
@@ -277,6 +281,39 @@ export default function AdminRegistrationsPage() {
         } catch (error) {
             console.error('Error updating registration:', error);
             setUpdateError('An error occurred while updating registration status');
+        } finally {
+            setIsUpdating(null);
+        }
+    };
+
+    const handleDelete = async (registrationId: string) => {
+        setIsUpdating(registrationId);
+        setUpdateError('');
+
+        try {
+            const response = await fetch('/api/admin/registrations/delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ registrationId }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Update the local state to remove the deleted registration
+                setRegistrations(prevRegistrations =>
+                    prevRegistrations.filter(reg => reg._id !== registrationId)
+                );
+                // Update stats after deletion
+                fetchStats();
+            } else {
+                setUpdateError(data.message || 'Failed to delete registration');
+            }
+        } catch (error) {
+            console.error('Error deleting registration:', error);
+            setUpdateError('An error occurred while deleting registration');
         } finally {
             setIsUpdating(null);
         }
@@ -564,6 +601,13 @@ export default function AdminRegistrationsPage() {
                                                             >
                                                                 {isUpdating === registration._id ? 'Processing...' : 'Reject'}
                                                             </button>
+                                                            <button
+                                                                onClick={() => openConfirmDialog(registration._id, registration.name, 'delete')}
+                                                                disabled={isUpdating === registration._id}
+                                                                className="px-3 py-1 rounded-md text-xs font-medium bg-red-600 text-white hover:bg-white hover:text-red-600 hover:border hover:border-red-600 dark:bg-red-600 dark:text-white dark:hover:bg-black dark:hover:text-red-500 dark:hover:border-red-500 transition-colors group-hover:bg-white group-hover:text-red-600 dark:group-hover:bg-black dark:group-hover:text-red-500"
+                                                            >
+                                                                {isUpdating === registration._id ? 'Processing...' : 'Delete'}
+                                                            </button>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -721,10 +765,15 @@ export default function AdminRegistrationsPage() {
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white dark:bg-black rounded-lg p-6 max-w-md w-full border border-black dark:border-white">
                         <h3 className="text-xl font-bold mb-4 text-black dark:text-white">
-                            {confirmDialog.action === 'approve' ? 'Approve Registration' : 'Reject Registration'}
+                            {confirmDialog.action === 'approve' ? 'Approve Registration' :
+                                confirmDialog.action === 'reject' ? 'Reject Registration' : 'Delete Registration'}
                         </h3>
                         <p className="mb-6 text-black dark:text-white">
-                            Are you sure you want to {confirmDialog.action === 'approve' ? 'approve' : 'reject'} the registration for <span className="font-semibold">{confirmDialog.name}</span>?
+                            {confirmDialog.action === 'delete' ? (
+                                <>Are you sure you want to <span className="font-semibold text-red-600 dark:text-red-500">permanently delete</span> the registration for <span className="font-semibold">{confirmDialog.name}</span>? This action cannot be undone.</>
+                            ) : (
+                                <>Are you sure you want to {confirmDialog.action === 'approve' ? 'approve' : 'reject'} the registration for <span className="font-semibold">{confirmDialog.name}</span>?</>
+                            )}
                         </p>
                         <div className="flex justify-end space-x-3">
                             <button
@@ -735,9 +784,13 @@ export default function AdminRegistrationsPage() {
                             </button>
                             <button
                                 onClick={confirmAction}
-                                className={`px-4 py-2 rounded text-white bg-black hover:bg-white hover:text-black hover:border hover:border-black dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white dark:hover:border-white transition-colors`}
+                                className={`px-4 py-2 rounded text-white ${confirmDialog.action === 'delete' ?
+                                    'bg-red-600 hover:bg-white hover:text-red-600 hover:border hover:border-red-600 dark:bg-red-600 dark:hover:bg-black dark:hover:text-red-500 dark:hover:border-red-500' :
+                                    'bg-black hover:bg-white hover:text-black hover:border hover:border-black dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white dark:hover:border-white'} transition-colors`}
                             >
-                                {isUpdating === confirmDialog.registrationId ? 'Processing...' : confirmDialog.action === 'approve' ? 'Approve' : 'Reject'}
+                                {isUpdating === confirmDialog.registrationId ? 'Processing...' :
+                                    confirmDialog.action === 'approve' ? 'Approve' :
+                                        confirmDialog.action === 'reject' ? 'Reject' : 'Delete'}
                             </button>
                         </div>
                     </div>
