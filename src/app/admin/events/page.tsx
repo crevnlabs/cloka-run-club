@@ -72,7 +72,8 @@ export default function AdminEventsPage() {
             }
 
             const data = await response.json();
-            setEvents(data);
+            // Extract the events array from the response
+            setEvents(data.events || []);
         } catch (error) {
             setError('Failed to load events. Please try again.');
             console.error('Error fetching events:', error);
@@ -244,7 +245,7 @@ export default function AdminEventsPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+        <div className="min-h-screen bg-white dark:bg-black">
             <div className="bg-black text-white p-4 shadow-md">
                 <div className="container mx-auto flex justify-between items-center">
                     <div className="flex items-center space-x-2">
@@ -267,13 +268,13 @@ export default function AdminEventsPage() {
                     <div className="flex space-x-4">
                         <button
                             onClick={() => router.push('/admin/registrations')}
-                            className="text-sm bg-gray-800 text-white px-3 py-1 rounded hover:bg-gray-700 transition-colors"
+                            className="text-sm bg-black text-white px-3 py-1 rounded hover:bg-gray-900 transition-colors"
                         >
                             Registrations
                         </button>
                         <button
                             onClick={() => router.push('/')}
-                            className="text-sm bg-white text-black px-3 py-1 rounded hover:bg-gray-200 transition-colors"
+                            className="text-sm bg-white text-black px-3 py-1 rounded hover:bg-gray-100 transition-colors"
                         >
                             Back to Site
                         </button>
@@ -287,42 +288,42 @@ export default function AdminEventsPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+                    <div className="bg-white dark:bg-black rounded-lg shadow-md p-6 mb-6 border border-gray-200 dark:border-gray-800">
                         <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Manage Events</h2>
+                            <h2 className="text-2xl font-bold text-black dark:text-white">Manage Events</h2>
                             <button
                                 onClick={() => openEventForm(false)}
-                                className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
+                                className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-900 transition-colors"
                             >
                                 Add New Event
                             </button>
                         </div>
 
                         {error && (
-                            <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-100 p-4 rounded-md mb-4">
+                            <div className="bg-white dark:bg-black border border-black dark:border-white text-black dark:text-white p-4 rounded-md mb-4">
                                 {error}
                             </div>
                         )}
 
                         {deleteError && (
-                            <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-100 p-4 rounded-md mb-4">
+                            <div className="bg-white dark:bg-black border border-black dark:border-white text-black dark:text-white p-4 rounded-md mb-4">
                                 {deleteError}
                             </div>
                         )}
 
                         {loading ? (
-                            <div className="text-center py-8 text-gray-700 dark:text-gray-300">
+                            <div className="text-center py-8 text-black dark:text-white">
                                 <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-black dark:border-white border-r-transparent"></div>
                                 <p className="mt-2">Loading events...</p>
                             </div>
                         ) : events.length === 0 ? (
-                            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                            <div className="text-center py-8 text-black dark:text-white">
                                 No events found. Click &quot;Add New Event&quot; to create one.
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {events.map((event) => (
-                                    <div key={event._id} className="bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden shadow-md">
+                                    <div key={event._id} className="bg-white dark:bg-black rounded-lg overflow-hidden shadow-md border border-gray-200 dark:border-gray-800">
                                         {event.image && (
                                             <div className="h-48 overflow-hidden relative">
                                                 <Image
@@ -334,27 +335,27 @@ export default function AdminEventsPage() {
                                             </div>
                                         )}
                                         <div className="p-4">
-                                            <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">{event.title}</h3>
-                                            <p className="text-gray-600 dark:text-gray-300 mb-2">
+                                            <h3 className="text-xl font-bold mb-2 text-black dark:text-white">{event.title}</h3>
+                                            <p className="text-black dark:text-white mb-2">
                                                 <span className="font-semibold">Date:</span> {formatDate(event.date)}
                                             </p>
-                                            <p className="text-gray-600 dark:text-gray-300 mb-2">
+                                            <p className="text-black dark:text-white mb-2">
                                                 <span className="font-semibold">Location:</span> {event.location}
                                             </p>
-                                            <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+                                            <p className="text-black dark:text-white mb-4 line-clamp-3">
                                                 {event.description}
                                             </p>
                                             <div className="flex justify-between">
                                                 <button
                                                     onClick={() => openEventForm(true, event)}
-                                                    className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                                                    className="px-3 py-1 bg-black text-white rounded hover:bg-gray-900 transition-colors"
                                                 >
                                                     Edit
                                                 </button>
                                                 <button
                                                     onClick={() => openConfirmDialog(event._id, event.title, 'delete')}
                                                     disabled={isDeleting === event._id}
-                                                    className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                                                    className="px-3 py-1 bg-white text-black rounded hover:bg-gray-100 transition-colors border border-black"
                                                 >
                                                     {isDeleting === event._id ? 'Deleting...' : 'Delete'}
                                                 </button>
@@ -371,23 +372,23 @@ export default function AdminEventsPage() {
             {/* Confirmation Dialog */}
             {confirmDialog.show && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full">
-                        <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+                    <div className="bg-white dark:bg-black rounded-lg p-6 max-w-md w-full border border-gray-200 dark:border-gray-800">
+                        <h3 className="text-xl font-bold mb-4 text-black dark:text-white">
                             Delete Event
                         </h3>
-                        <p className="mb-6 text-gray-700 dark:text-gray-300">
+                        <p className="mb-6 text-black dark:text-white">
                             Are you sure you want to delete the event <span className="font-semibold">{confirmDialog.title}</span>? This action cannot be undone.
                         </p>
                         <div className="flex justify-end space-x-3">
                             <button
                                 onClick={closeConfirmDialog}
-                                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                                className="px-4 py-2 bg-white dark:bg-black text-black dark:text-white rounded hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors border border-black dark:border-white"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={confirmAction}
-                                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded transition-colors"
+                                className="px-4 py-2 bg-black hover:bg-gray-900 text-white rounded transition-colors"
                             >
                                 {isDeleting === confirmDialog.eventId ? 'Deleting...' : 'Delete'}
                             </button>
@@ -399,20 +400,20 @@ export default function AdminEventsPage() {
             {/* Event Form Dialog */}
             {eventForm.show && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                        <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+                    <div className="bg-white dark:bg-black rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-gray-800">
+                        <h3 className="text-xl font-bold mb-4 text-black dark:text-white">
                             {eventForm.isEdit ? 'Edit Event' : 'Add New Event'}
                         </h3>
 
                         {formError && (
-                            <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-100 p-4 rounded-md mb-4">
+                            <div className="bg-white dark:bg-black border border-black dark:border-white text-black dark:text-white p-4 rounded-md mb-4">
                                 {formError}
                             </div>
                         )}
 
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
-                                <label htmlFor="title" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                                <label htmlFor="title" className="block text-sm font-medium mb-1 text-black dark:text-white">
                                     Title *
                                 </label>
                                 <input
@@ -421,13 +422,13 @@ export default function AdminEventsPage() {
                                     type="text"
                                     value={eventForm.event.title}
                                     onChange={handleFormChange}
-                                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                    className="w-full p-2 border border-black dark:border-white rounded-md bg-white dark:bg-black text-black dark:text-white"
                                     required
                                 />
                             </div>
 
                             <div>
-                                <label htmlFor="date" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                                <label htmlFor="date" className="block text-sm font-medium mb-1 text-black dark:text-white">
                                     Date *
                                 </label>
                                 <input
@@ -436,13 +437,13 @@ export default function AdminEventsPage() {
                                     type="date"
                                     value={eventForm.event.date}
                                     onChange={handleFormChange}
-                                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                    className="w-full p-2 border border-black dark:border-white rounded-md bg-white dark:bg-black text-black dark:text-white"
                                     required
                                 />
                             </div>
 
                             <div>
-                                <label htmlFor="location" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                                <label htmlFor="location" className="block text-sm font-medium mb-1 text-black dark:text-white">
                                     Location *
                                 </label>
                                 <input
@@ -451,13 +452,13 @@ export default function AdminEventsPage() {
                                     type="text"
                                     value={eventForm.event.location}
                                     onChange={handleFormChange}
-                                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                    className="w-full p-2 border border-black dark:border-white rounded-md bg-white dark:bg-black text-black dark:text-white"
                                     required
                                 />
                             </div>
 
                             <div>
-                                <label htmlFor="description" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                                <label htmlFor="description" className="block text-sm font-medium mb-1 text-black dark:text-white">
                                     Description *
                                 </label>
                                 <textarea
@@ -466,13 +467,13 @@ export default function AdminEventsPage() {
                                     value={eventForm.event.description}
                                     onChange={handleFormChange}
                                     rows={4}
-                                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                    className="w-full p-2 border border-black dark:border-white rounded-md bg-white dark:bg-black text-black dark:text-white"
                                     required
                                 />
                             </div>
 
                             <div>
-                                <label htmlFor="image" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                                <label htmlFor="image" className="block text-sm font-medium mb-1 text-black dark:text-white">
                                     Image URL
                                 </label>
                                 <input
@@ -481,12 +482,12 @@ export default function AdminEventsPage() {
                                     type="text"
                                     value={eventForm.event.image || ''}
                                     onChange={handleFormChange}
-                                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                    className="w-full p-2 border border-black dark:border-white rounded-md bg-white dark:bg-black text-black dark:text-white"
                                 />
                             </div>
 
                             <div>
-                                <label htmlFor="registrationLink" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                                <label htmlFor="registrationLink" className="block text-sm font-medium mb-1 text-black dark:text-white">
                                     Registration Link
                                 </label>
                                 <input
@@ -495,7 +496,7 @@ export default function AdminEventsPage() {
                                     type="text"
                                     value={eventForm.event.registrationLink || ''}
                                     onChange={handleFormChange}
-                                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                    className="w-full p-2 border border-black dark:border-white rounded-md bg-white dark:bg-black text-black dark:text-white"
                                 />
                             </div>
 
@@ -503,14 +504,14 @@ export default function AdminEventsPage() {
                                 <button
                                     type="button"
                                     onClick={closeEventForm}
-                                    className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                                    className="px-4 py-2 bg-white dark:bg-black text-black dark:text-white rounded hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors border border-black dark:border-white"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className="px-4 py-2 bg-black hover:bg-gray-800 text-white rounded transition-colors"
+                                    className="px-4 py-2 bg-black hover:bg-gray-900 text-white rounded transition-colors"
                                 >
                                     {isSubmitting ? 'Saving...' : eventForm.isEdit ? 'Update Event' : 'Create Event'}
                                 </button>

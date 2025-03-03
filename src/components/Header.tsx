@@ -78,20 +78,6 @@ const Header = () => {
                 >
                     <div className="luxury-container py-4 flex flex-col space-y-4">
                         <Link
-                            href="/"
-                            className="luxury-text hover:text-accent transition-colors"
-                            onClick={() => setIsMenuOpen(false)}
-                        >
-                            Home
-                        </Link>
-                        <Link
-                            href="/about"
-                            className="luxury-text hover:text-accent transition-colors"
-                            onClick={() => setIsMenuOpen(false)}
-                        >
-                            Cloka&apos;s Story
-                        </Link>
-                        <Link
                             href="/events"
                             className="luxury-text hover:text-accent transition-colors"
                             onClick={() => setIsMenuOpen(false)}
@@ -99,25 +85,11 @@ const Header = () => {
                             Events
                         </Link>
                         <Link
-                            href="/runner-of-the-week"
-                            className="luxury-text hover:text-accent transition-colors"
-                            onClick={() => setIsMenuOpen(false)}
-                        >
-                            Runner of the Week
-                        </Link>
-                        <Link
                             href="/register"
                             className="luxury-text hover:text-accent transition-colors"
                             onClick={() => setIsMenuOpen(false)}
                         >
                             Register for Runs
-                        </Link>
-                        <Link
-                            href="/shop"
-                            className="luxury-text hover:text-accent transition-colors"
-                            onClick={() => setIsMenuOpen(false)}
-                        >
-                            Shop
                         </Link>
                     </div>
                 </motion.div>

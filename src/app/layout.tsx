@@ -4,6 +4,7 @@ import "./globals.css";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { LoadingProvider } from "@/components/LoadingProvider";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import Script from "next/script";
 
 const urbanist = Urbanist({
   subsets: ["latin"],
@@ -54,6 +55,18 @@ export const metadata: Metadata = {
   verification: {
     google: 'google-site-verification-code', // Replace with actual verification code when available
   },
+  // PWA specific metadata
+  manifest: '/site.webmanifest',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'CLOKA',
+  },
+  applicationName: 'CLOKA',
+  formatDetection: {
+    telephone: false,
+  },
+  themeColor: '#ffffff',
 };
 
 export default function RootLayout({
@@ -69,6 +82,14 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="manifest" href="/site.webmanifest" />
         <meta name="theme-color" content="#ffffff" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="CLOKA" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="application-name" content="CLOKA" />
+        <meta name="msapplication-TileColor" content="#ffffff" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <meta name="format-detection" content="telephone=no" />
       </head>
       <body className={`${urbanist.variable} antialiased`}>
         <ErrorBoundary>
@@ -77,6 +98,7 @@ export default function RootLayout({
             {children}
           </LoadingProvider>
         </ErrorBoundary>
+        <Script src="/register-sw.js" strategy="lazyOnload" />
       </body>
     </html>
   );
