@@ -144,12 +144,29 @@ export default function AdminRegistrationsPage() {
             }
 
             const data = await response.json();
+            console.log('API Response:', data);
+            console.log('Pagination data:', data.pagination);
+
             setRegistrations(data.registrations);
-            setPagination(prev => ({
-                ...prev,
-                total: data.total,
-                pages: Math.ceil(data.total / prev.limit)
-            }));
+
+            // Handle both possible API response structures
+            if (data.pagination) {
+                // If pagination data is in a nested 'pagination' object
+                setPagination(prev => ({
+                    ...prev,
+                    total: data.pagination.total || 0,
+                    page: data.pagination.page || 1,
+                    limit: data.pagination.limit || 10,
+                    pages: data.pagination.pages || 0
+                }));
+            } else {
+                // If pagination data is at the root level
+                setPagination(prev => ({
+                    ...prev,
+                    total: data.total || 0,
+                    pages: Math.ceil((data.total || 0) / prev.limit)
+                }));
+            }
         } catch (error) {
             setError('Failed to load registrations. Please try again.');
             console.error('Error fetching registrations:', error);
@@ -267,7 +284,7 @@ export default function AdminRegistrationsPage() {
 
     return (
         <div className="min-h-screen bg-white dark:bg-black">
-            <div className="container mx-auto py-8 px-4">
+            <div className="container mx-auto px-4">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -275,7 +292,7 @@ export default function AdminRegistrationsPage() {
                 >
                     {/* Registration Stats */}
                     <div className="bg-white dark:bg-black rounded-lg shadow-md p-6 mb-6">
-                        <h2 className="text-xl font-bold mb-4 text-black dark:text-white">Registration Summary</h2>
+                        <h2 className="text-4xl font-bold mb-4 text-black dark:text-white">Registration Summary</h2>
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                             <div className="bg-white dark:bg-black border border-black dark:border-zinc-700 p-4 rounded-lg">
                                 <div className="text-2xl font-bold text-black dark:text-white">{stats.total}</div>
@@ -556,8 +573,8 @@ export default function AdminRegistrationsPage() {
                                 </div>
 
                                 {/* Pagination */}
-                                {pagination.pages > 1 && (
-                                    <div className="flex justify-between items-center mt-6">
+                                {registrations.length > 0 && (
+                                    <div className="flex flex-col md:flex-row justify-between items-center mt-6 gap-4">
                                         <div className="text-sm text-black dark:text-white">
                                             Showing <span className="font-medium">{(pagination.page - 1) * pagination.limit + 1}</span> to{' '}
                                             <span className="font-medium">
@@ -565,39 +582,125 @@ export default function AdminRegistrationsPage() {
                                             </span>{' '}
                                             of <span className="font-medium">{pagination.total}</span> results
                                         </div>
-                                        <div className="flex space-x-2">
+                                        <div className="flex flex-wrap justify-center gap-2">
                                             <button
                                                 onClick={() => handlePageChange(pagination.page - 1)}
                                                 disabled={pagination.page === 1}
-                                                className={`px-3 py-1 rounded ${pagination.page === 1
+                                                className={`px-3 hover:cursor-pointer py-1 rounded ${pagination.page === 1
                                                     ? 'bg-white text-black border border-black dark:bg-black dark:text-white dark:border-white cursor-not-allowed'
                                                     : 'bg-black text-white hover:bg-white hover:text-black hover:border hover:border-black dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white dark:hover:border-white'
                                                     }`}
                                             >
                                                 Previous
                                             </button>
-                                            {Array.from({ length: pagination.pages }, (_, i) => i + 1).map((page) => (
-                                                <button
-                                                    key={page}
-                                                    onClick={() => handlePageChange(page)}
-                                                    className={`px-3 py-1 rounded ${pagination.page === page
-                                                        ? 'bg-black text-white dark:bg-white dark:text-black'
-                                                        : 'bg-white text-black border border-black hover:bg-black hover:text-white dark:bg-black dark:text-white dark:border-white dark:hover:bg-white dark:hover:text-black'
-                                                        }`}
-                                                >
-                                                    {page}
-                                                </button>
-                                            ))}
+
+                                            {(() => {
+                                                const pageButtons = [];
+
+                                                // Always show first page
+                                                if (pagination.pages > 0) {
+                                                    pageButtons.push(
+                                                        <button
+                                                            key={1}
+                                                            onClick={() => handlePageChange(1)}
+                                                            className={`px-3 hover:cursor-pointer py-1 rounded ${pagination.page === 1
+                                                                ? 'bg-black text-white dark:bg-white dark:text-black'
+                                                                : 'bg-white text-black border border-black hover:bg-black hover:text-white dark:bg-black dark:text-white dark:border-white dark:hover:bg-white dark:hover:text-black'
+                                                                }`}
+                                                        >
+                                                            1
+                                                        </button>
+                                                    );
+                                                }
+
+                                                // Add ellipsis if needed
+                                                if (pagination.page > 3) {
+                                                    pageButtons.push(
+                                                        <span key="ellipsis1" className="px-3 py-1 text-black dark:text-white">
+                                                            ...
+                                                        </span>
+                                                    );
+                                                }
+
+                                                // Add pages around current page
+                                                for (let i = Math.max(2, pagination.page - 1); i <= Math.min(pagination.pages - 1, pagination.page + 1); i++) {
+                                                    pageButtons.push(
+                                                        <button
+                                                            key={i}
+                                                            onClick={() => handlePageChange(i)}
+                                                            className={`px-3 hover:cursor-pointer py-1 rounded ${pagination.page === i
+                                                                ? 'bg-black text-white dark:bg-white dark:text-black'
+                                                                : 'bg-white text-black border border-black hover:bg-black hover:text-white dark:bg-black dark:text-white dark:border-white dark:hover:bg-white dark:hover:text-black'
+                                                                }`}
+                                                        >
+                                                            {i}
+                                                        </button>
+                                                    );
+                                                }
+
+                                                // Add ellipsis if needed
+                                                if (pagination.page < pagination.pages - 2) {
+                                                    pageButtons.push(
+                                                        <span key="ellipsis2" className="px-3 py-1 text-black dark:text-white">
+                                                            ...
+                                                        </span>
+                                                    );
+                                                }
+
+                                                // Always show last page if there is more than one page
+                                                if (pagination.pages > 1) {
+                                                    pageButtons.push(
+                                                        <button
+                                                            key={pagination.pages}
+                                                            onClick={() => handlePageChange(pagination.pages)}
+                                                            className={`px-3 hover:cursor-pointer py-1 rounded ${pagination.page === pagination.pages
+                                                                ? 'bg-black text-white dark:bg-white dark:text-black'
+                                                                : 'bg-white text-black border border-black hover:bg-black hover:text-white dark:bg-black dark:text-white dark:border-white dark:hover:bg-white dark:hover:text-black'
+                                                                }`}
+                                                        >
+                                                            {pagination.pages}
+                                                        </button>
+                                                    );
+                                                }
+
+                                                return pageButtons;
+                                            })()}
+
                                             <button
                                                 onClick={() => handlePageChange(pagination.page + 1)}
                                                 disabled={pagination.page === pagination.pages}
-                                                className={`px-3 py-1 rounded ${pagination.page === pagination.pages
+                                                className={`px-3 hover:cursor-pointer py-1 rounded ${pagination.page === pagination.pages
                                                     ? 'bg-white text-black border border-black dark:bg-black dark:text-white dark:border-white cursor-not-allowed'
                                                     : 'bg-black text-white hover:bg-white hover:text-black hover:border hover:border-black dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white dark:hover:border-white'
                                                     }`}
                                             >
                                                 Next
                                             </button>
+                                        </div>
+
+                                        <div className="flex items-center gap-2">
+                                            <label htmlFor="pageSize" className="text-sm text-black dark:text-white">
+                                                Items per page:
+                                            </label>
+                                            <select
+                                                id="pageSize"
+                                                value={pagination.limit}
+                                                onChange={(e) => {
+                                                    const newLimit = parseInt(e.target.value);
+                                                    setPagination(prev => ({
+                                                        ...prev,
+                                                        limit: newLimit,
+                                                        page: 1, // Reset to first page when changing limit
+                                                        pages: Math.ceil(prev.total / newLimit)
+                                                    }));
+                                                }}
+                                                className="px-2 py-1 border border-black dark:border-white rounded-md bg-white dark:bg-black text-black dark:text-white"
+                                            >
+                                                <option value="10">10</option>
+                                                <option value="25">25</option>
+                                                <option value="50">50</option>
+                                                <option value="100">100</option>
+                                            </select>
                                         </div>
                                     </div>
                                 )}
