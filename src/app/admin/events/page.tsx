@@ -331,14 +331,14 @@ export default function AdminEventsPage() {
                                             <div className="flex justify-between">
                                                 <button
                                                     onClick={() => openEventForm(true, event)}
-                                                    className="px-3 py-1 bg-black text-white rounded hover:bg-zinc-900 transition-colors"
+                                                    className="border hover:cursor-pointer bg-white px-3 py-1 text-black rounded hover:bg-black hover:text-white hover:border-zinc-700 transition-colors   border-black"
                                                 >
                                                     Edit
                                                 </button>
                                                 <button
                                                     onClick={() => openConfirmDialog(event._id, event.title, 'delete')}
                                                     disabled={isDeleting === event._id}
-                                                    className="px-3 py-1 bg-white text-black rounded hover:bg-zinc-100 transition-colors border border-black"
+                                                    className="hover:cursor-pointer px-3 py-1 border-white text-white hover:text-black rounded hover:bg-zinc-100 transition-colors border"
                                                 >
                                                     {isDeleting === event._id ? 'Deleting...' : 'Delete'}
                                                 </button>
@@ -414,15 +414,22 @@ export default function AdminEventsPage() {
                                 <label htmlFor="date" className="block text-sm font-medium mb-1 text-black dark:text-white">
                                     Date *
                                 </label>
-                                <input
-                                    id="date"
-                                    name="date"
-                                    type="date"
-                                    value={eventForm.event.date}
-                                    onChange={handleFormChange}
-                                    className="w-full p-2 border border-black dark:border-white rounded-md bg-white dark:bg-black text-black dark:text-white"
-                                    required
-                                />
+                                <div className="relative">
+                                    <input
+                                        id="date"
+                                        name="date"
+                                        type="datetime-local"
+                                        value={eventForm.event.date}
+                                        onChange={handleFormChange}
+                                        className="w-full p-2 border border-black dark:border-white rounded-md bg-white dark:bg-black text-black dark:text-white [color-scheme:light] cursor-pointer"
+                                        required
+                                        onClick={(e) => {
+                                            // This ensures the datetime picker opens when clicking anywhere on the input
+                                            const input = e.currentTarget;
+                                            input.showPicker();
+                                        }}
+                                    />
+                                </div>
                             </div>
 
                             <div>
