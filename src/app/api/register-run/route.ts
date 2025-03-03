@@ -21,6 +21,7 @@ export async function POST(request: NextRequest) {
       acceptTerms,
       emergencyContact,
       instagramUsername,
+      eventId,
     } = body;
 
     // Validate required fields
@@ -62,6 +63,7 @@ export async function POST(request: NextRequest) {
       acceptTerms: true,
       emergencyContact,
       instagramUsername: instagramUsername || null,
+      eventId: eventId || null,
       approved: null,
       createdAt: new Date(),
     });
@@ -76,6 +78,7 @@ export async function POST(request: NextRequest) {
           registrationId: registration._id,
           joinedCrew: wantsToJoinCrew,
           instagramUsername,
+          eventId,
         },
       },
       { status: 201 }

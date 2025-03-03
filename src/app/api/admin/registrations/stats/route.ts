@@ -23,15 +23,24 @@ export async function GET() {
     // Get pending count
     const pending = await Registration.countDocuments({ approved: null });
 
+    // Get count of registrations with events
+    const withEvent = await Registration.countDocuments({
+      eventId: { $exists: true, $ne: null },
+    });
+
+    // Get count of registrations without events
+    const withoutEvent = await Registration.countDocuments({
+      $or: [{ eventId: null }, { eventId: { $exists: false } }],
+    });
+
     return NextResponse.json(
       {
-        success: true,
-        stats: {
-          total,
-          approved,
-          rejected,
-          pending,
-        },
+        total,
+        approved,
+        rejected,
+        pending,
+        withEvent,
+        withoutEvent,
       },
       { status: 200 }
     );

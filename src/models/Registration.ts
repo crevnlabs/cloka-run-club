@@ -10,6 +10,7 @@ export interface IRegistration extends Document {
   acceptTerms: boolean;
   emergencyContact: string;
   instagramUsername?: string;
+  eventId?: string;
   approved: boolean | null;
   createdAt: Date;
 }
@@ -35,6 +36,7 @@ const RegistrationSchema: Schema = new Schema({
   },
   emergencyContact: { type: String, required: true },
   instagramUsername: { type: String },
+  eventId: { type: Schema.Types.ObjectId, ref: "Event" },
   approved: { type: Boolean, default: null },
   createdAt: { type: Date, default: Date.now },
 });

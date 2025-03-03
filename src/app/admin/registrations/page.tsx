@@ -15,6 +15,13 @@ interface Registration {
     joinCrew: boolean;
     emergencyContact: string;
     instagramUsername?: string;
+    eventId?: string;
+    event?: {
+        _id: string;
+        title: string;
+        date: string;
+        location: string;
+    };
     approved: boolean | null;
     createdAt: string;
 }
@@ -26,8 +33,16 @@ interface PaginationData {
     pages: number;
 }
 
+interface Event {
+    _id: string;
+    title: string;
+    date: string;
+    location: string;
+}
+
 export default function AdminRegistrationsPage() {
     const [registrations, setRegistrations] = useState<Registration[]>([]);
+    const [events, setEvents] = useState<Event[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [pagination, setPagination] = useState<PaginationData>({
@@ -39,7 +54,8 @@ export default function AdminRegistrationsPage() {
     const [filters, setFilters] = useState({
         gender: '',
         joinCrew: '',
-        approved: ''
+        approved: '',
+        eventId: ''
     });
     const [isUpdating, setIsUpdating] = useState<string | null>(null);
     const [updateError, setUpdateError] = useState('');
@@ -47,7 +63,9 @@ export default function AdminRegistrationsPage() {
         approved: 0,
         rejected: 0,
         pending: 0,
-        total: 0
+        total: 0,
+        withEvent: 0,
+        withoutEvent: 0
     });
     const [confirmDialog, setConfirmDialog] = useState<{
         show: boolean;
@@ -105,6 +123,10 @@ export default function AdminRegistrationsPage() {
                 queryParams.append('approved', filters.approved);
             }
 
+            if (filters.eventId) {
+                queryParams.append('eventId', filters.eventId);
+            }
+
             const response = await fetch(`/api/admin/registrations?${queryParams.toString()}`);
 
             if (response.status === 401) {
@@ -131,6 +153,21 @@ export default function AdminRegistrationsPage() {
         }
     }, [pagination.page, pagination.limit, filters, router]);
 
+    const fetchEvents = useCallback(async () => {
+        try {
+            const response = await fetch('/api/events');
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch events');
+            }
+
+            const data = await response.json();
+            setEvents(data.events || []);
+        } catch (error) {
+            console.error('Error fetching events:', error);
+        }
+    }, []);
+
     useEffect(() => {
         fetchStats();
     }, [fetchStats]);
@@ -138,6 +175,10 @@ export default function AdminRegistrationsPage() {
     useEffect(() => {
         fetchRegistrations();
     }, [fetchRegistrations]);
+
+    useEffect(() => {
+        fetchEvents();
+    }, [fetchEvents]);
 
     const handlePageChange = (newPage: number) => {
         setPagination(prev => ({ ...prev, page: newPage }));
@@ -266,7 +307,7 @@ export default function AdminRegistrationsPage() {
                     {/* Registration Stats */}
                     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
                         <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Registration Summary</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                             <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                                 <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total}</div>
                                 <div className="text-sm text-gray-500 dark:text-gray-400">Total Registrations</div>
@@ -282,6 +323,16 @@ export default function AdminRegistrationsPage() {
                             <div className="bg-yellow-50 dark:bg-yellow-900 p-4 rounded-lg">
                                 <div className="text-2xl font-bold text-yellow-800 dark:text-yellow-100">{stats.pending}</div>
                                 <div className="text-sm text-yellow-600 dark:text-yellow-300">Pending</div>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="bg-purple-50 dark:bg-purple-900 p-4 rounded-lg">
+                                <div className="text-2xl font-bold text-purple-800 dark:text-purple-100">{stats.withEvent}</div>
+                                <div className="text-sm text-purple-600 dark:text-purple-300">With Event</div>
+                            </div>
+                            <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
+                                <div className="text-2xl font-bold text-blue-800 dark:text-blue-100">{stats.withoutEvent}</div>
+                                <div className="text-sm text-blue-600 dark:text-blue-300">Without Event</div>
                             </div>
                         </div>
                     </div>
@@ -348,6 +399,26 @@ export default function AdminRegistrationsPage() {
                                     <option value="pending">Pending</option>
                                 </select>
                             </div>
+
+                            <div className="w-full md:w-auto">
+                                <label htmlFor="eventId" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                                    Filter by Event
+                                </label>
+                                <select
+                                    id="eventId"
+                                    name="eventId"
+                                    value={filters.eventId}
+                                    onChange={handleFilterChange}
+                                    className="w-full md:w-40 p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                >
+                                    <option value="">All Events</option>
+                                    {events.map((event) => (
+                                        <option key={event._id} value={event._id}>
+                                            {event.title}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
 
                         {loading ? (
@@ -385,6 +456,9 @@ export default function AdminRegistrationsPage() {
                                                 </th>
                                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                                     Crew
+                                                </th>
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                    Event
                                                 </th>
                                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                                     Registered
@@ -435,11 +509,20 @@ export default function AdminRegistrationsPage() {
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${registration.joinCrew ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100' :
-                                                            'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100'
-                                                            }`}>
+                                                        <div className="text-sm text-gray-500 dark:text-gray-300">
                                                             {registration.joinCrew ? 'Yes' : 'No'}
-                                                        </span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <div className="text-sm text-gray-500 dark:text-gray-300">
+                                                            {registration.event ? (
+                                                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100">
+                                                                    {registration.event.title}
+                                                                </span>
+                                                            ) : (
+                                                                <span className="text-xs text-gray-400">No event</span>
+                                                            )}
+                                                        </div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="text-sm text-gray-500 dark:text-gray-300">{formatDate(registration.createdAt)}</div>

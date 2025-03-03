@@ -1,11 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { getApiUrl } from '@/lib/apiUtils';
+
+// Define event type
+type EventOption = {
+    _id: string;
+    title: string;
+    date: Date;
+    location: string;
+};
 
 // Define the form schema with Zod
 const registrationSchema = z.object({
@@ -20,7 +29,7 @@ const registrationSchema = z.object({
     }),
     emergencyContact: z.string().min(10, { message: 'Please enter a valid emergency contact' }),
     instagramUsername: z.string().optional(),
-    eventId: z.string().optional(),
+    eventId: z.string().min(1, { message: 'Please select an event' }),
     joinCrew: z.boolean().default(false),
     acceptTerms: z.boolean().refine(val => val === true, {
         message: 'You must accept the terms and conditions',
@@ -42,6 +51,8 @@ const RunRegistration = ({ eventId }: { eventId?: string }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [events, setEvents] = useState<EventOption[]>([]);
+    const [isLoadingEvents, setIsLoadingEvents] = useState(false);
 
     const {
         register,
@@ -49,6 +60,7 @@ const RunRegistration = ({ eventId }: { eventId?: string }) => {
         formState: { errors },
         reset,
         watch,
+        setValue,
     } = useForm<RegistrationFormData>({
         resolver: zodResolver(registrationSchema),
         defaultValues: {
@@ -58,6 +70,40 @@ const RunRegistration = ({ eventId }: { eventId?: string }) => {
             instagramUsername: '',
         },
     });
+
+    // Fetch events when component mounts
+    useEffect(() => {
+        const fetchEvents = async () => {
+            setIsLoadingEvents(true);
+            try {
+                const response = await fetch(getApiUrl('/api/events'));
+                if (!response.ok) {
+                    throw new Error('Failed to fetch events');
+                }
+                const data = await response.json();
+
+                // Filter events to only include future events
+                const now = new Date();
+                const futureEvents = data.events.filter((event: EventOption) => {
+                    const eventDate = new Date(event.date);
+                    return eventDate >= now;
+                }) || [];
+
+                setEvents(futureEvents);
+
+                // If eventId is provided and exists in the fetched events, set it
+                if (eventId && futureEvents.some((event: EventOption) => event._id === eventId)) {
+                    setValue('eventId', eventId);
+                }
+            } catch (error) {
+                console.error('Error fetching events:', error);
+            } finally {
+                setIsLoadingEvents(false);
+            }
+        };
+
+        fetchEvents();
+    }, [eventId, setValue]);
 
     // Watch the gender field to show conditional validation message
     const selectedGender = watch('gender');
@@ -260,6 +306,39 @@ const RunRegistration = ({ eventId }: { eventId?: string }) => {
                                     )}
                                 </div>
                             </div>
+
+                            <div>
+                                <label htmlFor="eventId" className="block text-sm font-medium mb-1 text-black dark:text-white">
+                                    Select Event *
+                                </label>
+                                <select
+                                    id="eventId"
+                                    className={`w-full p-3 border ${errors.eventId ? 'border-red-500' : 'border-black dark:border-white'
+                                        } rounded-md focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-black dark:text-white bg-white dark:bg-black`}
+                                    {...register('eventId')}
+                                    disabled={isLoadingEvents}
+                                >
+                                    <option value="">Select an Event</option>
+                                    {events.length > 0 ? (
+                                        events.map((event) => (
+                                            <option key={event._id} value={event._id}>
+                                                {event.title} - {new Date(event.date).toLocaleDateString()} - {event.location}
+                                            </option>
+                                        ))
+                                    ) : (
+                                        <option value="" disabled>No upcoming events available</option>
+                                    )}
+                                </select>
+                                {isLoadingEvents && (
+                                    <p className="mt-1 text-sm text-black dark:text-white">Loading events...</p>
+                                )}
+                                {!isLoadingEvents && events.length === 0 && (
+                                    <p className="mt-1 text-sm text-amber-600 dark:text-amber-400">No upcoming events available at this time.</p>
+                                )}
+                                {errors.eventId && (
+                                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.eventId.message}</p>
+                                )}
+                            </div>
                         </div>
 
                         <div className="space-y-4 mt-4">
@@ -298,8 +377,8 @@ const RunRegistration = ({ eventId }: { eventId?: string }) => {
                         <div className="text-center pt-4">
                             <button
                                 type="submit"
-                                disabled={isSubmitting}
-                                className={`luxury-button px-8 py-3 bg-black dark:bg-white text-white dark:text-black hover:bg-black dark:hover:bg-white ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
+                                disabled={isSubmitting || !watch('eventId')}
+                                className={`luxury-button px-8 py-3 bg-black dark:bg-white text-white dark:text-black hover:bg-black dark:hover:bg-white ${(isSubmitting || !watch('eventId')) ? 'opacity-70 cursor-not-allowed' : ''
                                     }`}
                             >
                                 {isSubmitting ? 'Submitting...' : 'Register Now'}
