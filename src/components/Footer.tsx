@@ -22,6 +22,9 @@ const Footer = () => {
                         <p className="luxury-text">
                             &copy; {new Date().getFullYear()} CLOKA. All rights reserved.
                         </p>
+                        <p className="luxury-text mt-2 text-sm">
+                            Built by <a href="https://crevn.xyz" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors font-bold">crevn.xyz</a>
+                        </p>
                     </div>
 
                     <div className="flex flex-col items-center justify-end text-center h-full">
