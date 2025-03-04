@@ -46,7 +46,6 @@ const Footer = () => {
                     <div className="flex flex-col items-center justify-end text-center h-full">
                         <h3 className="text-xl font-bold mb-4 tracking-wider">Contact</h3>
                         <p className="luxury-text mb-2">Email: info@cloka.com</p>
-                        <p className="luxury-text mb-2">Phone: +91 73586 63767</p>
                         <div className="flex space-x-4 mt-4">
                             <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-accent">
                                 <span className="sr-only">Instagram</span>
