@@ -86,11 +86,17 @@ export default function AdminEventsPage() {
     }, [fetchEvents]);
 
     const formatDate = (dateString: string) => {
+        // Parse the date string and preserve the exact time by handling timezone properly
         const date = new Date(dateString);
+
         return date.toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
-            day: 'numeric'
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true,
+            timeZone: 'UTC' // Use UTC to prevent timezone conversion
         });
     };
 

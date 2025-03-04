@@ -9,7 +9,6 @@ type EventProps = {
     id: string;
     title: string;
     date: string;
-    time: string;
     location: string;
     description: string;
 };
@@ -100,7 +99,7 @@ const EventCard = ({ event }: { event: EventProps }) => {
             className="bg-white text-black p-6 luxury-border"
         >
             <div className="mb-4">
-                <span className="text-sm uppercase tracking-wider text-accent">{event.date} • {event.time}</span>
+                <span className="text-sm uppercase tracking-wider text-accent">{event.date}</span>
             </div>
             <h3 className="text-xl font-bold mb-2">{event.title}</h3>
             <p className="text-sm mb-4">
@@ -254,8 +253,7 @@ const UpcomingEvents = ({ serverEvents }: UpcomingEventsProps) => {
                     return {
                         id: event._id,
                         title: event.title,
-                        date: eventDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
-                        time: eventDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+                        date: eventDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }),
                         location: event.location,
                         description: event.description,
                     };

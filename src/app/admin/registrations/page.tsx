@@ -212,14 +212,19 @@ export default function AdminRegistrationsPage() {
         setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page on filter change
     };
 
+
     const formatDate = (dateString: string) => {
+        // Parse the date string and preserve the exact time by handling timezone properly
         const date = new Date(dateString);
+
         return date.toLocaleDateString('en-US', {
             year: 'numeric',
-            month: 'short',
+            month: 'long',
             day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true,
+            timeZone: 'UTC' // Use UTC to prevent timezone conversion
         });
     };
 
