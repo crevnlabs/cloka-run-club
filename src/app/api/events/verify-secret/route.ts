@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Verify the secret first
-    if (event.secret !== secret) {
+    if (event.secret.toLowerCase() !== secret.toLowerCase()) {
       return NextResponse.json(
         {
           success: false,
