@@ -16,6 +16,17 @@ type EventOption = {
     location: string;
 };
 
+// Function to validate Instagram username format
+const isValidInstagramFormat = (username: string): boolean => {
+    // Remove @ if present
+    const cleanUsername = username.startsWith('@') ? username.substring(1) : username;
+
+    // Instagram usernames can only contain letters, numbers, periods, and underscores
+    // They cannot start or end with a period, and cannot have consecutive periods
+    const regex = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/;
+    return regex.test(cleanUsername);
+};
+
 // Define the form schema with Zod
 const registrationSchema = z.object({
     name: z.string().min(2, { message: 'Name must be at least 2 characters' }),
@@ -28,8 +39,12 @@ const registrationSchema = z.object({
         errorMap: () => ({ message: 'Please select a gender' }),
     }),
     emergencyContact: z.string().min(10, { message: 'Please enter a valid emergency contact' }),
-    instagramUsername: z.string().min(1, { message: 'Please enter your Instagram username' }),
-    eventId: z.string().min(1, { message: 'Please select an event' }),
+    instagramUsername: z.string().min(1, { message: 'Please enter your Instagram username' })
+        .refine(
+            (username) => isValidInstagramFormat(username),
+            { message: 'Please enter a valid Instagram username format' }
+        ),
+    eventId: z.string().optional(), // Made optional
     joinCrew: z.boolean().default(false),
     acceptTerms: z.boolean().refine(val => val === true, {
         message: 'You must accept the terms and conditions',
@@ -114,12 +129,24 @@ const RunRegistration = ({ eventId }: { eventId?: string }) => {
         setErrorMessage('');
 
         try {
+            // Clean the Instagram username (remove @ if present)
+            const cleanUsername = data.instagramUsername.startsWith('@')
+                ? data.instagramUsername.substring(1)
+                : data.instagramUsername;
+
+            // We'll validate the Instagram username on the server side
+            // Just pass the cleaned username to the API
+            const formData = {
+                ...data,
+                instagramUsername: cleanUsername
+            };
+
             const response = await fetch('/api/register-run', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(data),
+                body: JSON.stringify(formData),
             });
 
             const result = await response.json();
@@ -309,7 +336,7 @@ const RunRegistration = ({ eventId }: { eventId?: string }) => {
 
                             <div>
                                 <label htmlFor="eventId" className="block text-sm font-medium mb-1 text-black dark:text-white">
-                                    Select Event *
+                                    Select Event
                                 </label>
                                 <select
                                     id="eventId"
@@ -377,8 +404,8 @@ const RunRegistration = ({ eventId }: { eventId?: string }) => {
                         <div className="text-center pt-4">
                             <button
                                 type="submit"
-                                disabled={isSubmitting || !watch('eventId')}
-                                className={`luxury-button px-8 py-3 bg-black dark:bg-white text-white dark:text-black hover:bg-black dark:hover:bg-white ${(isSubmitting || !watch('eventId')) ? 'opacity-70 cursor-not-allowed' : ''
+                                disabled={isSubmitting}
+                                className={`luxury-button px-8 py-3 bg-black dark:bg-white text-white dark:text-black hover:bg-black dark:hover:bg-white ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
                                     }`}
                             >
                                 {isSubmitting ? 'Submitting...' : 'Register Now'}
