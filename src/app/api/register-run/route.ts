@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Registration from "@/models/Registration";
+import bcrypt from "bcryptjs";
 
 // In a real application, you would connect to a database here
 // This is a simplified example that just returns a success response
@@ -22,6 +23,7 @@ export async function POST(request: NextRequest) {
       emergencyContact,
       instagramUsername,
       eventId,
+      password,
     } = body;
 
     // Validate required fields
@@ -32,7 +34,8 @@ export async function POST(request: NextRequest) {
       !age ||
       !gender ||
       !emergencyContact ||
-      !acceptTerms
+      !acceptTerms ||
+      !password
     ) {
       return NextResponse.json(
         { success: false, message: "All fields are required" },
@@ -48,6 +51,10 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Hash the password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     // Determine if user wants to join the crew
     const wantsToJoinCrew = joinCrew === true;
@@ -66,6 +73,7 @@ export async function POST(request: NextRequest) {
       eventId: eventId || null,
       approved: null,
       createdAt: new Date(),
+      password: hashedPassword,
     });
 
     return NextResponse.json(

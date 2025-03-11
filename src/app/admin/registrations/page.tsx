@@ -24,6 +24,7 @@ interface Registration {
     };
     approved: boolean | null;
     createdAt: string;
+    password?: string;
 }
 
 interface PaginationData {
@@ -78,6 +79,20 @@ export default function AdminRegistrationsPage() {
         registrationId: '',
         name: '',
         action: 'approve'
+    });
+
+    const [passwordDialog, setPasswordDialog] = useState<{
+        show: boolean;
+        registrationId: string;
+        name: string;
+        email: string;
+        password: string;
+    }>({
+        show: false,
+        registrationId: '',
+        name: '',
+        email: '',
+        password: ''
     });
 
     const router = useRouter();
@@ -322,6 +337,93 @@ export default function AdminRegistrationsPage() {
         } finally {
             setIsUpdating(null);
         }
+    };
+
+    // Generate a random password
+    const generateRandomPassword = () => {
+        const length = 10; // Ensure it's at least 6 characters for security
+        const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
+        let password = "";
+        for (let i = 0; i < length; i++) {
+            const randomIndex = Math.floor(Math.random() * charset.length);
+            password += charset[randomIndex];
+        }
+        return password;
+    };
+
+    // Open password dialog
+    const openPasswordDialog = (registrationId: string, name: string, email: string) => {
+        setPasswordDialog({
+            show: true,
+            registrationId,
+            name,
+            email,
+            password: generateRandomPassword()
+        });
+    };
+
+    // Close password dialog
+    const closePasswordDialog = () => {
+        setPasswordDialog({
+            show: false,
+            registrationId: '',
+            name: '',
+            email: '',
+            password: ''
+        });
+    };
+
+    // Handle setting a password
+    const handleSetPassword = async () => {
+        const { registrationId, password } = passwordDialog;
+        setIsUpdating(registrationId);
+        setUpdateError('');
+
+        try {
+            const response = await fetch('/api/admin/registrations/set-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ registrationId, password }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Update the local state to reflect the change
+                setRegistrations(prevRegistrations =>
+                    prevRegistrations.map(reg =>
+                        reg._id === registrationId ? { ...reg, password } : reg
+                    )
+                );
+                // Don't close the dialog so the admin can still see the password to send
+            } else {
+                setUpdateError(data.message || 'Failed to set password');
+                closePasswordDialog();
+            }
+        } catch (error) {
+            console.error('Error setting password:', error);
+            setUpdateError('An error occurred while setting password');
+            closePasswordDialog();
+        } finally {
+            setIsUpdating(null);
+        }
+    };
+
+    // Generate mailto link with password information
+    const getMailtoLink = (email: string, name: string, password: string) => {
+        const subject = encodeURIComponent("Your Account Password");
+        const body = encodeURIComponent(
+            `Hello ${name},\n\n` +
+            `Your account has been created. Here are your login details:\n\n` +
+            `Email: ${email}\n` +
+            `Password: ${password}\n\n` +
+            `For security reasons, we recommend changing your password after your first login.\n\n` +
+            `Please keep this information secure.\n\n` +
+            `Best regards,\nThe Admin Team`
+        );
+        return `mailto:${email}?subject=${subject}&body=${body}`;
     };
 
     return (
@@ -589,7 +691,7 @@ export default function AdminRegistrationsPage() {
                                                             <button
                                                                 onClick={() => openConfirmDialog(registration._id, registration.name, 'approve')}
                                                                 disabled={isUpdating === registration._id || registration.approved === true}
-                                                                className={`px-3 py-1 rounded-md text-xs font-medium ${registration.approved === true
+                                                                className={`px-3 py-1 cursor-pointer rounded-md text-xs font-medium ${registration.approved === true
                                                                     ? 'bg-white text-black border border-black dark:bg-black dark:text-white dark:border-white cursor-not-allowed'
                                                                     : 'bg-black text-white hover:bg-white hover:text-black hover:border hover:border-black dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white dark:hover:border-white transition-colors'
                                                                     } group-hover:bg-white group-hover:text-black dark:group-hover:bg-black dark:group-hover:text-white`}
@@ -599,7 +701,7 @@ export default function AdminRegistrationsPage() {
                                                             <button
                                                                 onClick={() => openConfirmDialog(registration._id, registration.name, 'reject')}
                                                                 disabled={isUpdating === registration._id || registration.approved === false}
-                                                                className={`px-3 py-1 rounded-md text-xs font-medium ${registration.approved === false
+                                                                className={`px-3 py-1 cursor-pointer rounded-md text-xs font-medium ${registration.approved === false
                                                                     ? 'bg-white text-black border border-black dark:bg-black dark:text-white dark:border-white cursor-not-allowed'
                                                                     : 'bg-black text-white hover:bg-white hover:text-black hover:border hover:border-black dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white dark:hover:border-white transition-colors'
                                                                     } group-hover:bg-white group-hover:text-black dark:group-hover:bg-black dark:group-hover:text-white`}
@@ -609,9 +711,16 @@ export default function AdminRegistrationsPage() {
                                                             <button
                                                                 onClick={() => openConfirmDialog(registration._id, registration.name, 'delete')}
                                                                 disabled={isUpdating === registration._id}
-                                                                className="px-3 py-1 rounded-md text-xs font-medium bg-red-600 text-white hover:bg-white hover:text-red-600 hover:border hover:border-red-600 dark:bg-red-600 dark:text-white dark:hover:bg-black dark:hover:text-red-500 dark:hover:border-red-500 transition-colors group-hover:bg-white group-hover:text-red-600 dark:group-hover:bg-black dark:group-hover:text-red-500"
+                                                                className="px-3 py-1 cursor-pointer rounded-md text-xs font-medium bg-red-600 text-white hover:bg-white hover:text-red-600 hover:border hover:border-red-600 dark:bg-red-600 dark:text-white dark:hover:bg-black dark:hover:text-red-500 dark:hover:border-red-500 transition-colors group-hover:bg-white group-hover:text-red-600 dark:group-hover:bg-black dark:group-hover:text-red-500"
                                                             >
                                                                 {isUpdating === registration._id ? 'Processing...' : 'Delete'}
+                                                            </button>
+                                                            <button
+                                                                onClick={() => openPasswordDialog(registration._id, registration.name, registration.email)}
+                                                                disabled={isUpdating === registration._id}
+                                                                className="px-3 py-1 cursor-pointer rounded-md text-xs font-medium bg-blue-600 text-white hover:bg-white hover:text-blue-600 hover:border hover:border-blue-600 dark:bg-blue-600 dark:text-white dark:hover:bg-black dark:hover:text-blue-500 dark:hover:border-blue-500 transition-colors group-hover:bg-white group-hover:text-blue-600 dark:group-hover:bg-black dark:group-hover:text-blue-500"
+                                                            >
+                                                                {isUpdating === registration._id ? 'Processing...' : 'Set Password'}
                                                             </button>
                                                         </div>
                                                     </td>
@@ -796,6 +905,73 @@ export default function AdminRegistrationsPage() {
                                 {isUpdating === confirmDialog.registrationId ? 'Processing...' :
                                     confirmDialog.action === 'approve' ? 'Approve' :
                                         confirmDialog.action === 'reject' ? 'Reject' : 'Delete'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Password Dialog */}
+            {passwordDialog.show && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white dark:bg-black rounded-lg p-6 max-w-md w-full border border-black dark:border-white">
+                        <h3 className="text-xl font-bold mb-4 text-black dark:text-white">
+                            Set Password for {passwordDialog.name}
+                        </h3>
+                        <div className="mb-6">
+                            <label htmlFor="password" className="block text-sm font-medium mb-1 text-black dark:text-white">
+                                Password (minimum 6 characters)
+                            </label>
+                            <div className="flex">
+                                <input
+                                    type="text"
+                                    id="password"
+                                    value={passwordDialog.password}
+                                    onChange={(e) => setPasswordDialog(prev => ({ ...prev, password: e.target.value }))}
+                                    className={`w-full p-2 border ${passwordDialog.password.length > 0 && passwordDialog.password.length < 6 ? 'border-red-500' : 'border-black dark:border-white'} rounded-md bg-white dark:bg-black text-black dark:text-white`}
+                                />
+                                <button
+                                    onClick={() => setPasswordDialog(prev => ({ ...prev, password: generateRandomPassword() }))}
+                                    className="cursor-pointer ml-2 px-3 py-1 bg-black text-white dark:bg-white dark:text-black border border-black dark:border-white rounded-md hover:bg-white hover:text-black dark:hover:bg-black dark:hover:text-white transition-colors"
+                                >
+                                    Regenerate
+                                </button>
+                            </div>
+                            {passwordDialog.password.length > 0 && passwordDialog.password.length < 6 && (
+                                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                                    Password must be at least 6 characters
+                                </p>
+                            )}
+                            <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                                The password will be securely hashed before storing in the database.
+                            </p>
+                        </div>
+                        <div className="mb-6">
+                            <p className="text-sm text-black dark:text-white mb-2">
+                                After setting the password, you can send it to the user via email:
+                            </p>
+                            <div className="flex flex-col space-y-2">
+                                <a
+                                    href={getMailtoLink(passwordDialog.email, passwordDialog.name, passwordDialog.password)}
+                                    className="cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-white hover:text-blue-600 hover:border hover:border-blue-600 dark:bg-blue-600 dark:text-white dark:hover:bg-black dark:hover:text-blue-500 dark:hover:border-blue-500 transition-colors text-center"
+                                >
+                                    Send Password via Email
+                                </a>
+                            </div>
+                        </div>
+                        <div className="flex justify-end space-x-3">
+                            <button
+                                onClick={closePasswordDialog}
+                                className="cursor-pointer px-4 py-2 bg-white dark:bg-black text-black dark:text-white border border-black dark:border-white rounded hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleSetPassword}
+                                disabled={isUpdating === passwordDialog.registrationId || passwordDialog.password.length < 6}
+                                className={`cursor-pointer px-4 py-2 ${passwordDialog.password.length < 6 ? 'bg-gray-400 text-white dark:bg-gray-600 cursor-not-allowed' : 'bg-black text-white dark:bg-white dark:text-black hover:bg-white hover:text-black hover:border hover:border-black dark:hover:bg-black dark:hover:text-white dark:hover:border-white'} rounded transition-colors`}
+                            >
+                                {isUpdating === passwordDialog.registrationId ? 'Processing...' : 'Set Password'}
                             </button>
                         </div>
                     </div>

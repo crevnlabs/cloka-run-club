@@ -13,6 +13,7 @@ export interface IRegistration extends Document {
   eventId?: string;
   approved: boolean | null;
   createdAt: Date;
+  password?: string;
 }
 
 const RegistrationSchema: Schema = new Schema({
@@ -39,6 +40,7 @@ const RegistrationSchema: Schema = new Schema({
   eventId: { type: Schema.Types.ObjectId, ref: "Event" },
   approved: { type: Boolean, default: null },
   createdAt: { type: Date, default: Date.now },
+  password: { type: String },
 });
 
 // Check if the model already exists to prevent overwriting during hot reloads
