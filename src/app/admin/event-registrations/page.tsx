@@ -335,7 +335,7 @@ export default function EventRegistrationsPage() {
                     </div>
 
                     <div className="w-full md:w-64">
-                        <label className="block text-sm font-medium mb-1">Sex</label>
+                        <label className="block text-sm font-medium mb-1">Gender</label>
                         <select
                             value={selectedSex}
                             onChange={(e) => setSelectedSex(e.target.value)}

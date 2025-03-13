@@ -50,7 +50,17 @@ export default function AuthPage() {
 
     const handleSignupChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
-        const newValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
+        let newValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
+
+        // Special handling for phone number - only allow digits and limit to 10 digits
+        if (name === 'phone' && typeof newValue === 'string') {
+            // Remove all non-digit characters
+            const digitsOnly = newValue.replace(/\D/g, '');
+
+            // Take only the last 10 digits if more are entered
+            newValue = digitsOnly.slice(-10);
+        }
+
         setSignupData({ ...signupData, [name]: newValue });
     };
 
@@ -80,8 +90,14 @@ export default function AuthPage() {
         setError('');
 
         // Validate required fields
-        if (!signupData.name || !signupData.email || !signupData.password || !signupData.phone || !signupData.age || !signupData.gender) {
+        if (!signupData.name || !signupData.email || !signupData.password || !signupData.phone || !signupData.age || !signupData.gender || !signupData.instagramUsername) {
             setError('Please fill in all required fields');
+            return;
+        }
+
+        // Validate phone number (must be exactly 10 digits for Indian numbers)
+        if (!/^\d{10}$/.test(signupData.phone)) {
+            setError('Please enter a valid 10-digit Indian phone number');
             return;
         }
 
@@ -102,7 +118,7 @@ export default function AuthPage() {
                 age: signupData.age ? parseInt(signupData.age) : undefined,
                 gender: signupData.gender as 'male' | 'female' | 'other' | undefined,
                 emergencyContact: signupData.emergencyContact || undefined,
-                instagramUsername: signupData.instagramUsername || undefined,
+                instagramUsername: signupData.instagramUsername,
                 joinCrew: signupData.joinCrew,
             });
 
@@ -340,7 +356,7 @@ export default function AuthPage() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
                                             <label htmlFor="phone" className="block text-sm font-medium mb-1">
-                                                Phone Number *
+                                                Phone Number * (10 digits)
                                             </label>
                                             <input
                                                 id="phone"
@@ -350,6 +366,9 @@ export default function AuthPage() {
                                                 onChange={handleSignupChange}
                                                 className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
                                                 required
+                                                pattern="[0-9]{10}"
+                                                maxLength={10}
+                                                placeholder="10-digit mobile number"
                                             />
                                         </div>
                                         <div>
@@ -370,7 +389,7 @@ export default function AuthPage() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
                                             <label htmlFor="instagramUsername" className="block text-sm font-medium mb-1">
-                                                Instagram Username
+                                                Instagram Username *
                                             </label>
                                             <input
                                                 id="instagramUsername"
@@ -379,6 +398,7 @@ export default function AuthPage() {
                                                 value={signupData.instagramUsername}
                                                 onChange={handleSignupChange}
                                                 className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
+                                                required
                                             />
                                         </div>
                                         <div>
