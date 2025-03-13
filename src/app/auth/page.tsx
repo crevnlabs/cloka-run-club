@@ -34,13 +34,13 @@ export default function AuthPage() {
         name: '',
         email: '',
         password: '',
-        confirmPassword: '',
         phone: '',
         age: '',
         gender: '',
         emergencyContact: '',
         instagramUsername: '',
         joinCrew: false,
+        acceptTerms: false,
     });
 
     const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,15 +79,15 @@ export default function AuthPage() {
         e.preventDefault();
         setError('');
 
-        // Validate passwords match
-        if (signupData.password !== signupData.confirmPassword) {
-            setError('Passwords do not match');
-            return;
-        }
-
         // Validate required fields
         if (!signupData.name || !signupData.email || !signupData.password || !signupData.phone) {
             setError('Please fill in all required fields');
+            return;
+        }
+
+        // Validate terms acceptance
+        if (!signupData.acceptTerms) {
+            setError('You must accept the Terms and Conditions to continue');
             return;
         }
 
@@ -245,86 +245,6 @@ export default function AuthPage() {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="signup-email" className="block text-sm font-medium mb-1">
-                                            Email *
-                                        </label>
-                                        <input
-                                            id="signup-email"
-                                            name="email"
-                                            type="email"
-                                            value={signupData.email}
-                                            onChange={handleSignupChange}
-                                            className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
-                                            required
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label htmlFor="signup-password" className="block text-sm font-medium mb-1">
-                                            Password *
-                                        </label>
-                                        <PasswordInput
-                                            id="signup-password"
-                                            name="password"
-                                            value={signupData.password}
-                                            onChange={handleSignupChange}
-                                            className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
-                                            required
-                                            minLength={6}
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1">
-                                            Confirm Password *
-                                        </label>
-                                        <PasswordInput
-                                            id="confirmPassword"
-                                            name="confirmPassword"
-                                            value={signupData.confirmPassword}
-                                            onChange={handleSignupChange}
-                                            className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
-                                            required
-                                            showHelperText={false}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label htmlFor="phone" className="block text-sm font-medium mb-1">
-                                            Phone Number *
-                                        </label>
-                                        <input
-                                            id="phone"
-                                            name="phone"
-                                            type="tel"
-                                            value={signupData.phone}
-                                            onChange={handleSignupChange}
-                                            className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
-                                            required
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label htmlFor="age" className="block text-sm font-medium mb-1">
-                                            Age
-                                        </label>
-                                        <input
-                                            id="age"
-                                            name="age"
-                                            type="number"
-                                            value={signupData.age}
-                                            onChange={handleSignupChange}
-                                            className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
                                         <label htmlFor="gender" className="block text-sm font-medium mb-1">
                                             Gender
                                         </label>
@@ -341,7 +261,74 @@ export default function AuthPage() {
                                             <option value="other">Other</option>
                                         </select>
                                     </div>
+                                </div>
 
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label htmlFor="signup-email" className="block text-sm font-medium mb-1">
+                                            Email *
+                                        </label>
+                                        <input
+                                            id="signup-email"
+                                            name="email"
+                                            type="email"
+                                            value={signupData.email}
+                                            onChange={handleSignupChange}
+                                            className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label htmlFor="signup-password" className="block text-sm font-medium mb-1">
+                                            Password *
+                                        </label>
+                                        <PasswordInput
+                                            id="signup-password"
+                                            name="password"
+                                            value={signupData.password}
+                                            onChange={handleSignupChange}
+                                            className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
+                                            required
+                                            minLength={6}
+                                        />
+                                    </div>
+
+
+                                </div>
+
+                                <div className="grid grid-cols-12 gap-4">
+                                    <div className="col-span-3">
+                                        <label htmlFor="age" className="block text-sm font-medium mb-1">
+                                            Age
+                                        </label>
+                                        <input
+                                            id="age"
+                                            name="age"
+                                            type="number"
+                                            value={signupData.age}
+                                            onChange={handleSignupChange}
+                                            className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
+                                        />
+                                    </div>
+
+                                    <div className="col-span-9">
+                                        <label htmlFor="phone" className="block text-sm font-medium mb-1">
+                                            Phone Number *
+                                        </label>
+                                        <input
+                                            id="phone"
+                                            name="phone"
+                                            type="tel"
+                                            value={signupData.phone}
+                                            onChange={handleSignupChange}
+                                            className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label htmlFor="emergencyContact" className="block text-sm font-medium mb-1">
                                             Emergency Contact
@@ -355,20 +342,35 @@ export default function AuthPage() {
                                             className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
                                         />
                                     </div>
+
+                                    <div>
+                                        <label htmlFor="instagramUsername" className="block text-sm font-medium mb-1">
+                                            Instagram Username
+                                        </label>
+                                        <input
+                                            id="instagramUsername"
+                                            name="instagramUsername"
+                                            type="text"
+                                            value={signupData.instagramUsername}
+                                            onChange={handleSignupChange}
+                                            className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
+                                        />
+                                    </div>
                                 </div>
 
-                                <div>
-                                    <label htmlFor="instagramUsername" className="block text-sm font-medium mb-1">
-                                        Instagram Username
-                                    </label>
+                                <div className="flex items-center mb-3">
                                     <input
-                                        id="instagramUsername"
-                                        name="instagramUsername"
-                                        type="text"
-                                        value={signupData.instagramUsername}
+                                        id="acceptTerms"
+                                        name="acceptTerms"
+                                        type="checkbox"
+                                        checked={signupData.acceptTerms}
                                         onChange={handleSignupChange}
-                                        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
+                                        className="h-4 w-4 text-white focus:ring-white border-zinc-700 rounded"
+                                        required
                                     />
+                                    <label htmlFor="acceptTerms" className="ml-2 block text-sm">
+                                        I accept the <a href="/terms" className="text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">Terms and Conditions</a> *
+                                    </label>
                                 </div>
 
                                 <div className="flex items-center">
