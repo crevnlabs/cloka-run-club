@@ -37,8 +37,14 @@ export async function POST(request: NextRequest) {
     await dbConnect();
 
     // Parse the request body
-    const { title, description, date, location, secret, exactLocation } =
-      await request.json();
+    const {
+      title,
+      description,
+      date,
+      location,
+      exactLocation,
+      postApprovalMessage,
+    } = await request.json();
 
     // Validate required fields
     if (!title || !description || !date || !location) {
@@ -54,8 +60,8 @@ export async function POST(request: NextRequest) {
       description,
       date: new Date(date),
       location,
-      secret: secret || null,
       exactLocation: exactLocation || null,
+      postApprovalMessage: postApprovalMessage || null,
       createdAt: new Date(),
     });
 

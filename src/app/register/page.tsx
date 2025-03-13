@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function LoginRedirect() {
+export default function RegisterRedirect() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -14,13 +14,16 @@ export default function LoginRedirect() {
             params.append(key, value);
         });
 
+        // Add the signup mode
+        params.set('mode', 'signup');
+
         // Redirect to the new auth page
         router.replace(`/auth${params.toString() ? '?' + params.toString() : ''}`);
     }, [router, searchParams]);
 
     return (
         <div className="min-h-screen bg-black text-white flex items-center justify-center">
-            <p>Redirecting to login page...</p>
+            <p>Redirecting to registration page...</p>
         </div>
     );
-}
+} 

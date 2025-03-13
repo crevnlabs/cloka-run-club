@@ -13,7 +13,7 @@ export default function ProfilePage() {
     // Redirect if not authenticated (this is a backup to middleware)
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
-            router.push('/login');
+            router.push('/auth');
         }
     }, [isLoading, isAuthenticated, router]);
 

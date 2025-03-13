@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
     await dbConnect();
 
     // Check authentication
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const authCookie = cookieStore.get("cloka_auth");
 
     if (!authCookie || !authCookie.value) {
@@ -55,6 +55,7 @@ export async function POST(request: NextRequest) {
       date: new Date(date),
       location,
       exactLocation: body.exactLocation || null,
+      postApprovalMessage: body.postApprovalMessage || null,
       createdBy: userId,
     });
 

@@ -78,7 +78,7 @@ const Header = () => {
                     <Link href="/events" className="luxury-text hover:text-accent transition-colors hover:underline">
                         Events
                     </Link>
-                    <Link href="/register" className="luxury-text hover:text-accent transition-colors hover:underline">
+                    <Link href="/auth?mode=signup" className="luxury-text hover:text-accent transition-colors hover:underline">
                         Join
                     </Link>
 
@@ -146,14 +146,14 @@ const Header = () => {
                                 ) : (
                                     <>
                                         <Link
-                                            href="/login"
+                                            href="/auth"
                                             className="block px-4 py-2 text-sm hover:bg-zinc-800"
                                             onClick={() => setIsProfileMenuOpen(false)}
                                         >
                                             Login
                                         </Link>
                                         <Link
-                                            href="/signup"
+                                            href="/auth?mode=signup"
                                             className="block px-4 py-2 text-sm hover:bg-zinc-800"
                                             onClick={() => setIsProfileMenuOpen(false)}
                                         >
@@ -185,7 +185,7 @@ const Header = () => {
                             Events
                         </Link>
                         <Link
-                            href="/register"
+                            href="/auth?mode=signup"
                             className="luxury-text hover:text-accent transition-colors"
                             onClick={() => setIsMenuOpen(false)}
                         >
@@ -238,14 +238,14 @@ const Header = () => {
                             ) : (
                                 <>
                                     <Link
-                                        href="/login"
+                                        href="/auth"
                                         className="block py-2 luxury-text hover:text-accent"
                                         onClick={() => setIsMenuOpen(false)}
                                     >
                                         Login
                                     </Link>
                                     <Link
-                                        href="/signup"
+                                        href="/auth?mode=signup"
                                         className="block py-2 luxury-text hover:text-accent"
                                         onClick={() => setIsMenuOpen(false)}
                                     >

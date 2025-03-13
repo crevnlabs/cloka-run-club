@@ -63,7 +63,7 @@ const Hero = () => {
                         </p>
 
                         <div className="flex flex-col sm:flex-row justify-start items-center gap-4">
-                            <Link href="/register" className="luxury-button bg-transparent border border-white inline-block text-center">
+                            <Link href="/auth?mode=signup" className="luxury-button bg-transparent border border-white inline-block text-center">
                                 Join Cloka Club
                             </Link>
                             <p className="luxury-text text-lg text-zinc-300">

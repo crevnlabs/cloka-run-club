@@ -22,7 +22,7 @@ export default function EventRegistrationButton({
 
     const handleRegister = async () => {
         if (!isAuthenticated) {
-            router.push(`/login?redirect=/events/${eventId}`);
+            router.push(`/auth?redirect=/events/${eventId}`);
             return;
         }
 
@@ -55,7 +55,7 @@ export default function EventRegistrationButton({
 
     const handleCancel = async () => {
         if (!isAuthenticated) {
-            router.push(`/login?redirect=/events/${eventId}`);
+            router.push(`/auth?redirect=/events/${eventId}`);
             return;
         }
 

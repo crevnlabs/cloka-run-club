@@ -45,6 +45,8 @@ export async function GET(request: NextRequest) {
         description: event.description,
         date: event.date,
         location: event.location,
+        exactLocation: event.exactLocation,
+        postApprovalMessage: event.postApprovalMessage,
         approved: userEvent ? userEvent.approved : null,
       };
     });

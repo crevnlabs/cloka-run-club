@@ -11,8 +11,8 @@ interface Event {
     date: string;
     location: string;
     createdAt: string;
-    secret?: string;
     exactLocation?: string;
+    postApprovalMessage?: string;
 }
 
 export default function AdminEventsPage() {
@@ -44,8 +44,8 @@ export default function AdminEventsPage() {
             description: '',
             date: new Date().toISOString().split('T')[0],
             location: '',
-            secret: '',
-            exactLocation: ''
+            exactLocation: '',
+            postApprovalMessage: ''
         }
     });
     const [formError, setFormError] = useState('');
@@ -163,8 +163,8 @@ export default function AdminEventsPage() {
                 description: '',
                 date: new Date().toISOString().slice(0, 16),
                 location: '',
-                secret: '',
-                exactLocation: ''
+                exactLocation: '',
+                postApprovalMessage: ''
             }
         });
         setFormError('');
@@ -179,8 +179,8 @@ export default function AdminEventsPage() {
                 description: '',
                 date: new Date().toISOString().split('T')[0],
                 location: '',
-                secret: '',
-                exactLocation: ''
+                exactLocation: '',
+                postApprovalMessage: ''
             }
         });
         setFormError('');
@@ -473,23 +473,6 @@ export default function AdminEventsPage() {
                             </div>
 
                             <div>
-                                <label htmlFor="secret" className="block text-sm font-medium mb-1 text-black dark:text-white">
-                                    Event Secret (for location verification)
-                                </label>
-                                <input
-                                    id="secret"
-                                    name="secret"
-                                    type="text"
-                                    value={eventForm.event.secret || ''}
-                                    onChange={handleFormChange}
-                                    className="w-full p-2 border border-black dark:border-white rounded-md bg-white dark:bg-black text-black dark:text-white"
-                                />
-                                <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
-                                    This secret will be used to verify users who want to see the exact location
-                                </p>
-                            </div>
-
-                            <div>
                                 <label htmlFor="exactLocation" className="block text-sm font-medium mb-1 text-black dark:text-white">
                                     Exact Location (Google Maps Link)
                                 </label>
@@ -516,7 +499,25 @@ export default function AdminEventsPage() {
                                     </a>
                                 </div>
                                 <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
-                                    Paste a Google Maps link that will be revealed only to verified users. To get a link: open Google Maps, find your location, click Share, and copy the link.
+                                    Paste a Google Maps link for the exact event location.
+                                </p>
+                            </div>
+
+                            <div>
+                                <label htmlFor="postApprovalMessage" className="block text-sm font-medium mb-1 text-black dark:text-white">
+                                    Post-Approval Message
+                                </label>
+                                <textarea
+                                    id="postApprovalMessage"
+                                    name="postApprovalMessage"
+                                    value={eventForm.event.postApprovalMessage || ''}
+                                    onChange={handleFormChange}
+                                    rows={4}
+                                    className="w-full p-2 border border-black dark:border-white rounded-md bg-white dark:bg-black text-black dark:text-white"
+                                    placeholder="Enter a message that will be shown to approved participants"
+                                />
+                                <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
+                                    This message will be displayed to users after their registration is approved.
                                 </p>
                             </div>
 

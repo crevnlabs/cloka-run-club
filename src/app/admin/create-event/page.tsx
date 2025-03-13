@@ -92,7 +92,7 @@ export default function CreateEventPage() {
 
     // Redirect if not authenticated or not admin
     if (!isLoading && (!isAuthenticated || user?.role !== 'admin')) {
-        router.push('/login?redirect=/admin/create-event');
+        router.push('/auth?redirect=/admin/create-event');
         return null;
     }
 

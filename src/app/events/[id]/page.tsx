@@ -150,6 +150,14 @@ export default async function EventDetailPage({
                                                         ) : null}
                                                     </div>
                                                 )}
+
+                                                {/* Display post-approval message if available */}
+                                                {event.postApprovalMessage && (
+                                                    <div className="mt-4 p-4 bg-zinc-900 luxury-border">
+                                                        <h3 className="text-lg font-semibold mb-2">Important Information</h3>
+                                                        <p className="text-zinc-300 whitespace-pre-line">{event.postApprovalMessage}</p>
+                                                    </div>
+                                                )}
                                             </>
                                         ) : (
                                             <div className="p-4 bg-zinc-900 luxury-border">
@@ -169,7 +177,7 @@ export default async function EventDetailPage({
                                         {!isLoggedIn && event.exactLocation && (
                                             <div className="mt-4 p-4 bg-zinc-900 luxury-border">
                                                 <p className="text-zinc-300">
-                                                    <Link href={`/login?redirect=/events/${params.id}`} className="text-accent hover:underline">
+                                                    <Link href={`/auth?redirect=/events/${params.id}`} className="text-accent hover:underline">
                                                         Log in
                                                     </Link> to see the exact location details.
                                                 </p>

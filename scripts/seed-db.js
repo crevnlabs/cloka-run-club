@@ -31,7 +31,6 @@ const EventSchema = new mongoose.Schema({
   date: { type: Date, required: true },
   location: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
-  secret: { type: String },
   exactLocation: { type: String },
 });
 
@@ -121,33 +120,34 @@ const products = [
   },
 ];
 
-const sampleEvents = [
+// Create sample events
+const events = [
   {
-    title: "Morning Run Club",
+    title: "Morning Run",
     description:
       "Join us for a refreshing morning run through the city. All levels welcome!",
-    date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-    location: "Central Park",
-    secret: "morningrun2023",
+    date: new Date("2023-12-15T08:00:00Z"),
+    location: "Downtown Miami",
     exactLocation: "https://maps.app.goo.gl/example1",
+    createdAt: new Date(),
   },
   {
-    title: "Evening Trail Run",
+    title: "Trail Running Adventure",
     description:
-      "Experience the beauty of nature with our evening trail run. Bring headlamps!",
-    date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
-    location: "Mountain Trails",
-    secret: "trailrun2023",
+      "Explore the beautiful trails outside the city. Intermediate level recommended.",
+    date: new Date("2023-12-22T09:00:00Z"),
+    location: "Oleta River State Park",
     exactLocation: "https://maps.app.goo.gl/example2",
+    createdAt: new Date(),
   },
   {
-    title: "Weekend Marathon Training",
+    title: "Marathon Training",
     description:
-      "Prepare for upcoming marathons with our structured training session.",
-    date: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000), // 21 days from now
-    location: "City Stadium",
-    secret: "marathon2023",
+      "Preparing for the upcoming marathon? Join our training session!",
+    date: new Date("2023-12-29T07:30:00Z"),
+    location: "South Beach",
     exactLocation: "https://maps.app.goo.gl/example3",
+    createdAt: new Date(),
   },
 ];
 
@@ -167,7 +167,7 @@ async function seedDatabase() {
     await Product.insertMany(products);
     console.log("Products seeded");
 
-    await Event.insertMany(sampleEvents);
+    await Event.insertMany(events);
     console.log("Events seeded");
 
     console.log("Database seeded successfully!");

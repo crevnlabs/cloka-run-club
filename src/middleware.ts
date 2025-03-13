@@ -44,8 +44,8 @@ export function middleware(request: NextRequest) {
 
     // If not authenticated, redirect to login
     if (!authCookie || !authCookie.value) {
-      console.log("User authentication failed, redirecting to login");
-      const url = new URL("/login", request.url);
+      console.log("User authentication failed, redirecting to auth page");
+      const url = new URL("/auth", request.url);
       // Add the original URL as a redirect parameter
       url.searchParams.set("redirect", pathname);
       return NextResponse.redirect(url);
@@ -54,10 +54,35 @@ export function middleware(request: NextRequest) {
     console.log("User authentication successful");
   }
 
+  // Redirect old login and signup pages to the new combined auth page
+  if (pathname === "/login" || pathname === "/signup") {
+    console.log("Redirecting from old auth page to new combined auth page");
+    const url = new URL("/auth", request.url);
+
+    // Preserve any query parameters
+    const searchParams = new URL(request.url).searchParams;
+    searchParams.forEach((value, key) => {
+      url.searchParams.set(key, value);
+    });
+
+    // Set the initial mode based on the original path
+    if (pathname === "/signup") {
+      url.searchParams.set("mode", "signup");
+    }
+
+    return NextResponse.redirect(url);
+  }
+
   return NextResponse.next();
 }
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: [
+    "/admin/:path*",
+    "/profile/:path*",
+    "/my-events/:path*",
+    "/login",
+    "/signup",
+  ],
 };

@@ -26,7 +26,7 @@ export default function MyEventsPage() {
     // Redirect if not authenticated (this is a backup to middleware)
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
-            router.push('/login?redirect=/my-events');
+            router.push('/auth?redirect=/my-events');
         }
     }, [isLoading, isAuthenticated, router]);
 
