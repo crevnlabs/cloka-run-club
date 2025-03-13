@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import PasswordInput from '@/components/PasswordInput';
 
 export default function AdminLoginPage() {
     const [password, setPassword] = useState('');
@@ -44,14 +45,14 @@ export default function AdminLoginPage() {
             console.log('Response data:', data);
 
             if (response.ok) {
-                console.log('Login successful, redirecting to /admin/registrations');
+                console.log('Login successful, redirecting to /admin/event-registrations');
                 // Try both navigation methods
                 try {
-                    router.push('/admin/registrations');
+                    router.push('/admin/event-registrations');
                 } catch (navError) {
                     console.error('Router navigation failed:', navError);
                     // Fallback to window.location
-                    window.location.href = '/admin/registrations';
+                    window.location.href = '/admin/event-registrations';
                 }
             } else {
                 console.log('Login failed:', data.message);
@@ -97,9 +98,8 @@ export default function AdminLoginPage() {
                         <label htmlFor="password" className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
                             Password
                         </label>
-                        <input
+                        <PasswordInput
                             id="password"
-                            type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className="w-full p-3 border rounded-md focus:outline-none focus:ring-2"
@@ -108,7 +108,7 @@ export default function AdminLoginPage() {
                                 backgroundColor: isDarkMode ? '#2a2a2a' : '#ffffff',
                                 color: 'var(--foreground)',
                             }}
-                            required
+                            showHelperText={false}
                         />
                     </div>
 

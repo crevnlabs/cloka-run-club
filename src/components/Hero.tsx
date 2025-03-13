@@ -12,7 +12,7 @@ const Hero = () => {
     useEffect(() => {
         const fetchRegistrationCount = async () => {
             try {
-                const response = await fetch('/api/registrations/count');
+                const response = await fetch('/api/user/count');
                 if (response.ok) {
                     const data = await response.json();
                     setRegistrationCount(data.count);

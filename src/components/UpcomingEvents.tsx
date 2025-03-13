@@ -29,67 +29,6 @@ interface UpcomingEventsProps {
 }
 
 const EventCard = ({ event }: { event: EventProps }) => {
-    const [showModal, setShowModal] = useState(false);
-    const [instagramUsername, setInstagramUsername] = useState('');
-    const [secret, setSecret] = useState('');
-    const [isVerifying, setIsVerifying] = useState(false);
-    const [verificationError, setVerificationError] = useState('');
-    const [exactLocation, setExactLocation] = useState('');
-    const [isVerified, setIsVerified] = useState(false);
-    const [isGoogleMapsLink, setIsGoogleMapsLink] = useState(false);
-
-    const handleRevealLocation = () => {
-        setShowModal(true);
-    };
-
-    const closeModal = () => {
-        if (!isVerified) {
-            setInstagramUsername('');
-            setSecret('');
-            setVerificationError('');
-        }
-        setShowModal(false);
-    };
-
-    const verifySecret = async () => {
-        if (!instagramUsername || !secret) {
-            setVerificationError('Please fill in all fields');
-            return;
-        }
-
-        setIsVerifying(true);
-        setVerificationError('');
-
-        try {
-            const response = await fetch('/api/events/verify-secret', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    eventId: event.id,
-                    instagramUsername,
-                    secret,
-                }),
-            });
-
-            const data = await response.json();
-
-            if (response.ok && data.success) {
-                setExactLocation(data.exactLocation);
-                setIsGoogleMapsLink(data.isGoogleMapsLink || false);
-                setIsVerified(true);
-            } else {
-                setVerificationError(data.message || 'Verification failed. Please check your information and try again.');
-            }
-        } catch (error) {
-            setVerificationError('An error occurred during verification. Please try again.');
-            console.error('Error verifying secret:', error);
-        } finally {
-            setIsVerifying(false);
-        }
-    };
-
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -107,127 +46,13 @@ const EventCard = ({ event }: { event: EventProps }) => {
             </p>
             <p className="luxury-text mb-6">{event.description}</p>
             <div className="flex flex-wrap gap-3">
-                <button
-                    onClick={handleRevealLocation}
+                <Link
+                    href={`/events/${event.id}`}
                     className="hover:cursor-pointer luxury-button text-sm inline-block"
                 >
-                    Reveal Location
-                </button>
+                    View Details
+                </Link>
             </div>
-
-            {/* Location Verification Modal */}
-            {showModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-6 max-w-md w-full">
-                        <h3 className="text-xl font-bold mb-4 text-black">
-                            {isVerified ? 'Exact Location' : 'Verify to Reveal Location'}
-                        </h3>
-
-                        {isVerified ? (
-                            <div>
-                                <p className="mb-4 text-black">
-                                    <span className="font-medium">Exact Location:</span>
-                                </p>
-                                {isGoogleMapsLink ? (
-                                    <div className="mb-6">
-                                        <a
-                                            href={exactLocation}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-2 bg-black text-white px-4 py-2 rounded-md hover:bg-zinc-800 transition-colors"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                                            </svg>
-                                            Open in Google Maps
-                                        </a>
-                                        <p className="text-xs text-zinc-600 mt-2">
-                                            Click the button above to view the exact location in Google Maps
-                                        </p>
-                                    </div>
-                                ) : (
-                                    <p className="mb-6 text-black">{exactLocation}</p>
-                                )}
-                                <div className="flex justify-end">
-                                    <button
-                                        onClick={closeModal}
-                                        className="hover:cursor-pointer luxury-button text-sm"
-                                    >
-                                        Close
-                                    </button>
-                                </div>
-                            </div>
-                        ) : (
-                            <div>
-                                <p className="mb-4 text-black">
-                                    Enter your Instagram username and the event secret to reveal the exact location.
-                                </p>
-                                <p className="mb-4 text-sm text-zinc-600">
-                                    <strong>Note:</strong> If you have an approved registration with your Instagram username, you&apos;ll be verified automatically.
-                                </p>
-
-                                {verificationError && (
-                                    <div className="bg-red-50 border border-red-200 text-red-800 p-3 rounded-md mb-4">
-                                        {verificationError}
-                                    </div>
-                                )}
-
-                                <div className="space-y-4">
-                                    <div>
-                                        <label htmlFor="instagramUsername" className="block text-sm font-medium mb-1 text-black">
-                                            Instagram Username
-                                        </label>
-                                        <div className="relative">
-                                            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-black">@</span>
-                                            <input
-                                                id="instagramUsername"
-                                                type="text"
-                                                value={instagramUsername}
-                                                onChange={(e) => setInstagramUsername(e.target.value)}
-                                                className="w-full p-3 pl-8 border border-black rounded-md focus:outline-none focus:ring-2 focus:ring-black text-black bg-white"
-                                                placeholder="your_username"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label htmlFor="eventSecret" className="block text-sm font-medium mb-1 text-black">
-                                            Event Secret
-                                        </label>
-                                        <input
-                                            id="eventSecret"
-                                            type="text"
-                                            value={secret}
-                                            onChange={(e) => setSecret(e.target.value)}
-                                            className="w-full p-3 border border-black rounded-md focus:outline-none focus:ring-2 focus:ring-black text-black bg-white"
-                                            placeholder="Enter event secret"
-                                        />
-                                        <p className="text-xs text-zinc-600 mt-1">
-                                            Required only if you don&apos;t have an approved registration
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="flex justify-end space-x-3 mt-6">
-                                    <button
-                                        onClick={closeModal}
-                                        className="hover:cursor-pointer px-4 py-2 border border-black text-black rounded hover:bg-zinc-100 transition-colors"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        onClick={verifySecret}
-                                        disabled={isVerifying}
-                                        className="hover:cursor-pointer luxury-button text-sm"
-                                    >
-                                        {isVerifying ? 'Verifying...' : 'Verify & Reveal'}
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
         </motion.div>
     );
 };
@@ -245,6 +70,7 @@ const UpcomingEvents = ({ serverEvents }: UpcomingEventsProps) => {
         const fetchEvents = async () => {
             setLoading(true);
             try {
+                // Explicitly request only upcoming events (default behavior of the API)
                 const data = await fetchApi<{ events: ApiEventData[] }>('/api/events');
 
                 // Transform API data to component format
@@ -274,7 +100,12 @@ const UpcomingEvents = ({ serverEvents }: UpcomingEventsProps) => {
     return (
         <section className="py-16 bg-black text-white mt-10">
             <div className="luxury-container">
-
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12">
+                    <h2 className="text-3xl font-bold">Upcoming Events</h2>
+                    <p className="text-zinc-400 mt-2 md:mt-0">
+                        Join us for our next exclusive gatherings
+                    </p>
+                </div>
 
                 {loading ? (
                     <div className="text-center py-12">

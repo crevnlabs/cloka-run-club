@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "download-images": "node scripts/download-placeholders.js",
-    "seed-db": "node scripts/seed-db.js"
+    "seed-db": "node scripts/seed-db.js",
+    "migrate-users": "node scripts/migrate-users.js"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
@@ -21,6 +22,7 @@
     "critters": "^0.0.23",
     "dotenv": "^16.4.7",
     "framer-motion": "^12.4.7",
+    "lucide-react": "^0.479.0",
     "mongodb": "^6.14.0",
     "mongoose": "^8.11.0",
     "next": "15.2.0",

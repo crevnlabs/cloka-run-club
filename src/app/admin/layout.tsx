@@ -9,7 +9,7 @@ import Image from 'next/image';
 const navItems = [
     { name: 'Products', href: '/admin/products' },
     { name: 'Events', href: '/admin/events' },
-    { name: 'Registrations', href: '/admin/registrations' },
+    { name: 'Registrations', href: '/admin/event-registrations' },
 ];
 
 export default function AdminLayout({

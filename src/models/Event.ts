@@ -6,7 +6,6 @@ export interface IEvent extends Document {
   date: Date;
   location: string;
   createdAt: Date;
-  secret?: string;
   exactLocation?: string;
 }
 
@@ -16,7 +15,6 @@ const EventSchema: Schema = new Schema({
   date: { type: Date, required: true },
   location: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
-  secret: { type: String },
   exactLocation: { type: String },
 });
 
