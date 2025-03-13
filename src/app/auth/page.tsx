@@ -139,7 +139,7 @@ export default function AuthPage() {
     return (
         <>
             <Header />
-            <div className="min-h-screen bg-black text-white flex items-center justify-center px-4 py-12">
+            <div className="bg-black text-white flex items-center justify-center px-4 py-12">
                 <div className="container mx-auto max-w-6xl relative">
                     <div className="flex flex-col md:flex-row">
                         {/* Image Section */}
