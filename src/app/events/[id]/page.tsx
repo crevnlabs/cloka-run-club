@@ -70,6 +70,9 @@ export default async function EventDetailPage({
     const authCookie = cookieStore.get("cloka_auth");
     const isLoggedIn = !!(authCookie && authCookie.value);
 
+    // Check if event is in the past
+    const isPastEvent = new Date(event.date) < new Date();
+
     // Format date
     const formatDate = (date: Date) => {
         return date.toLocaleDateString('en-US', {
@@ -189,11 +192,18 @@ export default async function EventDetailPage({
                                 <div className="md:w-1/3">
                                     <div className="bg-zinc-900 luxury-border p-6">
                                         <h2 className="text-xl font-bold mb-4">Registration</h2>
-                                        <EventRegistrationButton
-                                            eventId={params.id}
-                                            isRegistered={isRegistered}
-                                            isApproved={isApproved}
-                                        />
+                                        {isPastEvent ? (
+                                            <div className="p-3 bg-zinc-800 text-zinc-300 rounded-md">
+                                                This event has already taken place.
+                                            </div>
+                                        ) : (
+                                            <EventRegistrationButton
+                                                eventId={params.id}
+                                                isRegistered={isRegistered}
+                                                isApproved={isApproved}
+                                                isPastEvent={isPastEvent}
+                                            />
+                                        )}
                                     </div>
                                 </div>
                             </div>

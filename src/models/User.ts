@@ -19,14 +19,14 @@ const UserSchema: Schema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  phone: { type: String, required: true },
+  phone: { type: String, required: true, unique: true },
   age: { type: Number },
   gender: {
     type: String,
     enum: ["male", "female", "other"],
   },
   emergencyContact: { type: String },
-  instagramUsername: { type: String },
+  instagramUsername: { type: String, sparse: true, unique: true },
   joinCrew: {
     type: Boolean,
     default: false,

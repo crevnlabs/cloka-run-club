@@ -61,6 +61,14 @@ export default function AuthPage() {
             newValue = digitsOnly.slice(-10);
         }
 
+        // Special handling for age - silently cap at 30
+        if (name === 'age' && typeof newValue === 'string') {
+            const ageValue = parseInt(newValue);
+            if (!isNaN(ageValue) && ageValue > 30) {
+                newValue = '30';
+            }
+        }
+
         setSignupData({ ...signupData, [name]: newValue });
     };
 
@@ -334,6 +342,8 @@ export default function AuthPage() {
                                                 onChange={handleSignupChange}
                                                 className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
                                                 required
+                                                min="1"
+                                                max="30"
                                             />
                                         </div>
 

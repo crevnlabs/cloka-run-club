@@ -121,7 +121,7 @@ export default function EventRegistrationsPage() {
                         });
                     }
                 } else {
-                    // Reset summary if no event is selected
+                    // Calculate global summary from the current data
                     let approvedCount = 0;
                     let rejectedCount = 0;
                     let pendingCount = 0;
@@ -280,7 +280,7 @@ export default function EventRegistrationsPage() {
                             type="text"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Search by name or email"
+                            placeholder="Search by name, email, or Instagram"
                             className="w-full bg-zinc-800 border border-zinc-700 rounded px-4 py-2 pl-10"
                         />
                         <Search className="absolute left-3 top-2.5 h-4 w-4 text-zinc-500" />
@@ -368,10 +368,10 @@ export default function EventRegistrationsPage() {
             )}
 
             {/* Event Summary */}
-            {selectedEvent && !loading && (
+            {!loading && (
                 <div className="bg-zinc-900 p-4 rounded-lg mb-6">
                     <h2 className="text-lg font-semibold mb-3">
-                        {events.find(e => e._id === selectedEvent)?.title || 'Event'} Summary
+                        {selectedEvent ? (events.find(e => e._id === selectedEvent)?.title || 'Event') : 'Global'} Summary
                     </h2>
                     <div className="grid grid-cols-4 gap-4">
                         <div className="bg-zinc-800 p-3 rounded-lg text-center">

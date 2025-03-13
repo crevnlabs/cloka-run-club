@@ -40,7 +40,7 @@ async function dbConnect() {
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
-      dbName: process.env.NODE_ENV === "production" ? "cloka" : "cloka-staging",
+      dbName: process.env.NODE_ENV === "production" ? "cloka" : "cloka",
     };
 
     cached.promise = mongoose

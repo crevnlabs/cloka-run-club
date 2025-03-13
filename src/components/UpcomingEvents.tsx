@@ -1,9 +1,9 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { fetchApi } from '@/lib/apiUtils';
+import Button from './Button';
 
 type EventProps = {
     id: string;
@@ -46,12 +46,14 @@ const EventCard = ({ event }: { event: EventProps }) => {
             </p>
             <p className="luxury-text mb-6">{event.description}</p>
             <div className="flex flex-wrap gap-3">
-                <Link
+                <Button
                     href={`/events/${event.id}`}
-                    className="hover:cursor-pointer luxury-button text-sm inline-block"
+                    variant="luxury"
+                    size="small"
+                    className="inline-block"
                 >
                     View Details
-                </Link>
+                </Button>
             </div>
         </motion.div>
     );
@@ -129,9 +131,13 @@ const UpcomingEvents = ({ serverEvents }: UpcomingEventsProps) => {
                 )}
 
                 <div className="text-center mt-12">
-                    <Link href="/events" className="luxury-button inline-block">
+                    <Button
+                        href="/events"
+                        variant="luxury"
+                        className="inline-block"
+                    >
                         View All Events
-                    </Link>
+                    </Button>
                 </div>
             </div>
         </section>

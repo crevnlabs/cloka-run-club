@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Loader from './Loader';
+import Button from './Button';
 
 interface LoadingButtonProps {
     isLoading: boolean;
@@ -13,6 +13,8 @@ interface LoadingButtonProps {
     className?: string;
     disabled?: boolean;
     onClick?: () => void;
+    href?: string;
+    fullWidth?: boolean;
 }
 
 export default function LoadingButton({
@@ -25,39 +27,23 @@ export default function LoadingButton({
     className = '',
     disabled = false,
     onClick,
+    href,
+    fullWidth = false,
 }: LoadingButtonProps) {
-    const baseClasses = 'flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2';
-
-    const variantClasses = {
-        primary: 'bg-primary text-white hover:bg-primary-dark focus:ring-primary',
-        secondary: 'bg-zinc-200 text-zinc-800 hover:bg-zinc-300 focus:ring-zinc-300',
-        outline: 'bg-transparent text-primary border border-primary hover:bg-primary/10 focus:ring-primary',
-        danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
-    };
-
-    const sizeClasses = {
-        small: 'py-1 px-3 text-sm',
-        medium: 'py-2 px-4 text-base',
-        large: 'py-3 px-6 text-lg',
-    };
-
-    const buttonClasses = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`;
-
     return (
-        <button
+        <Button
             type={type}
-            className={buttonClasses}
-            disabled={disabled || isLoading}
+            variant={variant}
+            size={size}
+            className={className}
+            disabled={disabled}
+            isLoading={isLoading}
+            loadingText={loadingText}
             onClick={onClick}
+            href={href}
+            fullWidth={fullWidth}
         >
-            {isLoading ? (
-                <>
-                    <Loader size="small" variant="spinner" className="mr-2" />
-                    <span>{loadingText || text}</span>
-                </>
-            ) : (
-                <span>{text}</span>
-            )}
-        </button>
+            {text}
+        </Button>
     );
 } 

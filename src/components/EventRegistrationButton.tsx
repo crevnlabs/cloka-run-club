@@ -8,12 +8,14 @@ interface EventRegistrationButtonProps {
     eventId: string;
     isRegistered?: boolean;
     isApproved?: boolean | null;
+    isPastEvent?: boolean;
 }
 
 export default function EventRegistrationButton({
     eventId,
     isRegistered = false,
     isApproved = null,
+    isPastEvent = false,
 }: EventRegistrationButtonProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
@@ -23,6 +25,12 @@ export default function EventRegistrationButton({
     const handleRegister = async () => {
         if (!isAuthenticated) {
             router.push(`/auth?redirect=/events/${eventId}`);
+            return;
+        }
+
+        // Prevent registration for past events
+        if (isPastEvent) {
+            setError('This event has already taken place and is no longer open for registration.');
             return;
         }
 

@@ -29,13 +29,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if user already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
+    // Check if user already exists with the same email
+    const existingUserByEmail = await User.findOne({ email });
+    if (existingUserByEmail) {
       return NextResponse.json(
         { success: false, message: "Email already registered" },
         { status: 400 }
       );
+    }
+
+    // Check if user already exists with the same phone number
+    const existingUserByPhone = await User.findOne({ phone });
+    if (existingUserByPhone) {
+      return NextResponse.json(
+        { success: false, message: "Phone number already registered" },
+        { status: 400 }
+      );
+    }
+
+    // Check if user already exists with the same Instagram username (if provided)
+    if (instagramUsername) {
+      const existingUserByInstagram = await User.findOne({ instagramUsername });
+      if (existingUserByInstagram) {
+        return NextResponse.json(
+          { success: false, message: "Instagram username already registered" },
+          { status: 400 }
+        );
+      }
     }
 
     // Hash the password

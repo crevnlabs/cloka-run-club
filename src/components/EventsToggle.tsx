@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import Button from './Button';
 
 type EventProps = {
     _id: string;
@@ -31,24 +31,28 @@ const EventsToggle = ({ allEvents, upcomingEvents }: EventsToggleProps) => {
         <>
             <div className="flex justify-end mb-6">
                 <div className="inline-flex items-center bg-zinc-900 rounded-lg p-1">
-                    <button
+                    <Button
                         onClick={() => toggleEvents(false)}
-                        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${!showUpcomingOnly
-                                ? 'bg-accent text-white'
-                                : 'text-zinc-400 hover:text-white'
+                        variant={!showUpcomingOnly ? 'primary' : 'secondary'}
+                        size="small"
+                        className={`px-4 py-2 text-sm font-medium transition-colors ${!showUpcomingOnly
+                            ? 'bg-accent text-white'
+                            : 'bg-transparent text-zinc-400 hover:text-white'
                             }`}
                     >
                         All Events
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         onClick={() => toggleEvents(true)}
-                        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${showUpcomingOnly
-                                ? 'bg-accent text-white'
-                                : 'text-zinc-400 hover:text-white'
+                        variant={showUpcomingOnly ? 'primary' : 'secondary'}
+                        size="small"
+                        className={`px-4 py-2 text-sm font-medium transition-colors ${showUpcomingOnly
+                            ? 'bg-accent text-white'
+                            : 'bg-transparent text-zinc-400 hover:text-white'
                             }`}
                     >
                         Upcoming Only
-                    </button>
+                    </Button>
                 </div>
             </div>
 
@@ -67,12 +71,14 @@ const EventsToggle = ({ allEvents, upcomingEvents }: EventsToggleProps) => {
                             </p>
                             <p className="luxury-text mb-6">{event.description}</p>
                             <div className="flex flex-wrap gap-3">
-                                <Link
+                                <Button
                                     href={`/events/${event._id}`}
-                                    className="hover:cursor-pointer luxury-button text-sm inline-block"
+                                    variant="luxury"
+                                    size="small"
+                                    className="inline-block"
                                 >
                                     View Details
-                                </Link>
+                                </Button>
                             </div>
                         </div>
                     ))}

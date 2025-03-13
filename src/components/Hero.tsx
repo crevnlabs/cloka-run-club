@@ -1,9 +1,9 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
+import Button from './Button';
 
 const Hero = () => {
     const [registrationCount, setRegistrationCount] = useState<number>(600);
@@ -63,9 +63,13 @@ const Hero = () => {
                         </p>
 
                         <div className="flex flex-col sm:flex-row justify-start items-center gap-4">
-                            <Link href="/auth?mode=signup" className="luxury-button bg-transparent border border-white inline-block text-center">
+                            <Button
+                                href="/auth?mode=signup"
+                                variant="luxury"
+                                className="bg-transparent border border-white inline-block text-center"
+                            >
                                 Join Cloka Club
-                            </Link>
+                            </Button>
                             <p className="luxury-text text-lg text-zinc-300">
                                 {isLoading ? (
                                     <span className="text-white font-bold">600+</span>

@@ -50,6 +50,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check if event is in the past
+    if (new Date(event.date) < new Date()) {
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "This event has already taken place and is no longer open for registration.",
+        },
+        { status: 400 }
+      );
+    }
+
     // Check if user is already registered for this event
     const existingRegistration = await UserEvent.findOne({
       userId,

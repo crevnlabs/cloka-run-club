@@ -18,7 +18,7 @@ if (!MONGODB_URI) {
 // MongoDB connection options
 const mongooseOptions = {
   bufferCommands: false,
-  dbName: process.env.NODE_ENV === "production" ? "cloka" : "cloka-staging",
+  dbName: process.env.NODE_ENV === "production" ? "cloka" : "cloka",
 };
 
 // Define schemas

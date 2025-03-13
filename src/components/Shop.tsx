@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import Button from './Button';
 
 type ProductProps = {
     id: string;
@@ -75,12 +76,13 @@ const ProductCard = ({ product, onBuyNow }: { product: ProductProps; onBuyNow: (
                 <h3 className="text-xl font-bold mb-1">{product.name}</h3>
                 <p className="text-lg font-medium mb-2">₹{product.price}</p>
                 <p className="luxury-text text-sm mb-4 text-zinc-700">{product.description}</p>
-                <button
+                <Button
                     onClick={() => onBuyNow(product)}
-                    className="luxury-button w-full"
+                    variant="luxury"
+                    fullWidth
                 >
                     Buy Now
-                </button>
+                </Button>
             </div>
         </motion.div>
     );
