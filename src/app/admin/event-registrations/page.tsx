@@ -1,0 +1,584 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { CheckCircle, XCircle, Clock, Search, Filter, RefreshCw } from 'lucide-react';
+
+interface User {
+    _id: string;
+    name: string;
+    email: string;
+    phone: string;
+    age?: number;
+    sex?: string;
+    instagram?: string;
+}
+
+interface Event {
+    _id: string;
+    title: string;
+    date: string;
+    location: string;
+}
+
+interface EventRegistration {
+    _id: string;
+    userId: string;
+    eventId: string;
+    approved: boolean | null;
+    createdAt: string;
+    user: User | null;
+    event: Event | null;
+}
+
+interface PaginationData {
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+}
+
+export default function EventRegistrationsPage() {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
+    // State
+    const [eventRegistrations, setEventRegistrations] = useState<EventRegistration[]>([]);
+    const [events, setEvents] = useState<Event[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+    const [pagination, setPagination] = useState<PaginationData>({
+        total: 0,
+        page: 1,
+        limit: 10,
+        pages: 0,
+    });
+    const [summary, setSummary] = useState({
+        total: 0,
+        approved: 0,
+        rejected: 0,
+        pending: 0
+    });
+
+    // Filters
+    const [selectedEvent, setSelectedEvent] = useState(searchParams.get('eventId') || '');
+    const [approvalStatus, setApprovalStatus] = useState(searchParams.get('approved') || '');
+    const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
+    const [ageRange, setAgeRange] = useState(searchParams.get('ageRange') || '');
+    const [selectedSex, setSelectedSex] = useState(searchParams.get('sex') || '');
+
+    // Load event registrations
+    const loadEventRegistrations = useCallback(async () => {
+        setLoading(true);
+        setError('');
+
+        try {
+            // Build query parameters
+            const params = new URLSearchParams();
+            params.append('page', pagination.page.toString());
+            params.append('limit', pagination.limit.toString());
+
+            if (selectedEvent) {
+                params.append('eventId', selectedEvent);
+            }
+
+            if (approvalStatus) {
+                params.append('approved', approvalStatus);
+            }
+
+            if (searchTerm) {
+                params.append('search', searchTerm);
+            }
+
+            if (ageRange) {
+                params.append('ageRange', ageRange);
+            }
+
+            if (selectedSex) {
+                params.append('sex', selectedSex);
+            }
+
+            // Fetch event registrations
+            const response = await fetch(`/api/admin/event-registrations?${params.toString()}`);
+            const data = await response.json();
+
+            if (response.ok) {
+                setEventRegistrations(data.eventRegistrations);
+                setPagination(data.pagination);
+
+                // Calculate summary if an event is selected
+                if (selectedEvent) {
+                    // Fetch summary data for the selected event
+                    const summaryResponse = await fetch(`/api/admin/event-registrations/stats?eventId=${selectedEvent}`);
+                    const summaryData = await summaryResponse.json();
+
+                    if (summaryResponse.ok) {
+                        setSummary({
+                            total: summaryData.total,
+                            approved: summaryData.approved,
+                            rejected: summaryData.rejected,
+                            pending: summaryData.pending
+                        });
+                    }
+                } else {
+                    // Reset summary if no event is selected
+                    let approvedCount = 0;
+                    let rejectedCount = 0;
+                    let pendingCount = 0;
+
+                    data.eventRegistrations.forEach((reg: EventRegistration) => {
+                        if (reg.approved === true) approvedCount++;
+                        else if (reg.approved === false) rejectedCount++;
+                        else pendingCount++;
+                    });
+
+                    setSummary({
+                        total: data.pagination.total,
+                        approved: approvedCount,
+                        rejected: rejectedCount,
+                        pending: pendingCount
+                    });
+                }
+            } else {
+                setError(data.message || 'Failed to load event registrations');
+            }
+        } catch (error) {
+            console.error('Error loading event registrations:', error);
+            setError('An error occurred while loading event registrations');
+        } finally {
+            setLoading(false);
+        }
+    }, [pagination.page, pagination.limit, selectedEvent, approvalStatus, searchTerm, ageRange, selectedSex]);
+
+    // Load events for filter
+    const loadEvents = useCallback(async () => {
+        try {
+            const response = await fetch('/api/events?limit=100&sort=date&all=true');
+            if (response.ok) {
+                const data = await response.json();
+                setEvents(data.events || data);
+            } else {
+                console.error('Failed to load events');
+            }
+        } catch (error) {
+            console.error('Error loading events:', error);
+        }
+    }, []);
+
+    // Handle approval/rejection
+    const handleApproval = async (registrationId: string, approved: boolean) => {
+        try {
+            const response = await fetch('/api/admin/event-registrations/approve', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    registrationId,
+                    approved,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Find the registration to update
+                const registration = eventRegistrations.find(reg => reg._id === registrationId);
+
+                // Update the registration in the state
+                setEventRegistrations(prevRegistrations =>
+                    prevRegistrations.map(reg =>
+                        reg._id === registrationId ? { ...reg, approved } : reg
+                    )
+                );
+
+                // Update summary counts
+                if (registration) {
+                    setSummary(prev => {
+                        const newSummary = { ...prev };
+
+                        // Decrement previous status count
+                        if (registration.approved === true) newSummary.approved--;
+                        else if (registration.approved === false) newSummary.rejected--;
+                        else newSummary.pending--;
+
+                        // Increment new status count
+                        if (approved) newSummary.approved++;
+                        else newSummary.rejected++;
+
+                        return newSummary;
+                    });
+                }
+            } else {
+                setError(data.message || 'Failed to update registration');
+            }
+        } catch (err) {
+            setError('An error occurred while updating registration');
+            console.error(err);
+        }
+    };
+
+    // Handle page change
+    const handlePageChange = (newPage: number) => {
+        setPagination(prev => ({ ...prev, page: newPage }));
+    };
+
+    // Handle filter change
+    const handleFilterChange = () => {
+        // Reset to page 1 when filters change
+        setPagination(prev => ({ ...prev, page: 1 }));
+
+        // Update URL with filters
+        const params = new URLSearchParams();
+        if (selectedEvent) params.append('eventId', selectedEvent);
+        if (approvalStatus) params.append('approved', approvalStatus);
+        if (searchTerm) params.append('search', searchTerm);
+        if (ageRange) params.append('ageRange', ageRange);
+        if (selectedSex) params.append('sex', selectedSex);
+
+        router.push(`/admin/event-registrations?${params.toString()}`);
+    };
+
+    // Format date
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+    };
+
+    // Load data on initial render and when filters/pagination change
+    useEffect(() => {
+        loadEvents();
+        loadEventRegistrations();
+    }, [loadEvents, loadEventRegistrations]);
+
+    return (
+        <div className="container mx-auto px-4 py-8">
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-2xl font-bold">Event Registrations</h1>
+                <button
+                    onClick={() => loadEventRegistrations()}
+                    className="flex items-center bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded"
+                >
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Refresh
+                </button>
+            </div>
+
+            {/* Filters */}
+            <div className="bg-zinc-900 p-4 rounded-lg mb-6">
+                {/* Search bar in its own row */}
+                <div className="mb-4">
+                    <label className="block text-sm font-medium mb-1">Search</label>
+                    <div className="relative">
+                        <input
+                            type="text"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder="Search by name or email"
+                            className="w-full bg-zinc-800 border border-zinc-700 rounded px-4 py-2 pl-10"
+                        />
+                        <Search className="absolute left-3 top-2.5 h-4 w-4 text-zinc-500" />
+                    </div>
+                </div>
+
+                <div className="flex flex-col md:flex-row gap-4">
+                    <div className="w-full md:w-64">
+                        <label className="block text-sm font-medium mb-1">Event</label>
+                        <select
+                            value={selectedEvent}
+                            onChange={(e) => setSelectedEvent(e.target.value)}
+                            className="w-full bg-zinc-800 border border-zinc-700 rounded px-4 py-2"
+                        >
+                            <option value="">All Events</option>
+                            {events.map((event) => (
+                                <option key={event._id} value={event._id}>
+                                    {event.title}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="w-full md:w-64">
+                        <label className="block text-sm font-medium mb-1">Status</label>
+                        <select
+                            value={approvalStatus}
+                            onChange={(e) => setApprovalStatus(e.target.value)}
+                            className="w-full bg-zinc-800 border border-zinc-700 rounded px-4 py-2"
+                        >
+                            <option value="">All Statuses</option>
+                            <option value="true">Approved</option>
+                            <option value="false">Rejected</option>
+                            <option value="pending">Pending</option>
+                        </select>
+                    </div>
+
+                    <div className="w-full md:w-64">
+                        <label className="block text-sm font-medium mb-1">Age Range</label>
+                        <select
+                            value={ageRange}
+                            onChange={(e) => setAgeRange(e.target.value)}
+                            className="w-full bg-zinc-800 border border-zinc-700 rounded px-4 py-2"
+                        >
+                            <option value="">All Ages</option>
+                            <option value="18-25">18-25</option>
+                            <option value="26-35">26-35</option>
+                            <option value="36-45">36-45</option>
+                            <option value="46-55">46-55</option>
+                            <option value="56+">56+</option>
+                        </select>
+                    </div>
+
+                    <div className="w-full md:w-64">
+                        <label className="block text-sm font-medium mb-1">Sex</label>
+                        <select
+                            value={selectedSex}
+                            onChange={(e) => setSelectedSex(e.target.value)}
+                            className="w-full bg-zinc-800 border border-zinc-700 rounded px-4 py-2"
+                        >
+                            <option value="">All</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div className="flex items-end">
+                        <button
+                            onClick={handleFilterChange}
+                            className="bg-white text-black px-4 py-2 rounded flex items-center"
+                        >
+                            <Filter className="h-4 w-4 mr-2" />
+                            Apply Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Error message */}
+            {error && (
+                <div className="bg-red-900/30 border border-red-800 text-red-300 p-4 rounded-lg mb-6">
+                    {error}
+                </div>
+            )}
+
+            {/* Event Summary */}
+            {selectedEvent && !loading && (
+                <div className="bg-zinc-900 p-4 rounded-lg mb-6">
+                    <h2 className="text-lg font-semibold mb-3">
+                        {events.find(e => e._id === selectedEvent)?.title || 'Event'} Summary
+                    </h2>
+                    <div className="grid grid-cols-4 gap-4">
+                        <div className="bg-zinc-800 p-3 rounded-lg text-center">
+                            <div className="text-2xl font-bold">{summary.total}</div>
+                            <div className="text-sm text-zinc-400">Total Registrations</div>
+                        </div>
+                        <div className="bg-green-900/30 p-3 rounded-lg text-center">
+                            <div className="text-2xl font-bold text-green-300">{summary.approved}</div>
+                            <div className="text-sm text-green-400">Approved</div>
+                        </div>
+                        <div className="bg-red-900/30 p-3 rounded-lg text-center">
+                            <div className="text-2xl font-bold text-red-300">{summary.rejected}</div>
+                            <div className="text-sm text-red-400">Rejected</div>
+                        </div>
+                        <div className="bg-yellow-900/30 p-3 rounded-lg text-center">
+                            <div className="text-2xl font-bold text-yellow-300">{summary.pending}</div>
+                            <div className="text-sm text-yellow-400">Pending</div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Loading state */}
+            {loading ? (
+                <div className="text-center py-12">
+                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white mb-2"></div>
+                    <p>Loading registrations...</p>
+                </div>
+            ) : (
+                <>
+                    {/* Registrations table */}
+                    {eventRegistrations.length > 0 ? (
+                        <div className="bg-zinc-900 rounded-lg overflow-hidden">
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
+                                    <thead className="bg-zinc-800">
+                                        <tr>
+                                            <th className="px-4 py-3 text-left">User</th>
+                                            <th className="px-4 py-3 text-left">Event</th>
+                                            <th className="px-4 py-3 text-left">Registered On</th>
+                                            <th className="px-4 py-3 text-left">Status</th>
+                                            <th className="px-4 py-3 text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-zinc-800">
+                                        {eventRegistrations.map((registration) => (
+                                            <tr key={registration._id} className="hover:bg-zinc-800/50">
+                                                <td className="px-4 py-3">
+                                                    {registration.user ? (
+                                                        <div>
+                                                            <div className="font-medium">{registration.user.name}</div>
+                                                            <div className="text-sm text-zinc-400">{registration.user.email}</div>
+                                                            <div className="text-sm text-zinc-400">{registration.user.phone}</div>
+                                                            <div className="text-sm text-zinc-400 mt-1">
+                                                                {registration.user.age && <span>Age: {registration.user.age}</span>}
+                                                                {registration.user.age && registration.user.sex && <span> | </span>}
+                                                                {registration.user.sex && <span>Sex: {registration.user.sex}</span>}
+                                                                {(registration.user.age || registration.user.sex) && registration.user.instagram && <span> | </span>}
+                                                                {registration.user.instagram && (
+                                                                    <a
+                                                                        href={`https://instagram.com/${registration.user.instagram.replace('@', '')}`}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        className="text-blue-400 hover:underline"
+                                                                    >
+                                                                        {registration.user.instagram}
+                                                                    </a>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-zinc-500">User not found</span>
+                                                    )}
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    {registration.event ? (
+                                                        <div>
+                                                            <div className="font-medium">{registration.event.title}</div>
+                                                            <div className="text-sm text-zinc-400">
+                                                                {new Date(registration.event.date).toLocaleDateString()}
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-zinc-500">Event not found</span>
+                                                    )}
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    {formatDate(registration.createdAt)}
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    {registration.approved === true ? (
+                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-900/30 text-green-300">
+                                                            <CheckCircle className="h-3 w-3 mr-1" />
+                                                            Approved
+                                                        </span>
+                                                    ) : registration.approved === false ? (
+                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-900/30 text-red-300">
+                                                            <XCircle className="h-3 w-3 mr-1" />
+                                                            Rejected
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-900/30 text-yellow-300">
+                                                            <Clock className="h-3 w-3 mr-1" />
+                                                            Pending
+                                                        </span>
+                                                    )}
+                                                </td>
+                                                <td className="px-4 py-3 text-right">
+                                                    <div className="flex justify-end space-x-2">
+                                                        {registration.approved !== true && (
+                                                            <button
+                                                                onClick={() => handleApproval(registration._id, true)}
+                                                                className="bg-green-700 hover:bg-green-600 text-white px-3 py-1 rounded text-sm"
+                                                            >
+                                                                Approve
+                                                            </button>
+                                                        )}
+                                                        {registration.approved !== false && (
+                                                            <button
+                                                                onClick={() => handleApproval(registration._id, false)}
+                                                                className="bg-red-700 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
+                                                            >
+                                                                Reject
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="bg-zinc-900 p-8 rounded-lg text-center">
+                            <p className="text-zinc-400">No registrations found matching your filters.</p>
+                        </div>
+                    )}
+
+                    {/* Pagination */}
+                    {pagination.pages > 1 && (
+                        <div className="flex justify-center mt-6">
+                            <nav className="flex space-x-2">
+                                {/* Previous button */}
+                                {pagination.page > 1 && (
+                                    <button
+                                        onClick={() => handlePageChange(pagination.page - 1)}
+                                        className="px-3 py-1 bg-zinc-800 rounded hover:bg-zinc-700"
+                                    >
+                                        Previous
+                                    </button>
+                                )}
+
+                                {/* Page numbers with ellipsis for large page counts */}
+                                {Array.from({ length: pagination.pages }, (_, i) => i + 1)
+                                    .filter(page => {
+                                        // Always show first and last page
+                                        if (page === 1 || page === pagination.pages) return true;
+                                        // Always show current page and one page before and after
+                                        if (Math.abs(page - pagination.page) <= 1) return true;
+                                        // Show a few pages at the beginning if we're not too far
+                                        if (pagination.page < 5 && page < 5) return true;
+                                        // Show a few pages at the end if we're close to the end
+                                        if (pagination.page > pagination.pages - 4 && page > pagination.pages - 4) return true;
+                                        // Otherwise hide
+                                        return false;
+                                    })
+                                    .map((page, index, filteredPages) => {
+                                        // Add ellipsis where needed
+                                        const showEllipsisBefore = index > 0 && filteredPages[index - 1] !== page - 1;
+                                        const showEllipsisAfter = index < filteredPages.length - 1 && filteredPages[index + 1] !== page + 1;
+
+                                        return (
+                                            <div key={page} className="flex items-center space-x-2">
+                                                {showEllipsisBefore && (
+                                                    <span className="px-2 text-zinc-500">...</span>
+                                                )}
+                                                <button
+                                                    onClick={() => handlePageChange(page)}
+                                                    className={`px-3 py-1 rounded ${page === pagination.page
+                                                        ? 'bg-white text-black'
+                                                        : 'bg-zinc-800 hover:bg-zinc-700'
+                                                        }`}
+                                                >
+                                                    {page}
+                                                </button>
+                                                {showEllipsisAfter && (
+                                                    <span className="px-2 text-zinc-500">...</span>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+
+                                {/* Next button */}
+                                {pagination.page < pagination.pages && (
+                                    <button
+                                        onClick={() => handlePageChange(pagination.page + 1)}
+                                        className="px-3 py-1 bg-zinc-800 rounded hover:bg-zinc-700"
+                                    >
+                                        Next
+                                    </button>
+                                )}
+                            </nav>
+                        </div>
+                    )}
+                </>
+            )}
+        </div>
+    );
+} 

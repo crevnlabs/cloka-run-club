@@ -12,7 +12,7 @@ export function middleware(request: NextRequest) {
 
     // Check if the user is authenticated
     const authToken = request.cookies.get("cloka_admin_auth");
-    console.log("Auth token exists:", !!authToken);
+    console.log("Admin auth token exists:", !!authToken);
 
     const expectedToken =
       process.env.ADMIN_AUTH_TOKEN || "default_admin_token_for_auth";
@@ -31,7 +31,27 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    console.log("Authentication successful");
+    console.log("Admin authentication successful");
+  }
+
+  // Protect user-only routes
+  if (pathname.startsWith("/profile") || pathname.startsWith("/my-events")) {
+    console.log("Checking auth for user route");
+
+    // Check if the user is authenticated
+    const authCookie = request.cookies.get("cloka_auth");
+    console.log("User auth cookie exists:", !!authCookie);
+
+    // If not authenticated, redirect to login
+    if (!authCookie || !authCookie.value) {
+      console.log("User authentication failed, redirecting to login");
+      const url = new URL("/login", request.url);
+      // Add the original URL as a redirect parameter
+      url.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(url);
+    }
+
+    console.log("User authentication successful");
   }
 
   return NextResponse.next();

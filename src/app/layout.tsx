@@ -5,6 +5,7 @@ import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { LoadingProvider } from "@/components/LoadingProvider";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import Script from "next/script";
+import { AuthProvider } from "@/lib/auth-context";
 
 const urbanist = Urbanist({
   subsets: ["latin"],
@@ -14,7 +15,7 @@ const urbanist = Urbanist({
 
 export const metadata: Metadata = {
   title: "CLOKA - Beyond the Seen",
-  description: "This isn’t just a run club—it’s your weekend crew. We hit the pavement, then unwind at our favorite café, sharing stories and good vibes. Big things are coming—don’t miss out. See you Saturday?",
+  description: "This isn't just a run club—it's your weekend crew. We hit the pavement, then unwind at our favorite café, sharing stories and good vibes. Big things are coming—don't miss out. See you Saturday?",
   keywords: "CLOKA, luxury clothing, Indian heritage, premium brand, Cloka Club, Run Club",
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://cloka.in'),
   alternates: {
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "CLOKA - Beyond the Seen",
-    description: "This isn’t just a run club—it’s your weekend crew. We hit the pavement, then unwind at our favorite café, sharing stories and good vibes. Big things are coming—don’t miss out. See you Saturday?",
+    description: "This isn't just a run club—it's your weekend crew. We hit the pavement, then unwind at our favorite café, sharing stories and good vibes. Big things are coming—don't miss out. See you Saturday?",
     url: 'https://cloka.in',
     siteName: 'CLOKA',
     locale: 'en_US',
@@ -39,7 +40,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: "CLOKA - Beyond the Seen",
-    description: "This isn’t just a run club—it’s your weekend crew. We hit the pavement, then unwind at our favorite café, sharing stories and good vibes. Big things are coming—don’t miss out. See you Saturday?",
+    description: "This isn't just a run club—it's your weekend crew. We hit the pavement, then unwind at our favorite café, sharing stories and good vibes. Big things are coming—don't miss out. See you Saturday?",
     images: ['/logo.png'],
   },
   robots: {
@@ -94,8 +95,10 @@ export default function RootLayout({
       <body className={`${urbanist.variable} antialiased`}>
         <ErrorBoundary>
           <LoadingProvider>
-            <GoogleAnalytics />
-            {children}
+            <AuthProvider>
+              <GoogleAnalytics />
+              {children}
+            </AuthProvider>
           </LoadingProvider>
         </ErrorBoundary>
         <Script src="/register-sw.js" strategy="lazyOnload" />

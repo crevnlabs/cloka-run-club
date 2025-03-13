@@ -148,7 +148,6 @@ The application uses the following data models:
 - **Registration** - For storing run registrations
 - **Product** - For storing merchandise products
 - **Order** - For tracking Razorpay orders
-- **RunnerOfTheWeek** - For featuring standout community members
 - **Event** - For upcoming runs and events
 
 ## Deployment

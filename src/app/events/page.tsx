@@ -1,90 +1,69 @@
+import { Metadata } from 'next';
 import Header from '@/components/Header';
-import UpcomingEvents from '@/components/UpcomingEvents';
 import Footer from '@/components/Footer';
-import { getApiUrl } from '@/lib/apiUtils';
+import dbConnect from '@/lib/mongodb';
+import Event from '@/models/Event';
+import EventsToggle from '@/components/EventsToggle';
 
-// Force dynamic rendering for this page
-export const dynamic = 'force-dynamic';
-
-// Define the event type for the client component
-interface EventProps {
-    id: string;
-    title: string;
-    date: string;
-    time: string;
-    location: string;
-    description: string;
-}
-
-export const metadata = {
-    title: 'Upcoming Events - CLOKA',
-    description: 'Stay updated with all upcoming runs and events organized by CLOKA.',
+export const metadata: Metadata = {
+    title: 'Events - CLOKA',
+    description: 'Browse and register for upcoming CLOKA events.',
 };
 
-// Define the event type for the API response
-interface ApiEvent {
-    _id: string;
-    title: string;
-    description: string;
-    date: Date;
-    location: string;
-    createdAt: Date;
-}
-
-// Fetch events from the API
-async function getEvents(): Promise<ApiEvent[]> {
-    try {
-        const url = getApiUrl('/api/events');
-
-        const res = await fetch(url, {
-            cache: 'no-store', // Don't cache this data
-            next: { revalidate: 60 } // Revalidate every 60 seconds
-        });
-
-        if (!res.ok) {
-            throw new Error('Failed to fetch events');
-        }
-
-        const data = await res.json();
-        return data.events || [];
-    } catch (error) {
-        console.error('Error fetching events:', error);
-        return [];
-    }
-}
-
-// Update the transformEvents function
-function transformEvents(events: ApiEvent[]): EventProps[] {
-    return events.map(event => {
-        const eventDate = new Date(event.date);
-        return {
-            id: event._id,
-            title: event.title,
-            date: eventDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
-            time: eventDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-            location: event.location,
-            description: event.description,
-        };
-    });
-}
-
 export default async function EventsPage() {
-    // Fetch events from the API
-    const apiEvents = await getEvents();
+    // Connect to the database
+    await dbConnect();
 
-    // Format the events for the UpcomingEvents component
-    const formattedEvents: EventProps[] = transformEvents(apiEvents);
+    // Fetch all events
+    const allEvents = await Event.find({}).sort({ date: 1 });
+
+    // Separate upcoming events
+    const upcomingEvents = allEvents.filter(event => new Date(event.date) >= new Date());
+
+    // Pre-format dates for client component
+    const formattedAllEvents = allEvents.map(event => ({
+        ...event.toObject(),
+        formattedDate: new Date(event.date).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: 'UTC'
+        })
+    }));
+
+    const formattedUpcomingEvents = upcomingEvents.map(event => ({
+        ...event.toObject(),
+        formattedDate: new Date(event.date).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: 'UTC'
+        })
+    }));
 
     return (
-        <main>
+        <>
             <Header />
-            <div className="pt-20 bg-black">
+            <main className="min-h-screen bg-black text-white py-12 px-4">
                 <div className="luxury-container">
-                    <h1 className="text-4xl md:text-6xl font-bold text-white text-center">Upcoming Events</h1>
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12">
+                        <h1 className="text-3xl font-bold">Events</h1>
+                        <p className="text-zinc-400 mt-2 md:mt-0">
+                            Join us for exciting events and connect with the community
+                        </p>
+                    </div>
+
+                    <EventsToggle
+                        allEvents={JSON.parse(JSON.stringify(formattedAllEvents))}
+                        upcomingEvents={JSON.parse(JSON.stringify(formattedUpcomingEvents))}
+                    />
                 </div>
-            </div>
-            <UpcomingEvents serverEvents={formattedEvents} />
+            </main>
             <Footer />
-        </main>
+        </>
     );
 } 

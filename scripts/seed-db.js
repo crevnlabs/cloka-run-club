@@ -25,15 +25,6 @@ const ProductSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-const RunnerOfTheWeekSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  image: { type: String, required: true },
-  story: { type: String, required: true },
-  achievements: { type: String, required: true },
-  weekOf: { type: Date, required: true },
-  createdAt: { type: Date, default: Date.now },
-});
-
 const EventSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
@@ -47,9 +38,7 @@ const EventSchema = new mongoose.Schema({
 // Create models
 const Product =
   mongoose.models.Product || mongoose.model("Product", ProductSchema);
-const RunnerOfTheWeek =
-  mongoose.models.RunnerOfTheWeek ||
-  mongoose.model("RunnerOfTheWeek", RunnerOfTheWeekSchema);
+
 const Event = mongoose.models.Event || mongoose.model("Event", EventSchema);
 
 // Sample data
@@ -132,16 +121,6 @@ const products = [
   },
 ];
 
-const runnerOfTheWeek = {
-  name: "Rahul Sharma",
-  image: "/images/runner-of-the-week.jpg",
-  story:
-    "Rahul has been running with Cloka for over 2 years. He started as a beginner and now completes half marathons regularly.",
-  achievements:
-    "Completed 3 half marathons and improved his 10K time by 15 minutes in the last year.",
-  weekOf: new Date(),
-};
-
 const sampleEvents = [
   {
     title: "Morning Run Club",
@@ -181,16 +160,12 @@ async function seedDatabase() {
 
     // Clear existing data
     await Product.deleteMany({});
-    await RunnerOfTheWeek.deleteMany({});
     await Event.deleteMany({});
     console.log("Cleared existing data");
 
     // Insert new data
     await Product.insertMany(products);
     console.log("Products seeded");
-
-    await RunnerOfTheWeek.create(runnerOfTheWeek);
-    console.log("Runner of the Week seeded");
 
     await Event.insertMany(sampleEvents);
     console.log("Events seeded");
