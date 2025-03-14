@@ -7,9 +7,9 @@ import { useState } from 'react';
 import Image from 'next/image';
 
 const navItems = [
-    { name: 'Products', href: '/admin/products' },
     { name: 'Events', href: '/admin/events' },
     { name: 'Registrations', href: '/admin/event-registrations' },
+    { name: 'Users', href: '/admin/users' },
 ];
 
 export default function AdminLayout({
