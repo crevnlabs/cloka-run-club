@@ -56,17 +56,7 @@ export default function UsersPage() {
     const [newPassword, setNewPassword] = useState('');
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>("Gender filtering has been implemented! You can now filter users by gender.");
-
-    // Clear the initial success message after 5 seconds
-    useEffect(() => {
-        if (successMessage === "Gender filtering has been implemented! You can now filter users by gender.") {
-            const timer = setTimeout(() => {
-                setSuccessMessage(null);
-            }, 5000);
-            return () => clearTimeout(timer);
-        }
-    }, [successMessage]);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     // Fetch total gender stats
     const fetchTotalGenderStats = async () => {
@@ -87,9 +77,7 @@ export default function UsersPage() {
                     }
                 }
                 // If we get here, the stats endpoint failed in some way
-                console.warn('Stats endpoint failed, falling back to calculating from all users');
-            } catch (statsError) {
-                console.warn('Error fetching from stats endpoint:', statsError);
+            } catch {
                 // Continue to fallback method
             }
 
@@ -126,8 +114,7 @@ export default function UsersPage() {
             } else {
                 throw new Error('Failed to calculate user statistics');
             }
-        } catch (err) {
-            console.error('Error fetching gender stats:', err);
+        } catch {
             // Use pagination total as a last resort
             if (pagination.total > 0) {
                 setGenderStats(prev => ({
@@ -159,12 +146,7 @@ export default function UsersPage() {
                 queryParams.append('gender', genderParam);
             }
 
-            // Log the full URL for debugging
             const url = `/api/admin/users?${queryParams.toString()}`;
-            console.log('Fetching users with URL:', url);
-
-            // Test the backend query construction
-            testBackendQuery(gender);
 
             const response = await fetch(url);
 
@@ -174,82 +156,33 @@ export default function UsersPage() {
 
             const data = await response.json();
 
-            // Debug the API response
-            debugApiResponse(data, `Gender filter: ${gender}`);
-
             if (data.success) {
                 setUsers(data.users);
                 setPagination(data.pagination);
 
-                // If we don't have total stats yet, calculate from current page as last resort
-                if (genderStats.total === 0) {
-                    // Get the total count from pagination data
-                    const totalUsers = data.pagination?.total || 0;
-
-                    // This is a temporary fallback until we can get full stats
-                    const pageStats = {
-                        male: 0,
-                        female: 0,
-                        other: 0,
-                        unknown: 0,
-                        total: totalUsers
-                    };
-
-                    // Calculate what we can from current page
-                    data.users.forEach((user: User) => {
-                        if (user.gender === 'male') pageStats.male++;
-                        else if (user.gender === 'female') pageStats.female++;
-                        else if (user.gender === 'other') pageStats.other++;
-                        else pageStats.unknown++;
-                    });
-
-                    setGenderStats(pageStats);
-
-                    // Add a note in the console that these are partial stats
-                    console.info('Using partial gender stats from current page only');
+                // Update total count if we have it from pagination but not from stats
+                if (genderStats.total === 0 && data.pagination?.total) {
+                    setGenderStats(prev => ({
+                        ...prev,
+                        total: data.pagination.total
+                    }));
                 }
             } else {
                 throw new Error(data.message || 'Failed to fetch users');
             }
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred');
-            console.error('Error fetching users:', err);
         } finally {
             setLoading(false);
         }
     };
 
-    // Test function to verify backend query construction
-    const testBackendQuery = (gender: string) => {
-        console.group('Backend Query Test');
-
-        // Add gender filter if provided
-        const genderParam = getGenderQueryParam(gender);
-        if (genderParam !== null) {
-            if (genderParam === 'null') {
-                console.log('Using "unknown" gender filter');
-                console.log('Expected MongoDB query:', JSON.stringify({
-                    gender: { $in: [null, undefined] }
-                }));
-            } else {
-                console.log(`Using "${gender}" gender filter`);
-                console.log('Expected MongoDB query:', JSON.stringify({
-                    gender: genderParam
-                }));
-            }
-        } else {
-            console.log('No gender filter applied');
-            console.log('Expected MongoDB query: {}');
-        }
-
-        console.groupEnd();
-    };
-
     // Initial fetch
     useEffect(() => {
-        // Fetch both users and total stats
-        fetchUsers(pagination.page, search, genderFilter);
-        fetchTotalGenderStats();
+        // Fetch total stats first, then users
+        fetchTotalGenderStats().then(() => {
+            fetchUsers(pagination.page, search, genderFilter);
+        });
     }, []);
 
     // Handle search with debounce
@@ -261,47 +194,10 @@ export default function UsersPage() {
         return () => clearTimeout(debounceTimer);
     }, [search]);
 
-    // Debug function to check API response
-    // We define a specific type for the API response to avoid using 'any'
-    const debugApiResponse = (data: {
-        success: boolean;
-        users?: User[];
-        pagination?: Pagination;
-        message?: string;
-        stats?: unknown; // For potential stats data
-    }, filterType: string): void => {
-        console.group(`API Debug - ${filterType}`);
-        console.log('Response data:', data);
-
-        if (data.users && Array.isArray(data.users)) {
-            // Count genders in the response
-            const genderCounts = {
-                male: 0,
-                female: 0,
-                other: 0,
-                unknown: 0,
-                total: data.users.length
-            };
-
-            data.users.forEach((user: User) => {
-                if (user.gender === 'male') genderCounts.male++;
-                else if (user.gender === 'female') genderCounts.female++;
-                else if (user.gender === 'other') genderCounts.other++;
-                else genderCounts.unknown++;
-            });
-
-            console.log('Gender counts in response:', genderCounts);
-            console.log('First few users:', data.users.slice(0, 3));
-        }
-
-        console.groupEnd();
-    };
-
     // Handle gender filter change
     const handleGenderFilterChange = (gender: string) => {
-        console.log(`Changing gender filter from ${genderFilter} to ${gender}`);
         setGenderFilter(gender);
-        // Reset to page 1 when changing filters
+        // Reset to page 1 when changing filters, but don't recalculate total stats
         fetchUsers(1, search, gender);
     };
 
@@ -340,9 +236,10 @@ export default function UsersPage() {
 
             if (data.success) {
                 setSuccessMessage('User deleted successfully');
-                // Refresh the user list and stats
-                fetchUsers(pagination.page, search, genderFilter);
-                fetchTotalGenderStats();
+                // Refresh the total stats first, then the user list
+                fetchTotalGenderStats().then(() => {
+                    fetchUsers(pagination.page, search, genderFilter);
+                });
             } else {
                 throw new Error(data.message || 'Failed to delete user');
             }
@@ -526,6 +423,9 @@ export default function UsersPage() {
             )}
 
             {/* Gender Stats */}
+            <div className="mb-2">
+                <h2 className="text-xl font-semibold">User Demographics <span className="text-sm font-normal text-zinc-400">(total counts across all users)</span></h2>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <div className="bg-zinc-800 p-4 rounded shadow relative">
                     <h3 className="text-lg font-semibold mb-1">Total Users</h3>
@@ -538,7 +438,7 @@ export default function UsersPage() {
                         <p className="text-2xl font-bold">{genderStats.total}</p>
                     )}
                     <div className="text-xs text-right absolute bottom-1 right-2 text-zinc-400">
-                        All users
+                        Total count
                     </div>
                 </div>
                 <div className="bg-blue-900 p-4 rounded shadow relative">
@@ -559,7 +459,7 @@ export default function UsersPage() {
                         </>
                     )}
                     <div className="text-xs text-right absolute bottom-1 right-2 text-blue-300">
-                        All users
+                        Total count
                     </div>
                 </div>
                 <div className="bg-pink-900 p-4 rounded shadow relative">
@@ -580,7 +480,7 @@ export default function UsersPage() {
                         </>
                     )}
                     <div className="text-xs text-right absolute bottom-1 right-2 text-pink-300">
-                        All users
+                        Total count
                     </div>
                 </div>
                 <div className="bg-purple-900 p-4 rounded shadow relative">
@@ -601,7 +501,7 @@ export default function UsersPage() {
                         </>
                     )}
                     <div className="text-xs text-right absolute bottom-1 right-2 text-purple-300">
-                        All users
+                        Total count
                     </div>
                 </div>
             </div>
