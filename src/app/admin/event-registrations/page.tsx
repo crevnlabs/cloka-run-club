@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { CheckCircle, XCircle, Clock, Search, Filter, RefreshCw } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, Search, Filter, RefreshCw, Clipboard } from 'lucide-react';
+import Button from '@/components/Button';
 
 interface User {
     _id: string;
@@ -50,7 +51,7 @@ export default function EventRegistrationsPage() {
     const [pagination, setPagination] = useState<PaginationData>({
         total: 0,
         page: 1,
-        limit: 10,
+        limit: 50,
         pages: 0,
     });
     const [summary, setSummary] = useState({
@@ -59,6 +60,8 @@ export default function EventRegistrationsPage() {
         rejected: 0,
         pending: 0
     });
+    const [copyingEmails, setCopyingEmails] = useState(false);
+    const [emailsCopied, setEmailsCopied] = useState(false);
 
     // Filters
     const [selectedEvent, setSelectedEvent] = useState(searchParams.get('eventId') || '');
@@ -106,38 +109,75 @@ export default function EventRegistrationsPage() {
                 setEventRegistrations(data.eventRegistrations);
                 setPagination(data.pagination);
 
-                // Calculate summary if an event is selected
-                if (selectedEvent) {
-                    // Fetch summary data for the selected event
-                    const summaryResponse = await fetch(`/api/admin/event-registrations/stats?eventId=${selectedEvent}`);
-                    const summaryData = await summaryResponse.json();
-
-                    if (summaryResponse.ok) {
-                        setSummary({
-                            total: summaryData.total,
-                            approved: summaryData.approved,
-                            rejected: summaryData.rejected,
-                            pending: summaryData.pending
-                        });
-                    }
+                // Use the stats from the same response if available
+                if (data.stats) {
+                    setSummary({
+                        total: data.stats.total,
+                        approved: data.stats.approved,
+                        rejected: data.stats.rejected,
+                        pending: data.stats.pending
+                    });
                 } else {
-                    // Calculate global summary from the current data
+                    // Calculate stats from the pagination total and filtered data
                     let approvedCount = 0;
                     let rejectedCount = 0;
                     let pendingCount = 0;
 
+                    // Count from the current page data
                     data.eventRegistrations.forEach((reg: EventRegistration) => {
                         if (reg.approved === true) approvedCount++;
                         else if (reg.approved === false) rejectedCount++;
                         else pendingCount++;
                     });
 
-                    setSummary({
-                        total: data.pagination.total,
-                        approved: approvedCount,
-                        rejected: rejectedCount,
-                        pending: pendingCount
-                    });
+                    // If we're on the first page and have fewer items than the limit,
+                    // we can use these counts directly
+                    if (pagination.page === 1 && data.eventRegistrations.length < pagination.limit) {
+                        setSummary({
+                            total: data.pagination.total,
+                            approved: approvedCount,
+                            rejected: rejectedCount,
+                            pending: pendingCount
+                        });
+                    } else {
+                        // Otherwise, we need to make an additional request to get accurate counts
+                        // Clone the current params but request all items (with a high limit and no pagination)
+                        const statsParams = new URLSearchParams(params);
+                        statsParams.set('page', '1');
+                        statsParams.set('limit', '1000000'); // Very high limit to get all items
+                        statsParams.append('countOnly', 'true'); // Add a flag to indicate we only need counts
+
+                        try {
+                            const statsResponse = await fetch(`/api/admin/event-registrations?${statsParams.toString()}`);
+                            const statsData = await statsResponse.json();
+
+                            if (statsResponse.ok && statsData.counts) {
+                                setSummary({
+                                    total: statsData.counts.total,
+                                    approved: statsData.counts.approved,
+                                    rejected: statsData.counts.rejected,
+                                    pending: statsData.counts.pending
+                                });
+                            } else {
+                                // Fallback to using the pagination total
+                                setSummary({
+                                    total: data.pagination.total,
+                                    approved: approvedCount,
+                                    rejected: rejectedCount,
+                                    pending: pendingCount
+                                });
+                            }
+                        } catch (statsError) {
+                            console.error('Error fetching stats:', statsError);
+                            // Fallback to using the pagination total
+                            setSummary({
+                                total: data.pagination.total,
+                                approved: approvedCount,
+                                rejected: rejectedCount,
+                                pending: pendingCount
+                            });
+                        }
+                    }
                 }
             } else {
                 setError(data.message || 'Failed to load event registrations');
@@ -209,6 +249,11 @@ export default function EventRegistrationsPage() {
                         return newSummary;
                     });
                 }
+
+                // If we have complex filters applied, refresh the data to get accurate stats
+                if (searchTerm || ageRange || selectedSex) {
+                    loadEventRegistrations();
+                }
             } else {
                 setError(data.message || 'Failed to update registration');
             }
@@ -251,6 +296,65 @@ export default function EventRegistrationsPage() {
         });
     };
 
+    // Function to copy all email IDs to clipboard
+    const copyEmailsToClipboard = async () => {
+        setCopyingEmails(true);
+        setEmailsCopied(false);
+        setError('');
+
+        try {
+            // Build query parameters (same as loadEventRegistrations but without pagination)
+            const params = new URLSearchParams();
+            // Don't include page and limit to get all results
+            params.append('emailsOnly', 'true'); // Add a flag to indicate we only need emails
+
+            if (selectedEvent) {
+                params.append('eventId', selectedEvent);
+            }
+
+            if (approvalStatus) {
+                params.append('approved', approvalStatus);
+            }
+
+            if (searchTerm) {
+                params.append('search', searchTerm);
+            }
+
+            if (ageRange) {
+                params.append('ageRange', ageRange);
+            }
+
+            if (selectedSex) {
+                params.append('sex', selectedSex);
+            }
+
+            // Fetch all emails matching the current filters
+            const response = await fetch(`/api/admin/event-registrations?${params.toString()}`);
+            const data = await response.json();
+
+            if (response.ok && data.emails) {
+                // Copy emails to clipboard
+                const emailText = data.emails.join('\n');
+                await navigator.clipboard.writeText(emailText);
+
+                // Show success message
+                setEmailsCopied(true);
+
+                // Reset success message after 3 seconds
+                setTimeout(() => {
+                    setEmailsCopied(false);
+                }, 3000);
+            } else {
+                setError(data.message || 'Failed to fetch email addresses');
+            }
+        } catch (error) {
+            console.error('Error copying emails:', error);
+            setError('An error occurred while copying email addresses');
+        } finally {
+            setCopyingEmails(false);
+        }
+    };
+
     // Load data on initial render and when filters/pagination change
     useEffect(() => {
         loadEvents();
@@ -261,13 +365,37 @@ export default function EventRegistrationsPage() {
         <div className="container mx-auto px-4 py-8">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold">Event Registrations</h1>
-                <button
-                    onClick={() => loadEventRegistrations()}
-                    className="flex items-center bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded"
-                >
-                    <RefreshCw className="h-4 w-4 mr-2" />
-                    Refresh
-                </button>
+                <div className="flex space-x-2">
+                    <Button
+                        onClick={copyEmailsToClipboard}
+                        disabled={copyingEmails}
+                        className={`flex items-center ${emailsCopied ? 'bg-green-600' : 'bg-zinc-800 hover:bg-zinc-700'} text-white px-4 py-2 rounded`}
+                    >
+                        {copyingEmails ? (
+                            <>
+                                <div className="animate-spin h-4 w-4 mr-2 border-t-2 border-b-2 border-white rounded-full"></div>
+                                Copying...
+                            </>
+                        ) : emailsCopied ? (
+                            <>
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Copied!
+                            </>
+                        ) : (
+                            <>
+                                <Clipboard className="h-4 w-4 mr-2" />
+                                Copy Email IDs
+                            </>
+                        )}
+                    </Button>
+                    <Button
+                        onClick={() => loadEventRegistrations()}
+                        className="flex items-center bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded"
+                    >
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        Refresh
+                    </Button>
+                </div>
             </div>
 
             {/* Filters */}
@@ -349,13 +477,13 @@ export default function EventRegistrationsPage() {
                     </div>
 
                     <div className="flex items-end">
-                        <button
+                        <Button
                             onClick={handleFilterChange}
-                            className="bg-white text-black px-4 py-2 rounded flex items-center"
+                            className="border border-zinc-700 bg-zinc-800 text-white px-4 py-2 rounded flex items-center"
                         >
                             <Filter className="h-4 w-4 mr-2" />
                             Apply Filters
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>
@@ -482,20 +610,20 @@ export default function EventRegistrationsPage() {
                                                 <td className="px-4 py-3 text-right">
                                                     <div className="flex justify-end space-x-2">
                                                         {registration.approved !== true && (
-                                                            <button
+                                                            <Button
                                                                 onClick={() => handleApproval(registration._id, true)}
                                                                 className="bg-green-700 hover:bg-green-600 text-white px-3 py-1 rounded text-sm"
                                                             >
                                                                 Approve
-                                                            </button>
+                                                            </Button>
                                                         )}
                                                         {registration.approved !== false && (
-                                                            <button
+                                                            <Button
                                                                 onClick={() => handleApproval(registration._id, false)}
                                                                 className="bg-red-700 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
                                                             >
                                                                 Reject
-                                                            </button>
+                                                            </Button>
                                                         )}
                                                     </div>
                                                 </td>
@@ -515,14 +643,14 @@ export default function EventRegistrationsPage() {
                     {pagination.pages > 1 && (
                         <div className="flex justify-center mt-6">
                             <nav className="flex space-x-2">
-                                {/* Previous button */}
+                                {/* Previous Button */}
                                 {pagination.page > 1 && (
-                                    <button
+                                    <Button
                                         onClick={() => handlePageChange(pagination.page - 1)}
                                         className="px-3 py-1 bg-zinc-800 rounded hover:bg-zinc-700"
                                     >
                                         Previous
-                                    </button>
+                                    </Button>
                                 )}
 
                                 {/* Page numbers with ellipsis for large page counts */}
@@ -549,7 +677,7 @@ export default function EventRegistrationsPage() {
                                                 {showEllipsisBefore && (
                                                     <span className="px-2 text-zinc-500">...</span>
                                                 )}
-                                                <button
+                                                <Button
                                                     onClick={() => handlePageChange(page)}
                                                     className={`px-3 py-1 rounded ${page === pagination.page
                                                         ? 'bg-white text-black'
@@ -557,7 +685,7 @@ export default function EventRegistrationsPage() {
                                                         }`}
                                                 >
                                                     {page}
-                                                </button>
+                                                </Button>
                                                 {showEllipsisAfter && (
                                                     <span className="px-2 text-zinc-500">...</span>
                                                 )}
@@ -565,14 +693,14 @@ export default function EventRegistrationsPage() {
                                         );
                                     })}
 
-                                {/* Next button */}
+                                {/* Next Button */}
                                 {pagination.page < pagination.pages && (
-                                    <button
+                                    <Button
                                         onClick={() => handlePageChange(pagination.page + 1)}
                                         className="px-3 py-1 bg-zinc-800 rounded hover:bg-zinc-700"
                                     >
                                         Next
-                                    </button>
+                                    </Button>
                                 )}
                             </nav>
                         </div>

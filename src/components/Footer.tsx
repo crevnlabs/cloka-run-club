@@ -36,9 +36,14 @@ const Footer = () => {
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/auth?mode=signup" className="luxury-text hover:text-accent transition-colors">
-                                    Register for Runs
-                                </Link>
+                                <a
+                                    href="https://forms.gle/2enLCA1zNw3QSJYs9"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="luxury-text hover:text-accent transition-colors"
+                                >
+                                    Support Form
+                                </a>
                             </li>
                         </ul>
                     </div>

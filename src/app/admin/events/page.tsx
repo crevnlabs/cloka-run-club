@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import Button from '@/components/Button';
 
 interface Event {
     _id: string;
@@ -290,12 +291,12 @@ export default function AdminEventsPage() {
                     <div className="bg-white dark:bg-black rounded-lg shadow-md p-6 mb-6 border border-zinc-200 dark:border-zinc-800">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-2xl font-bold text-black dark:text-white">Manage Events</h2>
-                            <button
+                            <Button
                                 onClick={() => openEventForm(false)}
                                 className="px-4 py-2 bg-black text-white rounded-md hover:bg-zinc-900 transition-colors"
                             >
                                 Add New Event
-                            </button>
+                            </Button>
                         </div>
 
                         {error && (
@@ -522,20 +523,20 @@ export default function AdminEventsPage() {
                             </div>
 
                             <div className="flex justify-end space-x-3 pt-4">
-                                <button
+                                <Button
                                     type="button"
                                     onClick={closeEventForm}
                                     className="px-4 py-2 bg-white dark:bg-black text-black dark:text-white rounded hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors border border-black dark:border-white"
                                 >
                                     Cancel
-                                </button>
-                                <button
+                                </Button>
+                                <Button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className="px-4 py-2 bg-black hover:bg-zinc-900 text-white rounded transition-colors"
+                                    className="bg-white dark:bg-black text-black dark:text-white rounded hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors border border-black dark:border-white"
                                 >
                                     {isSubmitting ? 'Saving...' : eventForm.isEdit ? 'Update Event' : 'Create Event'}
-                                </button>
+                                </Button>
                             </div>
                         </form>
                     </div>

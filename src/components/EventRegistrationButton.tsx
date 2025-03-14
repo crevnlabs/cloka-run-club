@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
+import Button from './Button';
 
 interface EventRegistrationButtonProps {
     eventId: string;
@@ -130,14 +131,14 @@ export default function EventRegistrationButton({
                 )}
             </div>
 
-            <button
+            <Button
                 onClick={handleCancel}
                 disabled={isLoading}
                 className={`w-full py-3 px-6 rounded-md transition-colors bg-red-900 hover:bg-red-800 text-white ${isLoading ? 'opacity-70 cursor-not-allowed' : ''
                     }`}
             >
                 {isLoading ? 'Cancelling...' : 'Cancel Registration'}
-            </button>
+            </Button>
             {error && <p className="mt-2 text-red-400 text-sm">{error}</p>}
         </div>
     );

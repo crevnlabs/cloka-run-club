@@ -31,7 +31,7 @@ export default function Button({
     ...props
 }: ButtonProps) {
     // Base classes for all buttons
-    const baseClasses = 'font-medium transition-colors focus:outline-none';
+    const baseClasses = 'cursor-pointer font-medium transition-colors focus:outline-none';
 
     // Size classes
     const sizeClasses = {

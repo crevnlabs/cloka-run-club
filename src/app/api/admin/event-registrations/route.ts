@@ -17,6 +17,8 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search") || "";
     const ageRange = searchParams.get("ageRange") || "";
     const sex = searchParams.get("sex") || "";
+    const countOnly = searchParams.get("countOnly") === "true";
+    const emailsOnly = searchParams.get("emailsOnly") === "true";
 
     // Calculate skip value for pagination
     const skip = (page - 1) * limit;
@@ -107,6 +109,51 @@ export async function GET(request: NextRequest) {
     if (sex) {
       pipeline.push({
         $match: { "userDetails.gender": sex },
+      });
+    }
+
+    // Create a copy of the pipeline for stats calculation
+    const statsPipeline = [...pipeline];
+
+    // For countOnly requests or to include stats, we need to calculate counts by approval status
+    const approvalCounts = await calculateApprovalCounts(statsPipeline);
+
+    // If countOnly is true, return only the counts
+    if (countOnly) {
+      return NextResponse.json({
+        success: true,
+        counts: {
+          total: approvalCounts.total,
+          approved: approvalCounts.approved,
+          rejected: approvalCounts.rejected,
+          pending: approvalCounts.pending,
+        },
+      });
+    }
+
+    // If emailsOnly is true, return only the email addresses
+    if (emailsOnly) {
+      // Create a pipeline to extract just the emails
+      const emailsPipeline = [...pipeline];
+
+      // Project only the email field
+      emailsPipeline.push({
+        $project: {
+          _id: 0,
+          email: "$userDetails.email",
+        },
+      });
+
+      // Execute the aggregation to get all emails
+      const emailsResult = await UserEvent.aggregate(emailsPipeline);
+
+      // Extract just the email strings from the result
+      const emails = emailsResult.map((item) => item.email).filter(Boolean);
+
+      return NextResponse.json({
+        success: true,
+        emails,
+        count: emails.length,
       });
     }
 
@@ -209,8 +256,6 @@ export async function GET(request: NextRequest) {
     // Calculate pagination data
     const pages = Math.ceil(total / limit);
 
-    console.log(JSON.stringify(eventRegistrations, null, 2));
-
     return NextResponse.json({
       success: true,
       eventRegistrations,
@@ -220,6 +265,12 @@ export async function GET(request: NextRequest) {
         limit,
         pages,
       },
+      stats: {
+        total: approvalCounts.total,
+        approved: approvalCounts.approved,
+        rejected: approvalCounts.rejected,
+        pending: approvalCounts.pending,
+      },
     });
   } catch (error) {
     console.error("Error fetching event registrations:", error);
@@ -228,4 +279,29 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+// Helper function to calculate counts by approval status
+async function calculateApprovalCounts(pipeline: PipelineStage[]) {
+  // Create a facet to count by approval status
+  const facetPipeline = [...pipeline];
+
+  facetPipeline.push({
+    $facet: {
+      total: [{ $count: "count" }],
+      approved: [{ $match: { approved: true } }, { $count: "count" }],
+      rejected: [{ $match: { approved: false } }, { $count: "count" }],
+      pending: [{ $match: { approved: null } }, { $count: "count" }],
+    },
+  });
+
+  const result = await UserEvent.aggregate(facetPipeline);
+
+  // Extract counts from the result
+  return {
+    total: result[0].total.length > 0 ? result[0].total[0].count : 0,
+    approved: result[0].approved.length > 0 ? result[0].approved[0].count : 0,
+    rejected: result[0].rejected.length > 0 ? result[0].rejected[0].count : 0,
+    pending: result[0].pending.length > 0 ? result[0].pending[0].count : 0,
+  };
 }

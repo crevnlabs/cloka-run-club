@@ -14,6 +14,7 @@ export default function AuthPage() {
     const [isLoginMode, setIsLoginMode] = useState(initialMode);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const router = useRouter();
     const redirect = searchParams.get('redirect') || '/profile';
     const { login, signup } = useAuth();
@@ -22,6 +23,22 @@ export default function AuthPage() {
     useEffect(() => {
         setIsLoginMode(searchParams.get('mode') !== 'signup');
     }, [searchParams]);
+
+    // Detect mobile screen size
+    useEffect(() => {
+        const checkIsMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        // Initial check
+        checkIsMobile();
+
+        // Add event listener for window resize
+        window.addEventListener('resize', checkIsMobile);
+
+        // Cleanup
+        return () => window.removeEventListener('resize', checkIsMobile);
+    }, []);
 
     // Login state
     const [loginData, setLoginData] = useState({
@@ -164,21 +181,21 @@ export default function AuthPage() {
         <>
             <Header />
             <div className="bg-black text-white flex items-center justify-center px-4 py-12">
-                <div className="container mx-auto max-w-6xl relative">
-                    <div className="flex flex-col md:flex-row">
+                <div className="container mx-auto max-w-6xl">
+                    <div className="flex flex-col md:flex-row gap-6">
                         {/* Image Section */}
                         <motion.div
-                            initial={{ opacity: 0, x: isLoginMode ? 0 : 100 }}
+                            initial={{ opacity: 0, x: isLoginMode ? 0 : (isMobile ? 0 : 100) }}
                             animate={{
                                 opacity: 1,
-                                x: isLoginMode ? 0 : 100
+                                x: isLoginMode ? 0 : (isMobile ? 0 : 100)
                             }}
                             transition={{
                                 duration: 0.5,
                                 type: "spring",
                                 stiffness: 100
                             }}
-                            className={`w-full md:w-1/2 order-1 ${isLoginMode ? 'md:order-1' : 'md:order-2'}`}
+                            className={`w-full md:w-1/2 order-1 ${isLoginMode ? 'md:order-1' : 'md:order-2'} relative`}
                         >
                             <div className="h-full rounded-lg overflow-hidden shadow-2xl border border-zinc-800">
                                 <img
@@ -186,7 +203,7 @@ export default function AuthPage() {
                                     alt={isLoginMode ? "Run Club" : "Returning Runners"}
                                     className="w-full h-full object-cover"
                                 />
-                                <div className="absolute bottom-4 left-4 right-4 md:right-[calc(50%+1rem)] bg-black/70 p-4 rounded-lg backdrop-blur-sm">
+                                <div className="absolute bottom-4 left-4 right-4 md:right-auto md:w-[90%] bg-black/70 p-4 rounded-lg backdrop-blur-sm">
                                     <h3 className="text-xl font-bold mb-2">
                                         {isLoginMode ? "Welcome Back Runners" : "Join Our Running Community"}
                                     </h3>
@@ -201,7 +218,7 @@ export default function AuthPage() {
 
                         {/* Form Section */}
                         <motion.div
-                            initial={{ opacity: 0, x: isLoginMode ? -100 : 0 }}
+                            initial={{ opacity: 0, x: isLoginMode ? (isMobile ? 0 : -100) : 0 }}
                             animate={{
                                 opacity: 1,
                                 x: 0
@@ -211,7 +228,7 @@ export default function AuthPage() {
                                 type: "spring",
                                 stiffness: 100
                             }}
-                            className={`p-8 rounded-lg shadow-lg w-full md:w-1/2 border border-zinc-700 bg-black order-2 ${isLoginMode ? 'md:order-2' : 'md:order-1'}`}
+                            className={`p-6 md:p-8 rounded-lg shadow-lg w-full md:w-1/2 border border-zinc-700 bg-black order-2 ${isLoginMode ? 'md:order-2' : 'md:order-1'}`}
                         >
                             <div className="flex justify-center mb-6">
                                 <div className="inline-flex rounded-md shadow-sm" role="group">

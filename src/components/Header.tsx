@@ -172,13 +172,7 @@ const Header = () => {
                         >
                             Events
                         </Link>
-                        <Link
-                            href="/auth?mode=signup"
-                            className="luxury-text hover:text-accent transition-colors"
-                            onClick={() => setIsMenuOpen(false)}
-                        >
-                            Register for Runs
-                        </Link>
+
 
                         {/* Mobile Auth Links */}
                         <div className="pt-2 border-t border-zinc-800">

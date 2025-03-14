@@ -102,7 +102,7 @@ export default function PrivacyPage() {
                     <h2 className="text-2xl font-semibold mb-4">9. Contact Us</h2>
                     <p>
                         If you have any questions about this Privacy Policy, please contact us through
-                        our website or support channels.
+                        our <a href="https://forms.gle/2enLCA1zNw3QSJYs9" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">support form</a> or other support channels.
                     </p>
                 </section>
 
