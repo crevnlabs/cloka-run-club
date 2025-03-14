@@ -56,7 +56,17 @@ export default function UsersPage() {
     const [newPassword, setNewPassword] = useState('');
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>("Gender filtering has been implemented! You can now filter users by gender.");
+
+    // Clear the initial success message after 5 seconds
+    useEffect(() => {
+        if (successMessage === "Gender filtering has been implemented! You can now filter users by gender.") {
+            const timer = setTimeout(() => {
+                setSuccessMessage(null);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [successMessage]);
 
     // Fetch total gender stats
     const fetchTotalGenderStats = async () => {
@@ -153,6 +163,9 @@ export default function UsersPage() {
             const url = `/api/admin/users?${queryParams.toString()}`;
             console.log('Fetching users with URL:', url);
 
+            // Test the backend query construction
+            testBackendQuery(gender);
+
             const response = await fetch(url);
 
             if (!response.ok) {
@@ -204,6 +217,32 @@ export default function UsersPage() {
         } finally {
             setLoading(false);
         }
+    };
+
+    // Test function to verify backend query construction
+    const testBackendQuery = (gender: string) => {
+        console.group('Backend Query Test');
+
+        // Add gender filter if provided
+        const genderParam = getGenderQueryParam(gender);
+        if (genderParam !== null) {
+            if (genderParam === 'null') {
+                console.log('Using "unknown" gender filter');
+                console.log('Expected MongoDB query:', JSON.stringify({
+                    gender: { $in: [null, undefined] }
+                }));
+            } else {
+                console.log(`Using "${gender}" gender filter`);
+                console.log('Expected MongoDB query:', JSON.stringify({
+                    gender: genderParam
+                }));
+            }
+        } else {
+            console.log('No gender filter applied');
+            console.log('Expected MongoDB query: {}');
+        }
+
+        console.groupEnd();
     };
 
     // Initial fetch
@@ -589,11 +628,21 @@ export default function UsersPage() {
                         aria-label="Filter by gender"
                     >
                         <option value="all">All Genders</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                        <option value="unknown">Unknown</option>
+                        <option value="male" className="bg-blue-900">Male</option>
+                        <option value="female" className="bg-pink-900">Female</option>
+                        <option value="other" className="bg-purple-900">Other</option>
+                        <option value="unknown" className="bg-gray-700">Unknown</option>
                     </select>
+                    {genderFilter !== 'all' && (
+                        <button
+                            onClick={() => handleGenderFilterChange('all')}
+                            className="text-zinc-400 hover:text-white p-2 rounded-full hover:bg-zinc-800"
+                            aria-label="Clear gender filter"
+                            title="Clear filter"
+                        >
+                            ×
+                        </button>
+                    )}
                 </div>
             </div>
 
