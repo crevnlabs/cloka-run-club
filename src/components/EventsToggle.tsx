@@ -33,21 +33,21 @@ const EventsToggle = ({ allEvents, upcomingEvents }: EventsToggleProps) => {
                 <div className="inline-flex items-center bg-zinc-900 rounded-lg p-1">
                     <Button
                         onClick={() => toggleEvents(false)}
-                        variant={!showUpcomingOnly ? 'primary' : 'secondary'}
+                        variant={!showUpcomingOnly ? 'secondary' : 'primary'}
                         size="small"
-                        className={`px-4 py-2 text-sm font-medium transition-colors ${!showUpcomingOnly
-                            ? 'bg-accent text-white'
-                            : 'bg-transparent text-zinc-400 hover:text-white'
+                        className={`px-3 py-1 text-xs font-medium transition-colors ${!showUpcomingOnly
+                            ? 'bg-transparent text-zinc-400 hover:text-white'
+                            : ''
                             }`}
                     >
                         All Events
                     </Button>
                     <Button
                         onClick={() => toggleEvents(true)}
-                        variant={showUpcomingOnly ? 'primary' : 'secondary'}
+                        variant={showUpcomingOnly ? 'secondary' : 'primary'}
                         size="small"
-                        className={`px-4 py-2 text-sm font-medium transition-colors ${showUpcomingOnly
-                            ? 'bg-accent text-white'
+                        className={`px-3 py-1 text-xs font-medium transition-colors ${showUpcomingOnly
+                            ? ''
                             : 'bg-transparent text-zinc-400 hover:text-white'
                             }`}
                     >

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import Button from '@/components/Button';
 
 export default function CreateEventPage() {
     const { user, isLoading, isAuthenticated } = useAuth();
@@ -225,13 +226,13 @@ export default function CreateEventPage() {
                         </div>
 
                         <div className="pt-4">
-                            <button
+                            <Button
                                 type="submit"
                                 disabled={isSubmitting}
                                 className="w-full px-6 py-3 bg-white text-black hover:bg-zinc-200 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {isSubmitting ? 'Creating Event...' : 'Create Event'}
-                            </button>
+                            </Button>
                         </div>
                     </form>
                 </div>

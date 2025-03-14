@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PasswordInput from '@/components/PasswordInput';
+import Button from '@/components/Button';
 
 export default function EditProfilePage() {
     const { user, isLoading, isAuthenticated, updateProfile } = useAuth();
@@ -145,12 +146,13 @@ export default function EditProfilePage() {
                 <div className="max-w-2xl mx-auto">
                     <div className="flex items-center justify-between mb-8">
                         <h1 className="text-3xl font-bold">Edit Profile</h1>
-                        <button
+                        <Button
+                            variant="primary"
                             onClick={() => router.push('/profile')}
                             className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-md transition-colors"
                         >
                             Back to Profile
-                        </button>
+                        </Button>
                     </div>
 
                     {error && (
@@ -332,13 +334,14 @@ export default function EditProfilePage() {
                         </div>
 
                         <div className="flex justify-end">
-                            <button
+                            <Button
+                                variant="secondary"
                                 type="submit"
                                 disabled={isSubmitting}
                                 className="px-6 py-3 bg-white text-black hover:bg-zinc-200 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {isSubmitting ? 'Saving...' : 'Save Changes'}
-                            </button>
+                            </Button>
                         </div>
                     </form>
                 </div>

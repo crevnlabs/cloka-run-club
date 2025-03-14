@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import PasswordInput from '@/components/PasswordInput';
+import Button from '@/components/Button';
 
 export default function AdminLoginPage() {
     const [password, setPassword] = useState('');
@@ -112,7 +113,7 @@ export default function AdminLoginPage() {
                         />
                     </div>
 
-                    <button
+                    <Button
                         type="submit"
                         disabled={isLoading}
                         className={`w-full py-3 rounded-md transition-colors ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
@@ -122,7 +123,7 @@ export default function AdminLoginPage() {
                         }}
                     >
                         {isLoading ? 'Logging in...' : 'Login'}
-                    </button>
+                    </Button>
                 </form>
 
                 {/* Debug link - remove in production */}

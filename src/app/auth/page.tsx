@@ -7,6 +7,8 @@ import { motion } from 'framer-motion';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PasswordInput from '@/components/PasswordInput';
+import Button from '@/components/Button';
+import Image from 'next/image';
 
 export default function AuthPage() {
     const searchParams = useSearchParams();
@@ -197,13 +199,15 @@ export default function AuthPage() {
                             }}
                             className={`w-full md:w-1/2 order-1 ${isLoginMode ? 'md:order-1' : 'md:order-2'} relative`}
                         >
-                            <div className="h-full rounded-lg overflow-hidden shadow-2xl border border-zinc-800">
-                                <img
+                            <div className="h-full overflow-hidden shadow-2xl border border-zinc-800">
+                                <Image
+                                    width={1000}
+                                    height={1000}
                                     src={isLoginMode ? "/images/runcluber.png" : "/images/returning.png"}
                                     alt={isLoginMode ? "Run Club" : "Returning Runners"}
                                     className="w-full h-full object-cover"
                                 />
-                                <div className="absolute bottom-4 left-4 right-4 md:right-auto md:w-[90%] bg-black/70 p-4 rounded-lg backdrop-blur-sm">
+                                <div className="absolute bottom-4 left-4 right-4 md:right-auto md:w-[90%] bg-black/70 p-4 backdrop-blur-sm">
                                     <h3 className="text-xl font-bold mb-2">
                                         {isLoginMode ? "Welcome Back Runners" : "Join Our Running Community"}
                                     </h3>
@@ -228,39 +232,39 @@ export default function AuthPage() {
                                 type: "spring",
                                 stiffness: 100
                             }}
-                            className={`p-6 md:p-8 rounded-lg shadow-lg w-full md:w-1/2 border border-zinc-700 bg-black order-2 ${isLoginMode ? 'md:order-2' : 'md:order-1'}`}
+                            className={`p-6 md:p-8 shadow-lg w-full md:w-1/2 border border-zinc-700 bg-black order-2 ${isLoginMode ? 'md:order-2' : 'md:order-1'}`}
                         >
-                            <div className="flex justify-center mb-6">
-                                <div className="inline-flex rounded-md shadow-sm" role="group">
-                                    <button
+                            <div className="flex items-center justify-between mb-6">
+                                <div className="inline-flex shadow-sm" role="group">
+                                    <Button
                                         type="button"
                                         onClick={() => setIsLoginMode(true)}
-                                        className={`px-4 py-2 text-sm font-medium rounded-l-lg ${isLoginMode
-                                            ? 'bg-white text-black'
-                                            : 'bg-zinc-800 text-white hover:bg-zinc-700'
+                                        className={`px-4 py-2 text-sm font-medium ${isLoginMode
+                                            ? ' text-black border border-zinc-700'
+                                            : 'bg-zinc-800 text-white hover:bg-zinc-700 border border-zinc-700'
                                             }`}
                                     >
                                         Login
-                                    </button>
-                                    <button
+                                    </Button>
+                                    <Button
                                         type="button"
                                         onClick={() => setIsLoginMode(false)}
-                                        className={`px-4 py-2 text-sm font-medium rounded-r-lg ${!isLoginMode
-                                            ? 'bg-white text-black'
-                                            : 'bg-zinc-800 text-white hover:bg-zinc-700'
+                                        className={`px-4 py-2 text-sm font-medium ${!isLoginMode
+                                            ? ' text-black border border-zinc-700'
+                                            : 'bg-zinc-800 text-white hover:bg-zinc-700 border border-zinc-700'
                                             }`}
                                     >
                                         Sign Up
-                                    </button>
+                                    </Button>
                                 </div>
+
+                                <h1 className="text-2xl font-bold">
+                                    {isLoginMode ? 'Welcome back!' : 'Join the club'}
+                                </h1>
                             </div>
 
-                            <h1 className="text-2xl font-bold text-center mb-6">
-                                {isLoginMode ? 'Login' : 'Sign Up'}
-                            </h1>
-
                             {error && (
-                                <div className="p-4 rounded-md mb-4 bg-red-900/30 border border-red-800 text-red-300">
+                                <div className="p-4  mb-4 bg-red-900/30 border border-red-800 text-red-300">
                                     {error}
                                 </div>
                             )}
@@ -278,7 +282,7 @@ export default function AuthPage() {
                                             type="email"
                                             value={loginData.email}
                                             onChange={handleLoginChange}
-                                            className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
+                                            className="w-full p-3 border  focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
                                             required
                                         />
                                     </div>
@@ -292,20 +296,21 @@ export default function AuthPage() {
                                             name="password"
                                             value={loginData.password}
                                             onChange={handleLoginChange}
-                                            className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
+                                            className="w-full p-3 border  focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
                                             required
                                             showHelperText={false}
                                         />
                                     </div>
 
-                                    <button
+                                    <Button
                                         type="submit"
+                                        variant="secondary"
                                         disabled={isLoading}
-                                        className={`w-full py-3 rounded-md transition-colors bg-white text-black hover:bg-zinc-200 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''
+                                        className={`w-full py-3  transition-colors ${isLoading ? 'opacity-70 cursor-not-allowed' : ''
                                             }`}
                                     >
                                         {isLoading ? 'Logging in...' : 'Login'}
-                                    </button>
+                                    </Button>
                                 </form>
                             ) : (
                                 // Signup Form
@@ -321,7 +326,7 @@ export default function AuthPage() {
                                                 type="text"
                                                 value={signupData.name}
                                                 onChange={handleSignupChange}
-                                                className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
+                                                className="w-full p-3 border  focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
                                                 required
                                             />
                                         </div>
@@ -335,7 +340,7 @@ export default function AuthPage() {
                                                 name="gender"
                                                 value={signupData.gender}
                                                 onChange={handleSignupChange}
-                                                className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
+                                                className="w-full p-3 border  focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
                                                 required
                                             >
                                                 <option value="">Select Gender</option>
@@ -357,7 +362,7 @@ export default function AuthPage() {
                                                 type="number"
                                                 value={signupData.age}
                                                 onChange={handleSignupChange}
-                                                className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
+                                                className="w-full p-3 border  focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
                                                 required
                                                 min="1"
                                                 max="30"
@@ -374,7 +379,7 @@ export default function AuthPage() {
                                                 type="email"
                                                 value={signupData.email}
                                                 onChange={handleSignupChange}
-                                                className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
+                                                className="w-full p-3 border  focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
                                                 required
                                             />
                                         </div>
@@ -391,7 +396,7 @@ export default function AuthPage() {
                                                 type="tel"
                                                 value={signupData.phone}
                                                 onChange={handleSignupChange}
-                                                className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
+                                                className="w-full p-3 border  focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
                                                 required
                                                 pattern="[0-9]{10}"
                                                 maxLength={10}
@@ -408,7 +413,7 @@ export default function AuthPage() {
                                                 type="text"
                                                 value={signupData.emergencyContact}
                                                 onChange={handleSignupChange}
-                                                className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
+                                                className="w-full p-3 border  focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
                                             />
                                         </div>
                                     </div>
@@ -424,7 +429,7 @@ export default function AuthPage() {
                                                 type="text"
                                                 value={signupData.instagramUsername}
                                                 onChange={handleSignupChange}
-                                                className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
+                                                className="w-full p-3 border  focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
                                                 required
                                             />
                                         </div>
@@ -437,7 +442,7 @@ export default function AuthPage() {
                                                 name="password"
                                                 value={signupData.password}
                                                 onChange={handleSignupChange}
-                                                className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
+                                                className="w-full p-3 border  focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
                                                 required
                                                 minLength={6}
                                             />
@@ -473,27 +478,28 @@ export default function AuthPage() {
                                         </label>
                                     </div>
 
-                                    <button
+                                    <Button
                                         type="submit"
                                         disabled={isLoading}
-                                        className={`w-full py-3 rounded-md transition-colors bg-white text-black hover:bg-zinc-200 mt-6 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''
+                                        variant="secondary"
+                                        className={`w-full py-3  transition-colors hover:bg-zinc-200 mt-6 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''
                                             }`}
                                     >
                                         {isLoading ? 'Signing up...' : 'Sign Up'}
-                                    </button>
+                                    </Button>
                                 </form>
                             )}
 
                             <div className="mt-6 text-center">
                                 <p className="text-zinc-400">
                                     {isLoginMode ? "Don't have an account?" : "Already have an account?"}{' '}
-                                    <button
+                                    <Button
                                         type="button"
                                         onClick={toggleMode}
                                         className="text-white hover:underline"
                                     >
                                         {isLoginMode ? 'Sign up' : 'Login'}
-                                    </button>
+                                    </Button>
                                 </p>
                             </div>
                         </motion.div>

@@ -8,6 +8,7 @@ export interface IEvent extends Document {
   createdAt: Date;
   exactLocation?: string;
   postApprovalMessage?: string;
+  postRejectionMessage?: string;
 }
 
 const EventSchema: Schema = new Schema({
@@ -18,6 +19,7 @@ const EventSchema: Schema = new Schema({
   createdAt: { type: Date, default: Date.now },
   exactLocation: { type: String },
   postApprovalMessage: { type: String },
+  postRejectionMessage: { type: String },
 });
 
 // Check if the model already exists to prevent overwriting during hot reloads

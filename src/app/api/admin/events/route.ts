@@ -44,6 +44,7 @@ export async function POST(request: NextRequest) {
       location,
       exactLocation,
       postApprovalMessage,
+      postRejectionMessage,
     } = await request.json();
 
     // Validate required fields
@@ -62,6 +63,7 @@ export async function POST(request: NextRequest) {
       location,
       exactLocation: exactLocation || null,
       postApprovalMessage: postApprovalMessage || null,
+      postRejectionMessage: postRejectionMessage || null,
       createdAt: new Date(),
     });
 

@@ -14,6 +14,7 @@ interface Event {
     createdAt: string;
     exactLocation?: string;
     postApprovalMessage?: string;
+    postRejectionMessage?: string;
 }
 
 export default function AdminEventsPage() {
@@ -46,7 +47,8 @@ export default function AdminEventsPage() {
             date: new Date().toISOString().split('T')[0],
             location: '',
             exactLocation: '',
-            postApprovalMessage: ''
+            postApprovalMessage: '',
+            postRejectionMessage: ''
         }
     });
     const [formError, setFormError] = useState('');
@@ -165,7 +167,8 @@ export default function AdminEventsPage() {
                 date: new Date().toISOString().slice(0, 16),
                 location: '',
                 exactLocation: '',
-                postApprovalMessage: ''
+                postApprovalMessage: '',
+                postRejectionMessage: ''
             }
         });
         setFormError('');
@@ -181,7 +184,8 @@ export default function AdminEventsPage() {
                 date: new Date().toISOString().split('T')[0],
                 location: '',
                 exactLocation: '',
-                postApprovalMessage: ''
+                postApprovalMessage: '',
+                postRejectionMessage: ''
             }
         });
         setFormError('');
@@ -336,19 +340,21 @@ export default function AdminEventsPage() {
                                                 {event.description}
                                             </p>
                                             <div className="flex justify-between">
-                                                <button
+                                                <Button
                                                     onClick={() => openEventForm(true, event)}
-                                                    className="border hover:cursor-pointer bg-white px-3 py-1 text-black rounded hover:bg-black hover:text-white hover:border-zinc-700 transition-colors   border-black"
+                                                    className="hover:cursor-pointer px-3 py-1 border-white text-white hover:text-black rounded hover:bg-zinc-100 transition-colors border"
+
                                                 >
                                                     Edit
-                                                </button>
-                                                <button
+                                                </Button>
+                                                <Button
                                                     onClick={() => openConfirmDialog(event._id, event.title, 'delete')}
                                                     disabled={isDeleting === event._id}
-                                                    className="hover:cursor-pointer px-3 py-1 border-white text-white hover:text-black rounded hover:bg-zinc-100 transition-colors border"
+                                                    className="border border-zinc-700 bg-zinc-800 text-white px-3 py-1 rounded hover:bg-black hover:text-white hover:border-zinc-700 transition-colors"
+
                                                 >
                                                     {isDeleting === event._id ? 'Deleting...' : 'Delete'}
-                                                </button>
+                                                </Button>
                                             </div>
                                         </div>
                                     </div>
@@ -370,18 +376,18 @@ export default function AdminEventsPage() {
                             Are you sure you want to delete the event <span className="font-semibold">{confirmDialog.title}</span>? This action cannot be undone.
                         </p>
                         <div className="flex justify-end space-x-3">
-                            <button
+                            <Button
                                 onClick={closeConfirmDialog}
                                 className="px-4 py-2 bg-white dark:bg-black text-black dark:text-white rounded hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors border border-black dark:border-white"
                             >
                                 Cancel
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                                 onClick={confirmAction}
                                 className="px-4 py-2 bg-black hover:bg-zinc-900 text-white rounded transition-colors"
                             >
                                 {isDeleting === confirmDialog.eventId ? 'Deleting...' : 'Delete'}
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </div>
@@ -519,6 +525,24 @@ export default function AdminEventsPage() {
                                 />
                                 <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
                                     This message will be displayed to users after their registration is approved.
+                                </p>
+                            </div>
+
+                            <div>
+                                <label htmlFor="postRejectionMessage" className="block text-sm font-medium mb-1 text-black dark:text-white">
+                                    Post-Rejection Message
+                                </label>
+                                <textarea
+                                    id="postRejectionMessage"
+                                    name="postRejectionMessage"
+                                    value={eventForm.event.postRejectionMessage || ''}
+                                    onChange={handleFormChange}
+                                    rows={4}
+                                    className="w-full p-2 border border-black dark:border-white rounded-md bg-white dark:bg-black text-black dark:text-white"
+                                    placeholder="Enter a message that will be shown to rejected participants"
+                                />
+                                <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
+                                    This message will be displayed to users after their registration is rejected.
                                 </p>
                             </div>
 

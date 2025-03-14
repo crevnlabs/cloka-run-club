@@ -63,6 +63,7 @@ export async function PUT(
       location,
       exactLocation,
       postApprovalMessage,
+      postRejectionMessage,
     } = body;
 
     // Validate required fields
@@ -83,6 +84,7 @@ export async function PUT(
         location,
         exactLocation: exactLocation || null,
         postApprovalMessage: postApprovalMessage || null,
+        postRejectionMessage: postRejectionMessage || null,
       },
       { new: true } // Return the updated document
     );

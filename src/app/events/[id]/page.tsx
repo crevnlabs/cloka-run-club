@@ -167,6 +167,7 @@ export default async function EventDetailPage({
                                                 <p className="text-zinc-300 whitespace-pre-line">
                                                     {isRegistered ? (
                                                         isApproved === false ? (
+                                                            event.postRejectionMessage ||
                                                             "Hey Runner,\n\nWe're so grateful for your energy and excitement! \nThis time, we couldn't fit everyone in, but don't sweat it—we're lacing up for the next run soon, and we can't wait to see you there.\n\nKeep that spirit high, and we'll be running together before you know it!\n\nMuch love,\nThe Cloka Team"
                                                         ) : (
                                                             "Your registration is pending approval. Location details will be available once approved."
