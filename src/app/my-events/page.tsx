@@ -16,6 +16,8 @@ interface Event {
     date: string;
     location: string;
     approved: boolean | null;
+    checkedIn?: boolean;
+    checkedInAt?: string | null;
 }
 
 export default function MyEventsPage() {
@@ -78,6 +80,16 @@ export default function MyEventsPage() {
         }
     };
 
+    // Get check-in badge
+    const getCheckInBadge = (checkedIn: boolean | undefined, approved: boolean | null) => {
+        if (!approved) return null;
+
+        if (checkedIn) {
+            return <span className="px-2 py-1 text-xs bg-blue-900 text-blue-300 border border-blue-800 ml-2">Checked In</span>;
+        }
+        return null;
+    };
+
     if (isLoading) {
         return (
             <>
@@ -133,13 +145,21 @@ export default function MyEventsPage() {
                                             <p className="text-zinc-400">{event.location}</p>
                                         </div>
                                         <div className="flex flex-col items-start md:items-end">
-                                            {getStatusBadge(event.approved)}
+                                            <div className="flex flex-wrap gap-2">
+                                                {getStatusBadge(event.approved)}
+                                                {getCheckInBadge(event.checkedIn, event.approved)}
+                                            </div>
                                             <Link
                                                 href={`/events/${event._id}`}
                                                 className="mt-3 text-sm text-white hover:underline"
                                             >
                                                 View Event Details
                                             </Link>
+                                            {event.approved === true && !event.checkedIn && (
+                                                <p className="mt-2 text-sm text-zinc-400">
+                                                    Check-in available at event venue
+                                                </p>
+                                            )}
                                         </div>
                                     </div>
                                     <p className="mt-4 text-zinc-300">{event.description}</p>

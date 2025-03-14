@@ -52,7 +52,7 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
                         <div className="text-center">
                             <button
                                 onClick={() => window.location.reload()}
-                                className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                                className="px-4 py-2 text-sm font-medium bg-primary rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                             >
                                 Refresh Page
                             </button>

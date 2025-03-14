@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Event from "@/models/Event";
+import mongoose from "mongoose";
 
 export async function GET(request: Request) {
   try {
@@ -10,7 +11,37 @@ export async function GET(request: Request) {
     // Get the URL and check for query parameters
     const { searchParams } = new URL(request.url);
     const showAll = searchParams.get("all") === "true";
+    const eventId = searchParams.get("id");
 
+    // If an ID is provided, fetch a single event
+    if (eventId) {
+      // Validate that the ID is a valid MongoDB ObjectId
+      if (!mongoose.Types.ObjectId.isValid(eventId)) {
+        return NextResponse.json(
+          { success: false, message: "Invalid event ID format" },
+          { status: 400 }
+        );
+      }
+
+      const event = await Event.findById(eventId);
+
+      if (!event) {
+        return NextResponse.json(
+          { success: false, message: "Event not found" },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json(
+        {
+          success: true,
+          event,
+        },
+        { status: 200 }
+      );
+    }
+
+    // Otherwise, fetch multiple events
     let events;
 
     if (showAll) {

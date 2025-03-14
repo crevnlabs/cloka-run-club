@@ -4,6 +4,8 @@ export interface IUserEvent extends Document {
   userId: mongoose.Types.ObjectId;
   eventId: mongoose.Types.ObjectId;
   approved: boolean | null;
+  checkedIn: boolean;
+  checkedInAt: Date | null;
   createdAt: Date;
 }
 
@@ -20,6 +22,14 @@ const UserEventSchema: Schema = new Schema({
   },
   approved: {
     type: Boolean,
+    default: null,
+  },
+  checkedIn: {
+    type: Boolean,
+    default: false,
+  },
+  checkedInAt: {
+    type: Date,
     default: null,
   },
   createdAt: {

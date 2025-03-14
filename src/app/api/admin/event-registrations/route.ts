@@ -164,6 +164,8 @@ export async function GET(request: NextRequest) {
         userId: 1,
         eventId: 1,
         approved: 1,
+        checkedIn: 1,
+        checkedInAt: 1,
         createdAt: 1,
         user: {
           _id: "$userDetails._id",
@@ -251,25 +253,40 @@ export async function GET(request: NextRequest) {
     countPipeline.push({ $count: "total" });
 
     const countResult = await UserEvent.aggregate(countPipeline);
-    const total = countResult.length > 0 ? countResult[0].total : 0;
+    const totalCount = countResult.length > 0 ? countResult[0].total : 0;
 
-    // Calculate pagination data
-    const pages = Math.ceil(total / limit);
+    // Calculate counts for summary
+    const approvedCount = await UserEvent.countDocuments({
+      ...matchStage,
+      approved: true,
+    });
+    const rejectedCount = await UserEvent.countDocuments({
+      ...matchStage,
+      approved: false,
+    });
+    const pendingCount = await UserEvent.countDocuments({
+      ...matchStage,
+      approved: null,
+    });
+    const checkedInCount = await UserEvent.countDocuments({
+      ...matchStage,
+      checkedIn: true,
+    });
 
     return NextResponse.json({
-      success: true,
-      eventRegistrations,
+      registrations: eventRegistrations || [],
       pagination: {
-        total,
+        total: totalCount,
         page,
         limit,
-        pages,
+        pages: Math.ceil(totalCount / limit),
       },
       stats: {
-        total: approvalCounts.total,
-        approved: approvalCounts.approved,
-        rejected: approvalCounts.rejected,
-        pending: approvalCounts.pending,
+        total: totalCount,
+        approved: approvedCount,
+        rejected: rejectedCount,
+        pending: pendingCount,
+        checkedIn: checkedInCount,
       },
     });
   } catch (error) {

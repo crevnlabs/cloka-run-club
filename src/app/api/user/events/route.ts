@@ -48,6 +48,8 @@ export async function GET(request: NextRequest) {
         exactLocation: event.exactLocation,
         postApprovalMessage: event.postApprovalMessage,
         approved: userEvent ? userEvent.approved : null,
+        checkedIn: userEvent ? userEvent.checkedIn : false,
+        checkedInAt: userEvent ? userEvent.checkedInAt : null,
       };
     });
 

@@ -39,6 +39,12 @@ export async function GET(request: NextRequest) {
       approved: null,
     });
 
+    // Count checked-in registrations
+    const checkedIn = await UserEvent.countDocuments({
+      ...query,
+      checkedIn: true,
+    });
+
     // Get unique event count
     const uniqueEvents = await UserEvent.distinct("eventId", {});
     const eventsCount = uniqueEvents.length;
@@ -52,6 +58,7 @@ export async function GET(request: NextRequest) {
       approved,
       rejected,
       pending,
+      checkedIn,
       eventsCount,
       usersCount,
     });

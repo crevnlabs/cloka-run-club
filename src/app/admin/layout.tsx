@@ -9,6 +9,7 @@ import Image from 'next/image';
 const navItems = [
     { name: 'Events', href: '/admin/events' },
     { name: 'Registrations', href: '/admin/event-registrations' },
+    { name: 'Check-In', href: '/admin/event-check-in' },
     { name: 'Users', href: '/admin/users' },
 ];
 

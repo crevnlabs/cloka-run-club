@@ -27,6 +27,8 @@ interface EventRegistration {
     userId: string;
     eventId: string;
     approved: boolean | null;
+    checkedIn: boolean;
+    checkedInAt: string | null;
     createdAt: string;
     user: User | null;
     event: Event | null;
@@ -37,6 +39,14 @@ interface PaginationData {
     page: number;
     limit: number;
     pages: number;
+}
+
+interface SummaryData {
+    total: number;
+    approved: number;
+    rejected: number;
+    pending: number;
+    checkedIn: number;
 }
 
 export default function EventRegistrationsPage() {
@@ -54,11 +64,12 @@ export default function EventRegistrationsPage() {
         limit: 50,
         pages: 0,
     });
-    const [summary, setSummary] = useState({
+    const [summary, setSummary] = useState<SummaryData>({
         total: 0,
         approved: 0,
         rejected: 0,
-        pending: 0
+        pending: 0,
+        checkedIn: 0,
     });
     const [copyingEmails, setCopyingEmails] = useState(false);
     const [emailsCopied, setEmailsCopied] = useState(false);
@@ -106,8 +117,8 @@ export default function EventRegistrationsPage() {
             const data = await response.json();
 
             if (response.ok) {
-                setEventRegistrations(data.eventRegistrations);
-                setPagination(data.pagination);
+                setEventRegistrations(data.registrations || []);
+                setPagination(data.pagination || { total: 0, page: 1, limit: 50, pages: 0 });
 
                 // Use the stats from the same response if available
                 if (data.stats) {
@@ -115,7 +126,8 @@ export default function EventRegistrationsPage() {
                         total: data.stats.total,
                         approved: data.stats.approved,
                         rejected: data.stats.rejected,
-                        pending: data.stats.pending
+                        pending: data.stats.pending,
+                        checkedIn: data.stats.checkedIn
                     });
                 } else {
                     // Calculate stats from the pagination total and filtered data
@@ -124,7 +136,8 @@ export default function EventRegistrationsPage() {
                     let pendingCount = 0;
 
                     // Count from the current page data
-                    data.eventRegistrations.forEach((reg: EventRegistration) => {
+                    const eventRegs = data.registrations || [];
+                    eventRegs.forEach((reg: EventRegistration) => {
                         if (reg.approved === true) approvedCount++;
                         else if (reg.approved === false) rejectedCount++;
                         else pendingCount++;
@@ -132,12 +145,13 @@ export default function EventRegistrationsPage() {
 
                     // If we're on the first page and have fewer items than the limit,
                     // we can use these counts directly
-                    if (pagination.page === 1 && data.eventRegistrations.length < pagination.limit) {
+                    if (pagination.page === 1 && (data.registrations || []).length < pagination.limit) {
                         setSummary({
-                            total: data.pagination.total,
+                            total: data.pagination?.total || 0,
                             approved: approvedCount,
                             rejected: rejectedCount,
-                            pending: pendingCount
+                            pending: pendingCount,
+                            checkedIn: 0
                         });
                     } else {
                         // Otherwise, we need to make an additional request to get accurate counts
@@ -153,28 +167,31 @@ export default function EventRegistrationsPage() {
 
                             if (statsResponse.ok && statsData.counts) {
                                 setSummary({
-                                    total: statsData.counts.total,
-                                    approved: statsData.counts.approved,
-                                    rejected: statsData.counts.rejected,
-                                    pending: statsData.counts.pending
+                                    total: statsData.counts.total || 0,
+                                    approved: statsData.counts.approved || 0,
+                                    rejected: statsData.counts.rejected || 0,
+                                    pending: statsData.counts.pending || 0,
+                                    checkedIn: statsData.counts.checkedIn || 0
                                 });
                             } else {
                                 // Fallback to using the pagination total
                                 setSummary({
-                                    total: data.pagination.total,
+                                    total: data.pagination?.total || 0,
                                     approved: approvedCount,
                                     rejected: rejectedCount,
-                                    pending: pendingCount
+                                    pending: pendingCount,
+                                    checkedIn: 0
                                 });
                             }
                         } catch (statsError) {
                             console.error('Error fetching stats:', statsError);
                             // Fallback to using the pagination total
                             setSummary({
-                                total: data.pagination.total,
+                                total: data.pagination?.total || 0,
                                 approved: approvedCount,
                                 rejected: rejectedCount,
-                                pending: pendingCount
+                                pending: pendingCount,
+                                checkedIn: 0
                             });
                         }
                     }
@@ -501,7 +518,7 @@ export default function EventRegistrationsPage() {
                     <h2 className="text-lg font-semibold mb-3">
                         {selectedEvent ? (events.find(e => e._id === selectedEvent)?.title || 'Event') : 'Global'} Summary
                     </h2>
-                    <div className="grid grid-cols-4 gap-4">
+                    <div className="grid grid-cols-5 gap-4">
                         <div className="bg-zinc-800 p-3 rounded-lg text-center">
                             <div className="text-2xl font-bold">{summary.total}</div>
                             <div className="text-sm text-zinc-400">Total Registrations</div>
@@ -518,6 +535,10 @@ export default function EventRegistrationsPage() {
                             <div className="text-2xl font-bold text-yellow-300">{summary.pending}</div>
                             <div className="text-sm text-yellow-400">Pending</div>
                         </div>
+                        <div className="bg-blue-900/30 p-3 rounded-lg text-center">
+                            <div className="text-2xl font-bold text-blue-300">{summary.checkedIn}</div>
+                            <div className="text-sm text-blue-400">Checked In</div>
+                        </div>
                     </div>
                 </div>
             )}
@@ -531,7 +552,7 @@ export default function EventRegistrationsPage() {
             ) : (
                 <>
                     {/* Registrations table */}
-                    {eventRegistrations.length > 0 ? (
+                    {eventRegistrations && eventRegistrations.length > 0 ? (
                         <div className="bg-zinc-900 rounded-lg overflow-hidden">
                             <div className="overflow-x-auto">
                                 <table className="w-full">
@@ -541,6 +562,7 @@ export default function EventRegistrationsPage() {
                                             <th className="px-4 py-3 text-left">Event</th>
                                             <th className="px-4 py-3 text-left">Registered On</th>
                                             <th className="px-4 py-3 text-left">Status</th>
+                                            <th className="px-4 py-3 text-left">Check-In</th>
                                             <th className="px-4 py-3 text-right">Actions</th>
                                         </tr>
                                     </thead>
@@ -607,6 +629,25 @@ export default function EventRegistrationsPage() {
                                                         </span>
                                                     )}
                                                 </td>
+                                                <td className="px-4 py-3">
+                                                    {registration.checkedIn ? (
+                                                        <div>
+                                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-900/30 text-blue-300">
+                                                                <CheckCircle className="h-3 w-3 mr-1" />
+                                                                Checked In
+                                                            </span>
+                                                            {registration.checkedInAt && (
+                                                                <div className="text-xs text-zinc-400 mt-1">
+                                                                    {new Date(registration.checkedInAt).toLocaleString()}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ) : registration.approved === true ? (
+                                                        <span className="text-zinc-400 text-xs">Not checked in</span>
+                                                    ) : (
+                                                        <span className="text-zinc-500 text-xs">-</span>
+                                                    )}
+                                                </td>
                                                 <td className="px-4 py-3 text-right">
                                                     <div className="flex justify-end space-x-2">
                                                         {registration.approved !== true && (
@@ -640,7 +681,7 @@ export default function EventRegistrationsPage() {
                     )}
 
                     {/* Pagination */}
-                    {pagination.pages > 1 && (
+                    {pagination && pagination.pages > 1 && (
                         <div className="flex justify-center mt-6">
                             <nav className="flex space-x-2">
                                 {/* Previous Button */}
@@ -654,7 +695,7 @@ export default function EventRegistrationsPage() {
                                 )}
 
                                 {/* Page numbers with ellipsis for large page counts */}
-                                {Array.from({ length: pagination.pages }, (_, i) => i + 1)
+                                {Array.from({ length: pagination.pages || 0 }, (_, i) => i + 1)
                                     .filter(page => {
                                         // Always show first and last page
                                         if (page === 1 || page === pagination.pages) return true;
