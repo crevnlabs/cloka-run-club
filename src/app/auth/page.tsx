@@ -258,7 +258,7 @@ export default function AuthPage() {
                                     </Button>
                                 </div>
 
-                                <h1 className="text-2xl font-bold">
+                                <h1 className="text-2xl font-bold text-end">
                                     {isLoginMode ? 'Welcome back!' : 'Join the club'}
                                 </h1>
                             </div>

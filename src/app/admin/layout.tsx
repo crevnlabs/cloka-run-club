@@ -130,7 +130,7 @@ export default function AdminLayout({
 
             {/* Main Content */}
             <main className="flex-1 p-8">
-                <div className="max-w-7xl mx-auto text-white">
+                <div className="container mx-auto text-white">
                     {children}
                 </div>
             </main>

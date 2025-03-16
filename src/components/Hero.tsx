@@ -70,9 +70,9 @@ const Hero = () => {
                             >
                                 Join Cloka Club
                             </Button>
-                            <p className="luxury-text text-lg text-zinc-300">
+                            <p className="luxury-text text-lg text-zinc-300 md:text-start text-center">
                                 {isLoading ? (
-                                    <span className="text-white font-bold">600+</span>
+                                    <span className="text-white font-bold">1500+</span>
                                 ) : (
                                     <motion.span
                                         className="text-white font-bold"
@@ -82,7 +82,7 @@ const Hero = () => {
                                     >
                                         {registrationCount}+
                                     </motion.span>
-                                )} registrations
+                                )} runners already locked in, what about you?
                             </p>
                         </div>
                     </motion.div>
