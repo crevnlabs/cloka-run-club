@@ -82,7 +82,7 @@ const Hero = () => {
                                     >
                                         {registrationCount}+
                                     </motion.span>
-                                )} runners already locked in, what about you?
+                                )} runners already locked in, <br /> what about you?
                             </p>
                         </div>
                     </motion.div>
