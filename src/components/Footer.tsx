@@ -32,12 +32,12 @@ const Footer = () => {
                         <ul className="space-y-2">
                             <li>
                                 <a
-                                    href="https://forms.gle/2enLCA1zNw3QSJYs9"
+                                    href="/contact"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="luxury-text hover:text-accent transition-colors"
                                 >
-                                    Support
+                                    Contact Us & Support
                                 </a>
                             </li>
                             <li>
