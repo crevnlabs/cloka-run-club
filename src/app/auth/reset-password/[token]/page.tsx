@@ -135,7 +135,7 @@ export default function ResetPasswordPage({
                             <div className="flex flex-col space-y-4">
                                 <Button
                                     type="submit"
-                                    variant="primary"
+                                    variant="secondary"
                                     isLoading={isLoading}
                                     loadingText="Resetting..."
                                 >
@@ -144,7 +144,7 @@ export default function ResetPasswordPage({
 
                                 <Button
                                     type="button"
-                                    variant="secondary"
+                                    variant="primary"
                                     onClick={() => router.push('/auth')}
                                 >
                                     Back to Login
