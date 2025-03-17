@@ -38,7 +38,7 @@ export default function CheckInPage() {
     // Redirect if not authenticated
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
-            router.push(`/login?redirect=/check-in?eventId=${eventId}&token=${token}`);
+            router.push(`/auth?redirect=/check-in?eventId=${eventId}&token=${token}`);
         }
     }, [isLoading, isAuthenticated, router, eventId, token]);
 
