@@ -300,6 +300,15 @@ export default function AuthPage() {
                                             required
                                             showHelperText={false}
                                         />
+                                        <div className="mt-1">
+                                            <button
+                                                type="button"
+                                                onClick={() => router.push('/auth/forgot-password')}
+                                                className="cursor-pointer text-sm text-zinc-400 hover:text-zinc-300"
+                                            >
+                                                Forgot Password?
+                                            </button>
+                                        </div>
                                     </div>
 
                                     <Button
