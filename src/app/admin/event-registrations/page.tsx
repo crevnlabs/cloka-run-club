@@ -73,6 +73,7 @@ export default function EventRegistrationsPage() {
     });
     const [copyingEmails, setCopyingEmails] = useState(false);
     const [emailsCopied, setEmailsCopied] = useState(false);
+    const [downloadingCSV, setDownloadingCSV] = useState(false);
 
     // Filters
     const [selectedEvent, setSelectedEvent] = useState(searchParams.get('eventId') || '');
@@ -372,6 +373,116 @@ export default function EventRegistrationsPage() {
         }
     };
 
+    // Function to download all registration data as CSV
+    const downloadAsCSV = async () => {
+        setDownloadingCSV(true);
+        setError('');
+
+        try {
+            // Build query parameters (same as loadEventRegistrations but without pagination)
+            const params = new URLSearchParams();
+            // Don't include page and limit to get all results
+            params.append('format', 'csv'); // Add a flag to indicate we need all data for CSV
+
+            if (selectedEvent) {
+                params.append('eventId', selectedEvent);
+            }
+
+            if (approvalStatus) {
+                params.append('approved', approvalStatus);
+            }
+
+            if (searchTerm) {
+                params.append('search', searchTerm);
+            }
+
+            if (ageRange) {
+                params.append('ageRange', ageRange);
+            }
+
+            if (selectedSex) {
+                params.append('sex', selectedSex);
+            }
+
+            // Fetch all registrations matching the current filters
+            const response = await fetch(`/api/admin/event-registrations?${params.toString()}`);
+            const data = await response.json();
+
+            if (response.ok && data.registrations) {
+                // Convert registrations to CSV
+                const registrations = data.registrations;
+
+                // Define CSV headers
+                const headers = [
+                    'Name', 'Email', 'Phone', 'Age', 'Gender', 'Instagram',
+                    'Event', 'Event Date', 'Registration Date', 'Status', 'Checked In'
+                ];
+
+                // Map registrations to CSV rows
+                const rows = registrations.map((reg: EventRegistration) => {
+                    const user = reg.user || {} as User;
+                    const event = reg.event || {} as Event;
+                    const status = reg.approved === true ? 'Approved' :
+                        reg.approved === false ? 'Rejected' : 'Pending';
+
+                    return [
+                        user.name || '',
+                        user.email || '',
+                        user.phone || '',
+                        user.age || '',
+                        user.sex || '',
+                        user.instagram || '',
+                        event.title || '',
+                        event.date ? new Date(event.date).toLocaleDateString() : '',
+                        reg.createdAt ? new Date(reg.createdAt).toLocaleDateString() : '',
+                        status,
+                        reg.checkedIn ? 'Yes' : 'No'
+                    ];
+                });
+
+                // Build CSV content
+                const csvContent = [
+                    headers.join(','),
+                    ...rows.map((row: string[]) => row.map((cell: string | number | boolean) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+                ].join('\n');
+
+                // Create a blob with the CSV data
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+
+                // Create a URL for the blob
+                const url = URL.createObjectURL(blob);
+
+                // Create a temporary link element
+                const link = document.createElement('a');
+                link.href = url;
+
+                // Set the filename - get event name or use 'all-events' + current date
+                const eventName = selectedEvent
+                    ? (events.find(e => e._id === selectedEvent)?.title || 'event').toLowerCase().replace(/\s+/g, '-')
+                    : 'all-events';
+                const date = new Date().toISOString().split('T')[0];
+                link.download = `registrations-${eventName}-${date}.csv`;
+
+                // Append the link to the document
+                document.body.appendChild(link);
+
+                // Click the link to trigger the download
+                link.click();
+
+                // Clean up
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            } else {
+                setError(data.message || 'Failed to fetch registration data for CSV');
+            }
+        } catch (error) {
+            console.error('Error downloading CSV data:', error);
+            setError('An error occurred while preparing registration data');
+        } finally {
+            setDownloadingCSV(false);
+        }
+    };
+
     // Load data on initial render and when filters/pagination change
     useEffect(() => {
         loadEvents();
@@ -402,6 +513,23 @@ export default function EventRegistrationsPage() {
                             <>
                                 <Clipboard className="h-4 w-4 mr-2" />
                                 Copy Email IDs
+                            </>
+                        )}
+                    </Button>
+                    <Button
+                        onClick={downloadAsCSV}
+                        disabled={downloadingCSV}
+                        className="flex items-center bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded"
+                    >
+                        {downloadingCSV ? (
+                            <>
+                                <div className="animate-spin h-4 w-4 mr-2 border-t-2 border-b-2 border-white rounded-full"></div>
+                                Downloading...
+                            </>
+                        ) : (
+                            <>
+                                <Clipboard className="h-4 w-4 mr-2" />
+                                Download CSV
                             </>
                         )}
                     </Button>

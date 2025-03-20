@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
     const sex = searchParams.get("sex") || "";
     const countOnly = searchParams.get("countOnly") === "true";
     const emailsOnly = searchParams.get("emailsOnly") === "true";
+    const formatCsv = searchParams.get("format") === "csv";
 
     // Calculate skip value for pagination
     const skip = (page - 1) * limit;
@@ -154,6 +155,49 @@ export async function GET(request: NextRequest) {
         success: true,
         emails,
         count: emails.length,
+      });
+    }
+
+    // If format=csv, return all registrations without pagination
+    if (formatCsv) {
+      // Create a pipeline for full CSV data without pagination
+      const csvPipeline = [...pipeline];
+
+      // Project the final shape of the documents
+      csvPipeline.push({
+        $project: {
+          _id: 1,
+          userId: 1,
+          eventId: 1,
+          approved: 1,
+          checkedIn: 1,
+          checkedInAt: 1,
+          createdAt: 1,
+          user: {
+            _id: "$userDetails._id",
+            name: "$userDetails.name",
+            email: "$userDetails.email",
+            phone: "$userDetails.phone",
+            age: "$userDetails.age",
+            sex: "$userDetails.gender",
+            instagram: "$userDetails.instagramUsername",
+          },
+          event: {
+            _id: "$eventDetails._id",
+            title: "$eventDetails.title",
+            date: "$eventDetails.date",
+            location: "$eventDetails.location",
+          },
+        },
+      });
+
+      // Execute the aggregation without pagination
+      const allRegistrations = await UserEvent.aggregate(csvPipeline);
+
+      return NextResponse.json({
+        success: true,
+        registrations: allRegistrations,
+        count: allRegistrations.length,
       });
     }
 
