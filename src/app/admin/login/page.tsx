@@ -7,6 +7,7 @@ import PasswordInput from '@/components/PasswordInput';
 import Button from '@/components/Button';
 
 export default function AdminLoginPage() {
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -29,35 +30,30 @@ export default function AdminLoginPage() {
         e.preventDefault();
         setError('');
         setIsLoading(true);
-        console.log('Login attempt with password:', password);
 
         try {
-            console.log('Sending request to /api/admin/login');
             const response = await fetch('/api/admin/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ password }),
+                body: JSON.stringify({ email, password }),
             });
 
-            console.log('Response status:', response.status);
             const data = await response.json();
-            console.log('Response data:', data);
+            console.log('Login response:', { status: response.status, data });
 
-            if (response.ok) {
-                console.log('Login successful, redirecting to /admin/event-registrations');
-                // Try both navigation methods
-                try {
-                    router.push('/admin/event-registrations');
-                } catch (navError) {
-                    console.error('Router navigation failed:', navError);
-                    // Fallback to window.location
-                    window.location.href = '/admin/event-registrations';
-                }
+            if (response.ok && data.success) {
+                // Successful login
+                console.log('Login successful, redirecting...');
+                // Force a small delay to ensure cookie is set
+                await new Promise(resolve => setTimeout(resolve, 100));
+                router.push('/admin/event-registrations');
+                // If the above doesn't work, try replacing with:
+                // window.location.href = '/admin/event-registrations';
             } else {
-                console.log('Login failed:', data.message);
-                setError(data.message || 'Invalid password');
+                console.error('Login failed:', data.message);
+                setError(data.message || 'Login failed');
             }
         } catch (err) {
             console.error('Login error:', err);
@@ -95,6 +91,25 @@ export default function AdminLoginPage() {
                 )}
 
                 <form onSubmit={handleSubmit}>
+                    <div className="mb-4">
+                        <label htmlFor="email" className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
+                            Email
+                        </label>
+                        <input
+                            id="email"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full p-3 border rounded-md focus:outline-none focus:ring-2"
+                            style={{
+                                borderColor: 'var(--accent)',
+                                backgroundColor: isDarkMode ? '#2a2a2a' : '#ffffff',
+                                color: 'var(--foreground)',
+                            }}
+                            required
+                        />
+                    </div>
+
                     <div className="mb-4">
                         <label htmlFor="password" className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
                             Password

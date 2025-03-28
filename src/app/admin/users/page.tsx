@@ -57,6 +57,9 @@ export default function UsersPage() {
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [showPromoteModal, setShowPromoteModal] = useState(false);
+    const [superadminPassword, setSuperadminPassword] = useState('');
+    const [isPromoting, setIsPromoting] = useState<string | null>(null);
 
     // Fetch total gender stats
     const fetchTotalGenderStats = async () => {
@@ -301,6 +304,61 @@ export default function UsersPage() {
                 setSuccessMessage(null);
             }, 3000);
         }
+    };
+
+    // Handle promote to admin
+    const handlePromoteToAdmin = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!selectedUserId || !superadminPassword) {
+            return;
+        }
+
+        try {
+            setIsPromoting(selectedUserId);
+
+            const response = await fetch('/api/admin/users/promote', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: selectedUserId,
+                    superadminPassword
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                setSuccessMessage('User promoted to admin successfully');
+                setShowPromoteModal(false);
+                // Update the user in the list
+                setUsers(users.map(user =>
+                    user._id === selectedUserId
+                        ? { ...user, role: 'admin' }
+                        : user
+                ));
+            } else {
+                setError(data.message || 'Failed to promote user to admin');
+            }
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'An error occurred');
+        } finally {
+            setIsPromoting(null);
+            setSuperadminPassword('');
+            // Clear success message after 3 seconds
+            setTimeout(() => {
+                setSuccessMessage(null);
+            }, 3000);
+        }
+    };
+
+    // Open promote modal
+    const openPromoteModal = (userId: string) => {
+        setSelectedUserId(userId);
+        setSuperadminPassword('');
+        setShowPromoteModal(true);
     };
 
     // Generate pagination buttons with limited range
@@ -619,6 +677,21 @@ export default function UsersPage() {
                                     </td>
                                     <td className="p-3">
                                         <div className="flex space-x-2">
+                                            {user.role !== 'admin' && (
+                                                <Button
+                                                    onClick={() => openPromoteModal(user._id)}
+                                                    className="p-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+                                                    title="Promote to Admin"
+                                                    isLoading={isPromoting === user._id}
+                                                    size="small"
+                                                >
+                                                    {isPromoting !== user._id && (
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fillRule="evenodd" d="M10 2a1 1 0 00-1 1v1.323l-3.954 1.582a1 1 0 00-.646.933V9.5h11.2V6.838a1 1 0 00-.646-.933L11 4.323V3a1 1 0 00-1-1zM4.4 11v3.162a1 1 0 00.646.933L9 16.677V18a1 1 0 002 0v-1.323l3.954-1.582a1 1 0 00.646-.933V11H4.4z" clipRule="evenodd" />
+                                                        </svg>
+                                                    )}
+                                                </Button>
+                                            )}
                                             <Button
                                                 onClick={() => openPasswordResetModal(user._id)}
                                                 className="p-2 bg-blue-600 text-white rounded hover:bg-blue-700"
@@ -694,6 +767,47 @@ export default function UsersPage() {
                                     loadingText="Resetting..."
                                 >
                                     Reset Password
+                                </Button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Promote to Admin Modal */}
+            {showPromoteModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+                    <div className="bg-zinc-800 p-6 rounded-lg w-full max-w-md">
+                        <h2 className="text-xl font-bold mb-4">Promote User to Admin</h2>
+                        <form onSubmit={handlePromoteToAdmin}>
+                            <div className="mb-4">
+                                <label htmlFor="superadminPassword" className="block mb-2">
+                                    Superadmin Password
+                                </label>
+                                <input
+                                    type="password"
+                                    id="superadminPassword"
+                                    value={superadminPassword}
+                                    onChange={(e) => setSuperadminPassword(e.target.value)}
+                                    className="w-full p-2 border border-zinc-700 bg-zinc-900 text-white rounded"
+                                    required
+                                />
+                            </div>
+                            <div className="flex justify-end space-x-2">
+                                <Button
+                                    type="button"
+                                    onClick={() => setShowPromoteModal(false)}
+                                    variant="secondary"
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    variant="primary"
+                                    isLoading={isPromoting !== null}
+                                    loadingText="Promoting..."
+                                >
+                                    Promote to Admin
                                 </Button>
                             </div>
                         </form>

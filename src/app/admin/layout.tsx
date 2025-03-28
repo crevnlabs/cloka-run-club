@@ -3,8 +3,10 @@
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useAdmin, AdminProvider } from '@/lib/admin-context';
+import { useRouter } from 'next/navigation';
 
 const navItems = [
     { name: 'Events', href: '/admin/events' },
@@ -13,13 +15,27 @@ const navItems = [
     { name: 'Users', href: '/admin/users' },
 ];
 
-export default function AdminLayout({
+function AdminLayoutContent({
     children,
 }: {
     children: React.ReactNode;
 }) {
     const pathname = usePathname();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const { isAdmin, adminUser, logout } = useAdmin();
+    const router = useRouter();
+
+    useEffect(() => {
+        // Redirect to login if not admin
+        if (!isAdmin && pathname !== '/admin/login') {
+            router.push('/admin/login');
+        }
+    }, [isAdmin, pathname, router]);
+
+    // Don't render the admin layout for non-admins (except on login page)
+    if (!isAdmin && pathname !== '/admin/login') {
+        return null;
+    }
 
     return (
         <div className="min-h-screen bg-black">
@@ -40,28 +56,36 @@ export default function AdminLayout({
                             <h1 className="text-xl font-bold ml-2">Admin</h1>
                         </div>
 
-                        {/* Hamburger button */}
-                        <button
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className="p-2 rounded-md text-white hover:bg-zinc-800 focus:outline-none hover:cursor-pointer"
-                            aria-label="Toggle menu"
-                        >
-                            <svg
-                                className="h-6 w-6"
-                                fill="none"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
+                        <div className="flex items-center space-x-4">
+                            {isAdmin && (
+                                <div className="text-sm text-zinc-400">
+                                    {adminUser?.email}
+                                </div>
+                            )}
+
+                            {/* Hamburger button */}
+                            <button
+                                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                                className="p-2 rounded-md text-white hover:bg-zinc-800 focus:outline-none hover:cursor-pointer"
+                                aria-label="Toggle menu"
                             >
-                                {isMenuOpen ? (
-                                    <path d="M6 18L18 6M6 6l12 12" />
-                                ) : (
-                                    <path d="M4 6h16M4 12h16M4 18h16" />
-                                )}
-                            </svg>
-                        </button>
+                                <svg
+                                    className="h-6 w-6"
+                                    fill="none"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    {isMenuOpen ? (
+                                        <path d="M6 18L18 6M6 6l12 12" />
+                                    ) : (
+                                        <path d="M4 6h16M4 12h16M4 18h16" />
+                                    )}
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -121,6 +145,14 @@ export default function AdminLayout({
                                             {item.name}
                                         </Link>
                                     ))}
+                                    {isAdmin && (
+                                        <button
+                                            onClick={logout}
+                                            className="block w-full px-4 py-2 text-xl font-medium text-center text-zinc-400 hover:text-zinc-300 hover:cursor-pointer"
+                                        >
+                                            Logout
+                                        </button>
+                                    )}
                                 </nav>
                             </div>
                         </div>
@@ -135,5 +167,17 @@ export default function AdminLayout({
                 </div>
             </main>
         </div>
+    );
+}
+
+export default function AdminLayout({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
+    return (
+        <AdminProvider>
+            <AdminLayoutContent>{children}</AdminLayoutContent>
+        </AdminProvider>
     );
 } 
