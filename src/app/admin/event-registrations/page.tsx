@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { CheckCircle, XCircle, Clock, Search, Filter, RefreshCw, Clipboard } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, Search, Filter, Download, RefreshCw, Clipboard } from 'lucide-react';
 import Button from '@/components/Button';
 
 interface User {
@@ -281,6 +281,45 @@ export default function EventRegistrationsPage() {
         }
     };
 
+    // Handle check-in
+    const handleCheckIn = async (registrationId: string) => {
+        try {
+            const response = await fetch('/api/admin/event-registrations/check-in', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    registrationId,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Update the registration in the state
+                setEventRegistrations(prevRegistrations =>
+                    prevRegistrations.map(reg =>
+                        reg._id === registrationId
+                            ? { ...reg, checkedIn: true, checkedInAt: new Date().toISOString() }
+                            : reg
+                    )
+                );
+
+                // Update summary counts
+                setSummary(prev => ({
+                    ...prev,
+                    checkedIn: prev.checkedIn + 1
+                }));
+            } else {
+                setError(data.message || 'Failed to check in registration');
+            }
+        } catch (err) {
+            setError('An error occurred while checking in registration');
+            console.error(err);
+        }
+    };
+
     // Handle page change
     const handlePageChange = (newPage: number) => {
         setPagination(prev => ({ ...prev, page: newPage }));
@@ -491,8 +530,8 @@ export default function EventRegistrationsPage() {
 
     return (
         <div className="w-full py-8">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">Event Registrations</h1>
+            <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+                <h1 className="text-2xl font-bold text-center md:text-left mb-4 md:mb-0">Event Registrations</h1>
                 <div className="flex space-x-2">
                     <Button
                         onClick={copyEmailsToClipboard}
@@ -512,7 +551,7 @@ export default function EventRegistrationsPage() {
                         ) : (
                             <>
                                 <Clipboard className="h-4 w-4 mr-2" />
-                                Copy Email IDs
+                                Email IDs
                             </>
                         )}
                     </Button>
@@ -528,8 +567,8 @@ export default function EventRegistrationsPage() {
                             </>
                         ) : (
                             <>
-                                <Clipboard className="h-4 w-4 mr-2" />
-                                Download CSV
+                                <Download className="h-4 w-4 mr-2" />
+                                CSV
                             </>
                         )}
                     </Button>
@@ -537,8 +576,7 @@ export default function EventRegistrationsPage() {
                         onClick={() => loadEventRegistrations()}
                         className="flex items-center bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded"
                     >
-                        <RefreshCw className="h-4 w-4 mr-2" />
-                        Refresh
+                        <RefreshCw className="h-4 w-4" />
                     </Button>
                 </div>
             </div>
@@ -646,26 +684,26 @@ export default function EventRegistrationsPage() {
                     <h2 className="text-lg font-semibold mb-3">
                         {selectedEvent ? (events.find(e => e._id === selectedEvent)?.title || 'Event') : 'Global'} Summary
                     </h2>
-                    <div className="grid grid-cols-5 gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                         <div className="bg-zinc-800 p-3 rounded-lg text-center">
-                            <div className="text-2xl font-bold">{summary.total}</div>
-                            <div className="text-sm text-zinc-400">Total Registrations</div>
+                            <div className="text-xl sm:text-2xl font-bold">{summary.total}</div>
+                            <div className="text-xs sm:text-sm text-zinc-400">Total Registrations</div>
                         </div>
                         <div className="bg-green-900/30 p-3 rounded-lg text-center">
-                            <div className="text-2xl font-bold text-green-300">{summary.approved}</div>
-                            <div className="text-sm text-green-400">Approved</div>
+                            <div className="text-xl sm:text-2xl font-bold text-green-300">{summary.approved}</div>
+                            <div className="text-xs sm:text-sm text-green-400">Approved</div>
                         </div>
                         <div className="bg-red-900/30 p-3 rounded-lg text-center">
-                            <div className="text-2xl font-bold text-red-300">{summary.rejected}</div>
-                            <div className="text-sm text-red-400">Rejected</div>
+                            <div className="text-xl sm:text-2xl font-bold text-red-300">{summary.rejected}</div>
+                            <div className="text-xs sm:text-sm text-red-400">Rejected</div>
                         </div>
                         <div className="bg-yellow-900/30 p-3 rounded-lg text-center">
-                            <div className="text-2xl font-bold text-yellow-300">{summary.pending}</div>
-                            <div className="text-sm text-yellow-400">Pending</div>
+                            <div className="text-xl sm:text-2xl font-bold text-yellow-300">{summary.pending}</div>
+                            <div className="text-xs sm:text-sm text-yellow-400">Pending</div>
                         </div>
                         <div className="bg-blue-900/30 p-3 rounded-lg text-center">
-                            <div className="text-2xl font-bold text-blue-300">{summary.checkedIn}</div>
-                            <div className="text-sm text-blue-400">Checked In</div>
+                            <div className="text-xl sm:text-2xl font-bold text-blue-300">{summary.checkedIn}</div>
+                            <div className="text-xs sm:text-sm text-blue-400">Checked In</div>
                         </div>
                     </div>
                 </div>
@@ -771,7 +809,12 @@ export default function EventRegistrationsPage() {
                                                             )}
                                                         </div>
                                                     ) : registration.approved === true ? (
-                                                        <span className="text-zinc-400 text-xs">Not checked in</span>
+                                                        <Button
+                                                            onClick={() => handleCheckIn(registration._id)}
+                                                            className="bg-blue-700 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
+                                                        >
+                                                            Check In
+                                                        </Button>
                                                     ) : (
                                                         <span className="text-zinc-500 text-xs">-</span>
                                                     )}
