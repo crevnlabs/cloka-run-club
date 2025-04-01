@@ -1,5 +1,12 @@
 # CLOKA - Beyond the Seen
 
+[![CI](https://github.com/fabianferno/cloka-app/actions/workflows/ci.yml/badge.svg)](https://github.com/fabianferno/cloka-app/actions/workflows/ci.yml)
+[![Deploy](https://github.com/fabianferno/cloka-app/actions/workflows/deploy.yml/badge.svg)](https://github.com/fabianferno/cloka-app/actions/workflows/deploy.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15.2-black)](https://nextjs.org/)
+[![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](CONTRIBUTING.md)
+
 A premium clothing brand website with Razorpay integration for the official merch store and seamless run registrations.
 
 ## Features
@@ -36,7 +43,7 @@ A premium clothing brand website with Razorpay integration for the official merc
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/cloka-app.git
+   git clone https://github.com/fabianferno/cloka-app.git
    cd cloka-app
    ```
 
@@ -165,6 +172,27 @@ This project uses Razorpay for payment processing. To test the payment flow:
 3. Update the `.env.local` file with your API keys
 4. Use the test mode to simulate payments
 
+## Contributing
+
+We love your input! We want to make contributing to CLOKA as easy and transparent as possible. Please read our [Contributing Guidelines](CONTRIBUTING.md) to get started.
+
+### Code of Conduct
+
+This project and everyone participating in it is governed by the [CLOKA Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
+
+### Development Process
+
+We use GitHub to host code, to track issues and feature requests, as well as accept pull requests. We use [Github Flow](https://guides.github.com/introduction/flow/index.html), so all code changes happen through pull requests.
+
+1. Fork the repo and create your branch from `main`
+2. If you've added code that should be tested, add tests
+3. If you've changed APIs, update the documentation
+4. Ensure the test suite passes
+5. Make sure your code lints
+6. Issue that pull request!
+
+See the [Contributing Guidelines](CONTRIBUTING.md) for more details.
+
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
