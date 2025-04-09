@@ -5,15 +5,51 @@ import Order from "@/models/Order";
 import Product from "@/models/Product";
 
 // Initialize Razorpay with your key_id and key_secret
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID || "",
-  key_secret: process.env.RAZORPAY_KEY_SECRET || "",
-});
+const razorpayConfig = {
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+};
+
+// Only initialize Razorpay if credentials are available
+let razorpay: Razorpay | null = null;
+if (razorpayConfig.key_id && razorpayConfig.key_secret) {
+  razorpay = new Razorpay(razorpayConfig);
+}
 
 export async function POST(request: NextRequest) {
   try {
     // Connect to the database
     await dbConnect();
+
+    // Check if Razorpay is properly initialized
+    if (!razorpay) {
+      if (process.env.NODE_ENV === "development") {
+        console.warn(
+          "Razorpay not initialized. Using mock data for development."
+        );
+        // For development, return a mock response
+        return NextResponse.json(
+          {
+            id: `order_dev_${Date.now()}`,
+            entity: "order",
+            amount: 10000,
+            amount_paid: 0,
+            amount_due: 10000,
+            currency: "INR",
+            receipt: `receipt_${Date.now()}`,
+            status: "created",
+            success: true,
+            orderId: `mock_order_${Date.now()}`,
+          },
+          { status: 201 }
+        );
+      } else {
+        return NextResponse.json(
+          { success: false, message: "Payment gateway not configured" },
+          { status: 500 }
+        );
+      }
+    }
 
     const body = await request.json();
     const {
