@@ -1,4 +1,4 @@
-# CLOKA - Beyond the Seen
+# CLOKA - Run Club App
 
 [![CI](https://github.com/fabianferno/cloka-app/actions/workflows/ci.yml/badge.svg)](https://github.com/fabianferno/cloka-app/actions/workflows/ci.yml)
 [![Deploy](https://github.com/fabianferno/cloka-app/actions/workflows/deploy.yml/badge.svg)](https://github.com/fabianferno/cloka-app/actions/workflows/deploy.yml)
