@@ -9,7 +9,7 @@ export default function TemporaryPaymentButton() {
         const script = document.createElement('script');
         script.src = 'https://checkout.razorpay.com/v1/payment-button.js';
         script.async = true;
-        script.dataset.payment_button_id = 'pl_Q7mNIDoaX0P8H2';
+        script.dataset.payment_button_id = 'pl_QGr8vsz93aK3Uv';
 
         if (formRef.current) {
             formRef.current.innerHTML = '';
@@ -22,6 +22,7 @@ export default function TemporaryPaymentButton() {
             }
         };
     }, []);
+
 
     return <form ref={formRef} />;
 }
