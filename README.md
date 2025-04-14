@@ -1,7 +1,5 @@
 # CLOKA - Run Club App
 
-[![CI](https://github.com/fabianferno/cloka-app/actions/workflows/ci.yml/badge.svg)](https://github.com/fabianferno/cloka-app/actions/workflows/ci.yml)
-[![Deploy](https://github.com/fabianferno/cloka-app/actions/workflows/deploy.yml/badge.svg)](https://github.com/fabianferno/cloka-app/actions/workflows/deploy.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-15.2-black)](https://nextjs.org/)
