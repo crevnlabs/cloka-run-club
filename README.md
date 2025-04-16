@@ -5,17 +5,45 @@
 [![Next.js](https://img.shields.io/badge/Next.js-15.2-black)](https://nextjs.org/)
 [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](CONTRIBUTING.md)
 
-A premium clothing brand website with Razorpay integration for the official merch store and seamless run registrations.
 
-## Features
+Cloka Run Club started as a grassroots weekend running group in Chennai, India aiming to bring fitness enthusiasts together through local runs followed by post-event networking and social activities. Over time, Cloka has grown into a multifaceted fitness hub, offering diverse activities and community engagement across India. Our mission is to foster a strong local fitness culture and build connections that extend beyond physical health.
 
-- **Luxury Black and White Theme** - Elegant design with a focus on typography and clean aesthetics.
-- **Seamless Run Registrations** - No more DMs or manual lists. Register for runs directly through the website.
-- **Official Cloka Merch Store** - Powered by Razorpay for secure payments.
-- **Runner of the Week Feature** - Spotlighting standout community members.
-- **Cloka's Story** - A dedicated section sharing the club's journey and mission.
-- **Upcoming Events & Run Updates** - Keeping the community in the loop.
-- **Admin Dashboard** - Password-protected admin area to view and manage registrations.
+![Banner](https://i.ibb.co/nsvFm62Q/image.png)
+
+**Core Features**:
+
+- **Local Community Engagement**: Runs are conducted every Saturday, paired with social events in partnership with local cafes and community spaces. This model encourages people to stay active and socialize, helping to strengthen local networks.
+    
+- **Cloka Chiefs**: Volunteer community leaders selected from across India are empowered to organize and host events, with access to a local instance of our Cloka Run Club app. This app helps them manage user registrations, event logistics, volunteer coordination, fitness tracking, and more.
+    
+- **App Features**: The Cloka app serves as a comprehensive platform that includes member management, event organization, fitness goals, tracking, ticketing, and a merch store. It supports a seamless experience for both users and event organizers, ensuring smooth communication and engagement.
+
+![Image](https://i.ibb.co/twLGZ1Q7/image.png)
+    
+- **Open Source with MIT License**: The Cloka app is open-source, making it freely available for community contribution. This approach helps build an open ecosystem where other communities can use and contribute to the platform, expanding the reach of the Cloka movement.
+    
+
+**Impact**:
+
+- **Local Public Good**: The app empowers individuals to take charge of their fitness journey while connecting them with local communities. By enabling local run clubs across India, Cloka fosters health and community cohesion, delivering measurable benefits on a neighborhood level. By providing the app for free under an MIT license, we ensure that anyone, anywhere, can start their own run club or fitness group with minimal cost. This scalability fosters a sustainable network of fitness communities that help improve health and well-being at the local level.
+- **User Base and Growth**: The Cloka Run Club community boasts 11.5K Instagram followers and 3,500 app users, with active engagement in multiple cities. Every week 100 users get together for a Cloka run and post run activities in a region. This active user base is an indicator of the project's success and its potential to grow further. 
+- **Community-driven**: Cloka's success hinges on community leadership and volunteerism, allowing us to make a meaningful impact at the neighborhood level. The app empowers local leaders (Cloka Chiefs) to host events and grow fitness communities in their respective regions.
+- **Impact on Neighborhood Communities**:    Cloka addresses the challenge of disconnected neighborhoods by providing a free, accessible platform for fitness and social interaction. Unlike commercial fitness apps, Cloka prioritizes community over profit, offering tools that empower local leaders to create inclusive, hyper-local experiences—for example:
+
+- A Chennai runner uses Cloka to register for a Saturday run, tracks their progress, and joins post-run networking at a local café.
+- A Cloka Chief in a new city deploys the app to organize events, leveraging the open-source codebase to customize features for their community.
+
+**Conclusion**: Cloka Run Club is not just an app; it’s a community-first initiative that brings people together, promotes fitness, and strengthens local neighborhoods. With the support of the Neighborhood Open Source Software Grant, we will be able to amplify our impact and help Cloka expand into more cities across India, creating a ripple effect of health and community building that benefits the neighborhoods at the core of this initiative.
+
+Additional Information
+- GitHub Repository: [https://github.com/crevnlabs/cloka-run-club].
+- License: MIT License, ensuring open access and contribution.
+- Team: Led by volunteer Cloka Chiefs and a small developer community, with no commercial backing.
+- Media Coverage: Featured in The Hindu for its innovative approach to community fitness.
+- Social Proof: 11.5K Instagram followers and growing user base reflect strong community trust. [https://www.instagram.com/cloka.club/]
+
+
+
 
 ## Tech Stack
 
