@@ -15,7 +15,7 @@ export default function ShippingPolicy() {
         <div className="container mx-auto px-4 py-8 max-w-4xl">
             <Header />
             <div className="mx-auto px-4 py-12 max-w-4xl">
-                <h1 className="text-4xl font-bold mb-8">Run & Brew Week 15 payment</h1>
+                <h1 className="text-4xl font-bold mb-8">Run & Game | Week 16 payment</h1>
 
                 <div className="prose prose-lg max-w-none space-y-8">
                     <p className="leading-relaxed">
