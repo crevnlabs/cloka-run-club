@@ -6,8 +6,8 @@ import Footer from '@/components/Footer';
 import TemporaryPaymentButton from '@/components/TemporaryPaymentButton';
 
 export const metadata: Metadata = {
-    title: 'Run & Brew Week 15 payment | Cloka',
-    description: 'Run & Brew Week 15 payment for Cloka Club',
+    title: 'Run & Game | Week 16 payment | Cloka',
+    description: 'Run & Game | Week 16 payment for Cloka Club',
 };
 
 export default function ShippingPolicy() {
@@ -23,7 +23,6 @@ export default function ShippingPolicy() {
                     </p>
 
                     <TemporaryPaymentButton />
-
                 </div>
             </div>
             <Footer />
