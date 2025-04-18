@@ -7,6 +7,8 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useAdmin, AdminProvider } from '@/lib/admin-context';
 import { useRouter } from 'next/navigation';
+import { Suspense } from 'react';
+import PageTransition from '@/components/PageTransition';
 
 const navItems = [
     { name: 'Events', href: '/admin/events' },
@@ -22,20 +24,39 @@ function AdminLayoutContent({
 }) {
     const pathname = usePathname();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const { isAdmin, adminUser, logout } = useAdmin();
+    const { isAdmin, adminUser, logout, isLoading } = useAdmin();
     const router = useRouter();
 
     useEffect(() => {
-        // Redirect to login if not admin
-        if (!isAdmin && pathname !== '/admin/login') {
+        // Only redirect if we're sure the admin state has been loaded and user is not admin
+        if (!isLoading && !isAdmin && pathname !== '/admin/login') {
             router.push('/admin/login');
         }
-    }, [isAdmin, pathname, router]);
+    }, [isAdmin, isLoading, pathname, router]);
+
+    // Show loading state while checking admin status
+    if (isLoading && pathname !== '/admin/login') {
+        return (
+            <div className="min-h-screen bg-black flex items-center justify-center">
+                <div className="text-center">
+                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white mb-4"></div>
+                    <p className="text-white">Loading...</p>
+                </div>
+            </div>
+        );
+    }
 
     // Don't render the admin layout for non-admins (except on login page)
     if (!isAdmin && pathname !== '/admin/login') {
         return null;
     }
+
+    const handleNavigation = (href: string) => {
+        if (pathname !== href) {
+            setIsMenuOpen(false);
+            router.push(href);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-black">
@@ -131,19 +152,18 @@ function AdminLayoutContent({
                             <div className="flex-1 flex items-center justify-center">
                                 <nav className="space-y-8">
                                     {navItems.map((item) => (
-                                        <Link
+                                        <button
                                             key={item.href}
-                                            href={item.href}
+                                            onClick={() => handleNavigation(item.href)}
                                             className={cn(
-                                                'block px-4 py-2 text-xl font-medium text-center transition-colors',
+                                                'block w-full px-4 py-2 text-xl font-medium text-center transition-colors',
                                                 pathname === item.href
                                                     ? 'text-white'
                                                     : 'text-zinc-400 hover:text-zinc-300 hover:cursor-pointer'
                                             )}
-                                            onClick={() => setIsMenuOpen(false)}
                                         >
                                             {item.name}
-                                        </Link>
+                                        </button>
                                     ))}
                                     {isAdmin && (
                                         <button
@@ -163,7 +183,15 @@ function AdminLayoutContent({
             {/* Main Content */}
             <main className="flex-1 p-8">
                 <div className="container mx-auto text-white">
-                    {children}
+                    <Suspense fallback={
+                        <PageTransition variant="admin">
+                            <div />
+                        </PageTransition>
+                    }>
+                        <PageTransition variant="admin">
+                            {children}
+                        </PageTransition>
+                    </Suspense>
                 </div>
             </main>
         </div>

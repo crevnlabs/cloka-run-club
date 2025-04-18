@@ -140,17 +140,6 @@ export default function AdminLoginPage() {
                         {isLoading ? 'Logging in...' : 'Login'}
                     </Button>
                 </form>
-
-                {/* Debug link - remove in production */}
-                <div className="mt-4 text-center">
-                    <a
-                        href="/admin/test-login"
-                        className="text-sm underline"
-                        style={{ color: 'var(--foreground)' }}
-                    >
-                        Test Login (Debug)
-                    </a>
-                </div>
             </motion.div>
         </div>
     );

@@ -9,6 +9,7 @@ interface AdminContextType {
     adminUser: IUser | null;
     checkAdminStatus: () => Promise<void>;
     logout: () => Promise<void>;
+    isLoading: boolean;
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
@@ -16,6 +17,7 @@ const AdminContext = createContext<AdminContextType | undefined>(undefined);
 export function AdminProvider({ children }: { children: React.ReactNode }) {
     const [isAdmin, setIsAdmin] = useState(false);
     const [adminUser, setAdminUser] = useState<IUser | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
 
     const checkAdminStatus = async () => {
@@ -34,6 +36,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             console.error('Error checking admin status:', error);
             setIsAdmin(false);
             setAdminUser(null);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -53,7 +57,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     return (
-        <AdminContext.Provider value={{ isAdmin, adminUser, checkAdminStatus, logout }}>
+        <AdminContext.Provider value={{ isAdmin, adminUser, checkAdminStatus, logout, isLoading }}>
             {children}
         </AdminContext.Provider>
     );
