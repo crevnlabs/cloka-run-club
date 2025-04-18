@@ -6,6 +6,7 @@ import { LoadingProvider } from "@/components/LoadingProvider";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import Script from "next/script";
 import { AuthProvider } from "@/lib/auth-context";
+import PageTransition from "@/components/PageTransition";
 
 const urbanist = Urbanist({
   subsets: ["latin"],
@@ -97,7 +98,9 @@ export default function RootLayout({
           <LoadingProvider>
             <AuthProvider>
               <GoogleAnalytics />
-              {children}
+              <PageTransition>
+                {children}
+              </PageTransition>
             </AuthProvider>
           </LoadingProvider>
         </ErrorBoundary>

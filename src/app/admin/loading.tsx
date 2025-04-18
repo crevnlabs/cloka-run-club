@@ -1,13 +1,6 @@
-import Loader from '@/components/Loader';
+'use client';
 
+// We don't need this anymore since PageTransition handles loading states
 export default function AdminLoading() {
-    return (
-        <div className="min-h-screen flex items-center justify-center">
-            <Loader
-                size="large"
-                variant="spinner"
-                text="Loading admin panel..."
-            />
-        </div>
-    );
+    return null;
 } 
