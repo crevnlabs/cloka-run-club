@@ -9,6 +9,7 @@ export interface IEvent extends Document {
   exactLocation?: string;
   postApprovalMessage?: string;
   postRejectionMessage?: string;
+  razorpayButtonId?: string;
 }
 
 const EventSchema: Schema = new Schema({
@@ -20,6 +21,7 @@ const EventSchema: Schema = new Schema({
   exactLocation: { type: String },
   postApprovalMessage: { type: String },
   postRejectionMessage: { type: String },
+  razorpayButtonId: { type: String },
 });
 
 // Check if the model already exists to prevent overwriting during hot reloads

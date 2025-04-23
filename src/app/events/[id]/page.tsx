@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import EventRegistrationButton from '@/components/EventRegistrationButton';
+import TemporaryPaymentButton from '@/components/TemporaryPaymentButton';
 import dbConnect from '@/lib/mongodb';
 import Event from '@/models/Event';
 import { checkEventRegistration } from '@/lib/event-utils';
@@ -105,7 +106,7 @@ export default async function EventDetailPage({
 
                     <div className="bg-black text-white luxury-border">
                         {/* Event Header */}
-                        <div className="relative h-64 w-full">
+                        <div className="relative h-80 w-full">
                             <video
                                 src="/teaser.MP4"
                                 autoPlay
@@ -115,7 +116,7 @@ export default async function EventDetailPage({
                                 className="absolute inset-0 w-full h-full object-cover"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
-                            <div className="absolute bottom-0 left-0 p-6">
+                            <div className="absolute bottom-0 left-2 p-6">
                                 <h1 className="text-3xl md:text-4xl font-bold text-white">{event.title}</h1>
                                 <p className="text-zinc-300 mt-2">
                                     {formatDate(event.date)} at {formatTime(event.date)}
@@ -159,6 +160,15 @@ export default async function EventDetailPage({
                                                     <div className="mt-4 p-4 bg-zinc-900 luxury-border">
                                                         <h3 className="text-lg font-semibold mb-2">Important Information</h3>
                                                         <p className="text-zinc-300 whitespace-pre-line">{event.postApprovalMessage}</p>
+                                                    </div>
+                                                )}
+
+                                                {/* Show payment button if razorpayButtonId exists */}
+                                                {event.razorpayButtonId && (
+                                                    <div className="mt-4 p-4 bg-zinc-900 luxury-border">
+                                                        <h3 className="text-lg font-semibold mb-2">Payment</h3>
+                                                        <p className="text-zinc-300 mb-4">Complete your payment to confirm your spot.</p>
+                                                        <TemporaryPaymentButton paymentButtonId={event.razorpayButtonId} />
                                                     </div>
                                                 )}
                                             </>

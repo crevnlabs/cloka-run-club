@@ -65,12 +65,22 @@ export default function ProfilePage() {
     useEffect(() => {
         if (allEvents.length > 0) {
             const now = new Date();
-            const filtered = showUpcomingOnly
-                ? allEvents.filter(event => new Date(event.date) >= now)
-                : allEvents;
+            let filtered = allEvents;
+
+            // Filter by date if showing upcoming only
+            if (showUpcomingOnly) {
+                filtered = filtered.filter(event => new Date(event.date) >= now);
+            }
+
+            // Filter to show only approved events from userEvents
+            filtered = filtered.filter(event => {
+                const userEvent = userEvents.find(ue => ue._id.toString() === event._id.toString());
+                return userEvent?.approved === true;
+            });
+
             setDisplayedEvents(filtered);
         }
-    }, [allEvents, showUpcomingOnly]);
+    }, [allEvents, showUpcomingOnly, userEvents]);
 
     // Prepare chart data when user events change
     useEffect(() => {

@@ -19,7 +19,14 @@ export default function AuthPage() {
     const [isMobile, setIsMobile] = useState(false);
     const router = useRouter();
     const redirect = searchParams.get('redirect') || '/profile';
-    const { login, signup } = useAuth();
+    const { login, signup, isAuthenticated } = useAuth();
+
+    // Redirect if user is already authenticated
+    useEffect(() => {
+        if (isAuthenticated) {
+            router.replace('/profile');
+        }
+    }, [isAuthenticated, router]);
 
     // Update mode when URL parameters change
     useEffect(() => {

@@ -15,6 +15,7 @@ interface Event {
     exactLocation?: string;
     postApprovalMessage?: string;
     postRejectionMessage?: string;
+    razorpayButtonId?: string;
 }
 
 export default function AdminEventsPage() {
@@ -48,7 +49,8 @@ export default function AdminEventsPage() {
             location: '',
             exactLocation: '',
             postApprovalMessage: '',
-            postRejectionMessage: ''
+            postRejectionMessage: '',
+            razorpayButtonId: ''
         }
     });
     const [formError, setFormError] = useState('');
@@ -168,7 +170,8 @@ export default function AdminEventsPage() {
                 location: '',
                 exactLocation: '',
                 postApprovalMessage: '',
-                postRejectionMessage: ''
+                postRejectionMessage: '',
+                razorpayButtonId: ''
             }
         });
         setFormError('');
@@ -185,7 +188,8 @@ export default function AdminEventsPage() {
                 location: '',
                 exactLocation: '',
                 postApprovalMessage: '',
-                postRejectionMessage: ''
+                postRejectionMessage: '',
+                razorpayButtonId: ''
             }
         });
         setFormError('');
@@ -543,6 +547,24 @@ export default function AdminEventsPage() {
                                 />
                                 <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
                                     This message will be displayed to users after their registration is rejected.
+                                </p>
+                            </div>
+
+                            <div>
+                                <label htmlFor="razorpayButtonId" className="block text-sm font-medium mb-1 text-black dark:text-white">
+                                    Razorpay Button ID
+                                </label>
+                                <input
+                                    id="razorpayButtonId"
+                                    name="razorpayButtonId"
+                                    type="text"
+                                    value={eventForm.event.razorpayButtonId || ''}
+                                    onChange={handleFormChange}
+                                    className="w-full p-2 border border-black dark:border-white rounded-md bg-white dark:bg-black text-black dark:text-white"
+                                    placeholder="Enter the Razorpay payment button ID"
+                                />
+                                <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
+                                    Optional: Add a Razorpay payment button ID for this event.
                                 </p>
                             </div>
 
