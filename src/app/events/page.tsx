@@ -15,7 +15,7 @@ export default async function EventsPage() {
     await dbConnect();
 
     // Fetch all events
-    const allEvents = await Event.find({}).sort({ date: 1 });
+    const allEvents = await Event.find({}).sort({ date: -1 });
 
     // Separate upcoming events
     const upcomingEvents = allEvents.filter(event => new Date(event.date) >= new Date());

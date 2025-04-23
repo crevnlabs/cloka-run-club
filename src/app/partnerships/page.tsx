@@ -99,8 +99,8 @@ export default function PartnershipsPage() {
                 <div className="container mx-auto px-4 py-8">
                     <div className="max-w-4xl mx-auto">
                         <section className="text-center space-y-4">
-                            <h1 className="text-5xl font-bold">🌟 Partner with Cloka</h1>
-                            <p className="text-xl text-gray-300">Let&apos;s Build Something Inspiring Together</p>
+                            <h1 className="text-5xl font-bold">Partner with Cloka</h1>
+                            <p className="text-xl text-gray-300">Let&apos;s Build Something Inspiring, Together</p>
                             <div className="max-w-3xl mx-auto">
                                 <p className="text-zinc-400">
                                     Cloka isn&apos;t just a run club. We&apos;re a growing community built on movement, motivation, and meaningful connections. Whether you&apos;re a local café, a creative collective, a wellness brand, or a community-first initiative—we&apos;re always looking to collaborate with people and organizations that share our spirit.
@@ -128,8 +128,8 @@ export default function PartnershipsPage() {
                                 />
                             </section>
                             <section className="bg-zinc-800 p-8">
-                                <h2 className="text-3xl font-bold mb-6">Why Partner with Cloka?</h2>
-                                <ul className="space-y-4 text-gray-300">
+                                <h2 className="text-4xl font-bold mb-6">Why Partner with Cloka?</h2>
+                                <ul className="space-y-4 text-md text-gray-300">
                                     <li>• <strong>Tap into a 3,500+ strong engaged community</strong> across India&apos;s top cities.</li>
                                     <li>• <strong>Get featured in our events, merch drops, reels, and stories</strong> on Instagram and our mobile app, reaching over 12,000+ followers.</li>
                                     <li>• <strong>Create value-driven local experiences</strong> that bring your brand or idea to life.</li>
