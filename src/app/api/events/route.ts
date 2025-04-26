@@ -3,6 +3,13 @@ import dbConnect from "@/lib/mongodb";
 import Event from "@/models/Event";
 import mongoose from "mongoose";
 
+// Define no-cache headers
+const NO_CACHE_HEADERS = {
+  "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+  Pragma: "no-cache",
+  Expires: "0",
+};
+
 export async function GET(request: Request) {
   try {
     // Connect to the database
@@ -19,7 +26,10 @@ export async function GET(request: Request) {
       if (!mongoose.Types.ObjectId.isValid(eventId)) {
         return NextResponse.json(
           { success: false, message: "Invalid event ID format" },
-          { status: 400 }
+          {
+            status: 400,
+            headers: NO_CACHE_HEADERS,
+          }
         );
       }
 
@@ -28,7 +38,10 @@ export async function GET(request: Request) {
       if (!event) {
         return NextResponse.json(
           { success: false, message: "Event not found" },
-          { status: 404 }
+          {
+            status: 404,
+            headers: NO_CACHE_HEADERS,
+          }
         );
       }
 
@@ -37,7 +50,10 @@ export async function GET(request: Request) {
           success: true,
           event,
         },
-        { status: 200 }
+        {
+          status: 200,
+          headers: NO_CACHE_HEADERS,
+        }
       );
     }
 
@@ -59,14 +75,20 @@ export async function GET(request: Request) {
         success: true,
         events,
       },
-      { status: 200 }
+      {
+        status: 200,
+        headers: NO_CACHE_HEADERS,
+      }
     );
   } catch (error) {
     console.error("Error fetching events:", error);
 
     return NextResponse.json(
       { success: false, message: "Failed to fetch events" },
-      { status: 500 }
+      {
+        status: 500,
+        headers: NO_CACHE_HEADERS,
+      }
     );
   }
 }
