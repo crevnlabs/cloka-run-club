@@ -355,7 +355,7 @@ export default function ProfilePage() {
                             className="md:col-span-2 bg-black border border-zinc-800 p-6"
                         >
                             <div className="flex justify-between items-center mb-6">
-                                <h2 className="text-xl font-bold">Events Dashboard</h2>
+                                <h2 className="text-xl font-bold">Events you&apos;ve registered</h2>
                                 <div className="inline-flex items-center bg-zinc-900 p-1 border border-zinc-800">
                                     <Button
                                         onClick={() => setShowUpcomingOnly(false)}

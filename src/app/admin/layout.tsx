@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useAdmin, AdminProvider } from '@/lib/admin-context';
+import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
 import { Suspense } from 'react';
 import PageTransition from '@/components/PageTransition';
@@ -24,17 +25,29 @@ function AdminLayoutContent({
 }) {
     const pathname = usePathname();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const { isAdmin, adminUser, logout, isLoading } = useAdmin();
+    const { isAdmin, adminUser, logout, isLoading: adminLoading } = useAdmin();
+    const { user, isAuthenticated, isLoading: authLoading } = useAuth();
     const router = useRouter();
 
-    useEffect(() => {
-        // Only redirect if we're sure the admin state has been loaded and user is not admin
-        if (!isLoading && !isAdmin && pathname !== '/admin/login') {
-            router.push('/admin/login');
-        }
-    }, [isAdmin, isLoading, pathname, router]);
+    const isLoading = adminLoading || authLoading;
 
-    // Show loading state while checking admin status
+    useEffect(() => {
+        // Only redirect if we're sure both auth states have been loaded
+        if (!isLoading) {
+            if (!isAuthenticated) {
+                // If not authenticated at all, redirect to main auth
+                router.push('/auth?redirect=' + pathname);
+            } else if (!isAdmin && pathname !== '/admin/login') {
+                // If authenticated but not admin, redirect to admin login
+                router.push('/admin/login');
+            } else if (user?.role !== 'admin' && pathname !== '/admin/login') {
+                // If user role is not admin, redirect to admin login
+                router.push('/admin/login');
+            }
+        }
+    }, [isAdmin, isAuthenticated, isLoading, pathname, router, user?.role]);
+
+    // Show loading state while checking auth status
     if (isLoading && pathname !== '/admin/login') {
         return (
             <div className="min-h-screen bg-black flex items-center justify-center">
@@ -47,7 +60,7 @@ function AdminLayoutContent({
     }
 
     // Don't render the admin layout for non-admins (except on login page)
-    if (!isAdmin && pathname !== '/admin/login') {
+    if (!isAdmin && !isAuthenticated && pathname !== '/admin/login') {
         return null;
     }
 
@@ -205,7 +218,11 @@ export default function AdminLayout({
 }) {
     return (
         <AdminProvider>
-            <AdminLayoutContent>{children}</AdminLayoutContent>
+            <Suspense fallback={<div>Loading...</div>}>
+                <PageTransition>
+                    <AdminLayoutContent>{children}</AdminLayoutContent>
+                </PageTransition>
+            </Suspense>
         </AdminProvider>
     );
 } 

@@ -99,15 +99,28 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
 
-    // Set the admin auth cookie with the user's ID
+    // Set both the admin auth cookie and regular auth cookie
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      sameSite: "lax" as const,
+    };
+
+    // Set admin auth cookie
     response.cookies.set({
       name: "cloka_admin_auth",
       value: user._id.toString(),
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      ...cookieOptions,
       maxAge: 60 * 60 * 24, // 1 day
-      path: "/",
-      sameSite: "lax",
+    });
+
+    // Set regular auth cookie
+    response.cookies.set({
+      name: "cloka_auth",
+      value: user._id.toString(),
+      ...cookieOptions,
+      maxAge: 60 * 60 * 24 * 7, // 7 days
     });
 
     return response;

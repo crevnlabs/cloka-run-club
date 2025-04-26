@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/auth-context';
 import type { IUser } from '@/models/User';
 
 interface AdminContextType {
@@ -19,9 +20,18 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     const [adminUser, setAdminUser] = useState<IUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
+    const { user, isAuthenticated } = useAuth();
 
     const checkAdminStatus = async () => {
         try {
+            // If not authenticated in main context, we're definitely not admin
+            if (!isAuthenticated || !user) {
+                setIsAdmin(false);
+                setAdminUser(null);
+                setIsLoading(false);
+                return;
+            }
+
             const response = await fetch('/api/admin/check-status');
             const data = await response.json();
 
@@ -52,9 +62,10 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    // Check admin status when main auth state changes
     useEffect(() => {
         checkAdminStatus();
-    }, []);
+    }, [isAuthenticated, user]);
 
     return (
         <AdminContext.Provider value={{ isAdmin, adminUser, checkAdminStatus, logout, isLoading }}>
@@ -63,6 +74,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     );
 }
 
+// Custom hook to use the admin context
 export function useAdmin() {
     const context = useContext(AdminContext);
     if (context === undefined) {
