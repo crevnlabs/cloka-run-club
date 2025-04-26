@@ -132,11 +132,11 @@ export default function VolunteersPage() {
     };
 
     if (isLoading || loadingApplication) {
-        return <div>Loading...</div>;
+        return <div className='min-h-screen flex items-center justify-center'>Loading...</div>;
     }
 
     if (!isAuthenticated) {
-        return <div>Redirecting to login...</div>;
+        return <div className='min-h-screen flex items-center justify-center'>Redirecting to login...</div>;
     }
 
     return (
