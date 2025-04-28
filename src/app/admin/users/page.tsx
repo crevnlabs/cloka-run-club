@@ -71,6 +71,25 @@ export default function UsersPage() {
         }
     }, [isSuperAdmin, router]);
 
+    // Initial fetch
+    useEffect(() => {
+        if (!isSuperAdmin) return;
+        // Fetch total stats first, then users
+        fetchTotalGenderStats().then(() => {
+            fetchUsers(pagination.page, search, genderFilter);
+        });
+    }, []);
+
+    // Handle search with debounce
+    useEffect(() => {
+        if (!isSuperAdmin) return;
+        const debounceTimer = setTimeout(() => {
+            fetchUsers(1, search, genderFilter);
+        }, 300);
+
+        return () => clearTimeout(debounceTimer);
+    }, [search]);
+
     if (!isSuperAdmin) {
         return (
             <div className="text-center text-white mt-20">
@@ -197,23 +216,6 @@ export default function UsersPage() {
             setLoading(false);
         }
     };
-
-    // Initial fetch
-    useEffect(() => {
-        // Fetch total stats first, then users
-        fetchTotalGenderStats().then(() => {
-            fetchUsers(pagination.page, search, genderFilter);
-        });
-    }, []);
-
-    // Handle search with debounce
-    useEffect(() => {
-        const debounceTimer = setTimeout(() => {
-            fetchUsers(1, search, genderFilter);
-        }, 300);
-
-        return () => clearTimeout(debounceTimer);
-    }, [search]);
 
     // Handle gender filter change
     const handleGenderFilterChange = (gender: string) => {
