@@ -3,21 +3,13 @@
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useAdmin, AdminProvider } from '@/lib/admin-context';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
 import { Suspense } from 'react';
 import PageTransition from '@/components/PageTransition';
-
-const navItems = [
-    { name: 'Events', href: '/admin/events' },
-    { name: 'Registrations', href: '/admin/event-registrations' },
-    { name: 'Check-In', href: '/admin/event-check-in' },
-    { name: 'Users', href: '/admin/users' },
-    { name: 'Volunteers', href: '/admin/volunteers' },
-];
 
 function AdminLayoutContent({
     children,
@@ -26,9 +18,10 @@ function AdminLayoutContent({
 }) {
     const pathname = usePathname();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const { isAdmin, adminUser, logout, isLoading: adminLoading } = useAdmin();
+    const { isAdmin, isSuperAdmin, adminUser, logout, isLoading: adminLoading } = useAdmin();
     const { user, isAuthenticated, isLoading: authLoading } = useAuth();
     const router = useRouter();
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
     const isLoading = adminLoading || authLoading;
 
@@ -38,18 +31,29 @@ function AdminLayoutContent({
             if (!isAuthenticated) {
                 // If not authenticated at all, redirect to main auth
                 router.push('/auth?redirect=' + pathname);
-            } else if (!isAdmin && pathname !== '/admin/login') {
-                // If authenticated but not admin, redirect to admin login
-                router.push('/admin/login');
-            } else if (user?.role !== 'admin' && pathname !== '/admin/login') {
-                // If user role is not admin, redirect to admin login
-                router.push('/admin/login');
+            } else if (!isAdmin) {
+                // If authenticated but not admin, redirect to main auth
+                router.push('/auth?redirect=' + pathname);
             }
         }
     }, [isAdmin, isAuthenticated, isLoading, pathname, router, user?.role]);
 
+    // Close dropdown on click outside
+    useEffect(() => {
+        if (!isMenuOpen) return;
+        function handleClickOutside(event: MouseEvent) {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsMenuOpen(false);
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isMenuOpen]);
+
     // Show loading state while checking auth status
-    if (isLoading && pathname !== '/admin/login') {
+    if (isLoading) {
         return (
             <div className="min-h-screen bg-black flex items-center justify-center">
                 <div className="text-center">
@@ -60,8 +64,8 @@ function AdminLayoutContent({
         );
     }
 
-    // Don't render the admin layout for non-admins (except on login page)
-    if (!isAdmin && !isAuthenticated && pathname !== '/admin/login') {
+    // Don't render the admin layout for non-admins
+    if (!isAdmin && !isAuthenticated) {
         return null;
     }
 
@@ -72,14 +76,30 @@ function AdminLayoutContent({
         }
     };
 
+    // Navigation items
+    const navItems = [
+        { name: 'Dashboard', href: '/admin' },
+        { name: 'Events', href: '/admin/events' },
+        { name: 'Registrations', href: '/admin/event-registrations' },
+        ...(isSuperAdmin ? [{ name: 'Users', href: '/admin/users' }] : []),
+        { name: 'Volunteers', href: '/admin/volunteers' },
+    ];
+
     return (
         <div className="min-h-screen bg-black">
             {/* Header Navigation */}
             <header className="relative">
                 <div className="bg-black text-white p-4">
-                    <div className="container mx-auto flex justify-between items-center">
+                    <div className="container mx-auto flex justify-between items-center relative">
                         <div className="flex items-center space-x-2">
-                            <Link href="/" className="flex items-center space-x-2">
+                            <Link href="/admin" className="flex items-center space-x-2">
+                                <Image
+                                    src="/logo.png"
+                                    alt="CLOKA Logo"
+                                    width={100}
+                                    height={100}
+                                    className="h-auto invert -mr-2"
+                                />
                                 <Image
                                     src="/logo-text-mark.PNG"
                                     alt="CLOKA Text"
@@ -98,57 +118,12 @@ function AdminLayoutContent({
                                 </div>
                             )}
 
-                            {/* Hamburger button */}
-                            <button
-                                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                                className="p-2 rounded-md text-white hover:bg-zinc-800 focus:outline-none hover:cursor-pointer"
-                                aria-label="Toggle menu"
-                            >
-                                <svg
-                                    className="h-6 w-6"
-                                    fill="none"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    {isMenuOpen ? (
-                                        <path d="M6 18L18 6M6 6l12 12" />
-                                    ) : (
-                                        <path d="M4 6h16M4 12h16M4 18h16" />
-                                    )}
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Mobile menu - now full screen */}
-                {isMenuOpen && (
-                    <div className="fixed inset-0 bg-black z-50">
-                        <div className="flex flex-col h-full">
-                            <div className="p-4 flex justify-between items-center">
-                                <div className="flex items-center space-x-2">
-                                    <Image
-                                        src="/logo.png"
-                                        alt="CLOKA Logo"
-                                        width={30}
-                                        height={30}
-                                        className="h-auto invert"
-                                    />
-                                    <Image
-                                        src="/logo-text-mark.PNG"
-                                        alt="CLOKA Text"
-                                        width={80}
-                                        height={25}
-                                        className="h-auto invert"
-                                    />
-                                    <h1 className="text-xl font-bold ml-2 text-white">Admin</h1>
-                                </div>
+                            {/* Hamburger and dropdown */}
+                            <div className="relative">
                                 <button
-                                    onClick={() => setIsMenuOpen(false)}
-                                    className="p-2 text-white hover:bg-zinc-800 rounded-md hover:cursor-pointer"
+                                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                                    className="p-2 rounded-md text-white hover:bg-zinc-800 focus:outline-none hover:cursor-pointer"
+                                    aria-label="Toggle menu"
                                 >
                                     <svg
                                         className="h-6 w-6"
@@ -159,39 +134,50 @@ function AdminLayoutContent({
                                         viewBox="0 0 24 24"
                                         stroke="currentColor"
                                     >
-                                        <path d="M6 18L18 6M6 6l12 12" />
+                                        {isMenuOpen ? (
+                                            <path d="M6 18L18 6M6 6l12 12" />
+                                        ) : (
+                                            <path d="M4 6h16M4 12h16M4 18h16" />
+                                        )}
                                     </svg>
                                 </button>
-                            </div>
-                            <div className="flex-1 flex items-center justify-center">
-                                <nav className="space-y-8">
-                                    {navItems.map((item) => (
-                                        <button
-                                            key={item.href}
-                                            onClick={() => handleNavigation(item.href)}
-                                            className={cn(
-                                                'block w-full px-4 py-2 text-xl font-medium text-center transition-colors',
-                                                pathname === item.href
-                                                    ? 'text-white'
-                                                    : 'text-zinc-400 hover:text-zinc-300 hover:cursor-pointer'
-                                            )}
-                                        >
-                                            {item.name}
-                                        </button>
-                                    ))}
-                                    {isAdmin && (
-                                        <button
-                                            onClick={logout}
-                                            className="block w-full px-4 py-2 text-xl font-medium text-center text-zinc-400 hover:text-zinc-300 hover:cursor-pointer"
-                                        >
-                                            Logout
-                                        </button>
-                                    )}
-                                </nav>
+                                {isMenuOpen && (
+                                    <div
+                                        ref={dropdownRef}
+                                        className="absolute right-0 top-full mt-2 w-56 bg-zinc-900 border border-zinc-800 rounded-lg shadow-lg z-50"
+                                    >
+                                        <div className="p-4 flex flex-col space-y-2">
+                                            <nav className="flex flex-col space-y-2">
+                                                {navItems.map((item) => (
+                                                    <button
+                                                        key={item.href}
+                                                        onClick={() => handleNavigation(item.href)}
+                                                        className={cn(
+                                                            'cursor-pointer w-full px-3 py-2 text-base font-medium text-left rounded transition-colors',
+                                                            pathname === item.href
+                                                                ? 'text-white bg-zinc-800'
+                                                                : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
+                                                        )}
+                                                    >
+                                                        {item.name}
+                                                    </button>
+                                                ))}
+                                                {isAdmin && (
+                                                    <button
+                                                        onClick={logout}
+                                                        className="cursor-pointer w-full px-3 py-2 text-base font-medium text-left rounded text-zinc-400 hover:text-white hover:bg-zinc-800"
+                                                    >
+                                                        Logout
+                                                    </button>
+                                                )}
+                                            </nav>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
-                )}
+                </div>
             </header>
 
             {/* Main Content */}

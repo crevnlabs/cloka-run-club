@@ -1,10 +1,26 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import User from "@/models/User";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const { userId, superadminPassword } = await request.json();
+
+    // Authenticate and check admin
+    const authCookie = request.cookies.get("cloka_auth");
+    if (!authCookie || !authCookie.value) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+    const adminUser = await User.findById(authCookie.value);
+    if (!adminUser || adminUser.role !== "super-admin") {
+      return NextResponse.json(
+        { success: false, message: "Admin access required" },
+        { status: 403 }
+      );
+    }
 
     // Verify superadmin password
     if (
@@ -30,7 +46,7 @@ export async function POST(request: Request) {
     }
 
     // Check if user is already an admin
-    if (user.role === "admin") {
+    if (user.role === "admin" || user.role === "super-admin") {
       return NextResponse.json(
         { success: false, message: "User is already an admin" },
         { status: 400 }

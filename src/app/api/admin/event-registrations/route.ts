@@ -2,9 +2,29 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import UserEvent from "@/models/UserEvent";
 import mongoose, { PipelineStage } from "mongoose";
+import User from "@/models/User";
 
 export async function GET(request: NextRequest) {
   try {
+    // Authenticate and check admin
+    const authCookie = request.cookies.get("cloka_auth");
+    if (!authCookie || !authCookie.value) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+    const adminUser = await User.findById(authCookie.value);
+    if (
+      !adminUser ||
+      (adminUser.role !== "admin" && adminUser.role !== "super-admin")
+    ) {
+      return NextResponse.json(
+        { success: false, message: "Admin access required" },
+        { status: 403 }
+      );
+    }
+
     // Connect to the database
     await dbConnect();
 

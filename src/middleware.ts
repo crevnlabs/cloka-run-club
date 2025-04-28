@@ -6,20 +6,21 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   console.log("Middleware running for path:", pathname);
 
-  // Protect admin routes except the login page
-  if (pathname.startsWith("/admin") && !pathname.includes("/admin/login")) {
+  // Protect admin routes
+  if (pathname.startsWith("/admin")) {
     console.log("Checking auth for admin route");
 
     // Check if the user is authenticated
-    const adminAuthCookie = request.cookies.get("cloka_admin_auth");
-    console.log("Admin auth cookie exists:", !!adminAuthCookie);
+    const authCookie = request.cookies.get("cloka_auth");
+    console.log("User auth cookie exists:", !!authCookie);
 
-    if (!adminAuthCookie || !adminAuthCookie.value) {
-      console.log("Admin authentication failed, redirecting to login");
-      // Redirect to login page if not authenticated
-      const url = new URL("/admin/login", request.url);
+    if (!authCookie || !authCookie.value) {
+      console.log("User authentication failed, redirecting to auth page");
+      const url = new URL("/auth", request.url);
+      url.searchParams.set("redirect", pathname);
       return NextResponse.redirect(url);
     }
+    // Optionally, you could fetch user data here to check role, or rely on API route protection for role-based access.
   }
 
   // Protect user-only routes

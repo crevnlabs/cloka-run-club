@@ -5,6 +5,8 @@ import { TrashIcon, KeyIcon } from '@heroicons/react/24/solid';
 import { MagnifyingGlassIcon, FunnelIcon } from '@heroicons/react/24/outline';
 import Button from "@/components/Button"
 import { Loader } from 'lucide-react';
+import { useAdmin } from '@/lib/admin-context';
+import { useRouter } from 'next/navigation';
 
 interface User {
     _id: string;
@@ -32,6 +34,8 @@ interface GenderStats {
 }
 
 export default function UsersPage() {
+    const { isSuperAdmin } = useAdmin();
+    const router = useRouter();
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -60,6 +64,20 @@ export default function UsersPage() {
     const [showPromoteModal, setShowPromoteModal] = useState(false);
     const [superadminPassword, setSuperadminPassword] = useState('');
     const [isPromoting, setIsPromoting] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!isSuperAdmin) {
+            router.replace('/admin');
+        }
+    }, [isSuperAdmin, router]);
+
+    if (!isSuperAdmin) {
+        return (
+            <div className="text-center text-white mt-20">
+                You do not have permission to view this page.
+            </div>
+        );
+    }
 
     // Fetch total gender stats
     const fetchTotalGenderStats = async () => {

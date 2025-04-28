@@ -14,6 +14,25 @@ export async function DELETE(
 
     const userId = params.id;
 
+    // Authenticate and check admin
+    const authCookie = request.cookies.get("cloka_auth");
+    if (!authCookie || !authCookie.value) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+    const adminUser = await User.findById(authCookie.value);
+    if (
+      !adminUser ||
+      (adminUser.role !== "admin" && adminUser.role !== "super-admin")
+    ) {
+      return NextResponse.json(
+        { success: false, message: "Admin access required" },
+        { status: 403 }
+      );
+    }
+
     // Find and delete the user
     const deletedUser = await User.findByIdAndDelete(userId);
 
@@ -49,6 +68,25 @@ export async function PATCH(
     const userId = params.id;
     const body = await request.json();
     const { password } = body;
+
+    // Authenticate and check admin
+    const authCookie = request.cookies.get("cloka_auth");
+    if (!authCookie || !authCookie.value) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+    const adminUser = await User.findById(authCookie.value);
+    if (
+      !adminUser ||
+      (adminUser.role !== "admin" && adminUser.role !== "super-admin")
+    ) {
+      return NextResponse.json(
+        { success: false, message: "Admin access required" },
+        { status: 403 }
+      );
+    }
 
     // Validate required fields
     if (!password) {

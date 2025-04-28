@@ -6,10 +6,10 @@ export async function GET(request: NextRequest) {
   try {
     await dbConnect();
 
-    // Get the admin auth cookie
-    const adminAuthCookie = request.cookies.get("cloka_admin_auth");
+    // Get the user auth cookie
+    const authCookie = request.cookies.get("cloka_auth");
 
-    if (!adminAuthCookie || !adminAuthCookie.value) {
+    if (!authCookie || !authCookie.value) {
       return NextResponse.json(
         { success: false, message: "Not authenticated" },
         { status: 401 }
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Find the user and verify admin role
-    const user = await User.findById(adminAuthCookie.value).select("-password");
+    const user = await User.findById(authCookie.value).select("-password");
 
     if (!user) {
       // Clear the invalid cookie
@@ -25,18 +25,21 @@ export async function GET(request: NextRequest) {
         { success: false, message: "User not found" },
         { status: 401 }
       );
-      response.cookies.delete("cloka_admin_auth");
+      response.cookies.set({
+        name: "cloka_auth",
+        value: "",
+        httpOnly: true,
+        expires: new Date(0),
+        path: "/",
+      });
       return response;
     }
 
-    if (user.role !== "admin") {
-      // Clear the cookie if user is not an admin
-      const response = NextResponse.json(
+    if (user.role !== "admin" && user.role !== "super-admin") {
+      return NextResponse.json(
         { success: false, message: "Unauthorized access" },
         { status: 403 }
       );
-      response.cookies.delete("cloka_admin_auth");
-      return response;
     }
 
     return NextResponse.json({

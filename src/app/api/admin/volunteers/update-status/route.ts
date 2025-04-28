@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
 
     // Get user and check if admin
     const user = await User.findById(authCookie.value);
-    if (!user || user.role !== "admin") {
+    if (!user || (user.role !== "admin" && user.role !== "super-admin")) {
       return NextResponse.json(
         { success: false, message: "Unauthorized - Admin access required" },
         { status: 401 }

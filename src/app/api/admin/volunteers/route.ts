@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
 
     // Get user and check if admin
     const user = await User.findById(authCookie.value);
-    if (!user?.role || user.role !== "admin") {
+    if (!user?.role || (user.role !== "admin" && user.role !== "super-admin")) {
       return NextResponse.json(
         { success: false, message: "Unauthorized - Admin access required" },
         { status: 401 }

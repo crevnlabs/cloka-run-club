@@ -1,14 +1,12 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/auth-context';
-import type { IUser } from '@/models/User';
+import React, { createContext, useContext } from 'react';
+import { useAuth, User } from '@/lib/auth-context';
 
 interface AdminContextType {
     isAdmin: boolean;
-    adminUser: IUser | null;
-    checkAdminStatus: () => Promise<void>;
+    isSuperAdmin: boolean;
+    adminUser: User | null;
     logout: () => Promise<void>;
     isLoading: boolean;
 }
@@ -16,59 +14,15 @@ interface AdminContextType {
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
 export function AdminProvider({ children }: { children: React.ReactNode }) {
-    const [isAdmin, setIsAdmin] = useState(false);
-    const [adminUser, setAdminUser] = useState<IUser | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const router = useRouter();
-    const { user, isAuthenticated } = useAuth();
-
-    const checkAdminStatus = async () => {
-        try {
-            // If not authenticated in main context, we're definitely not admin
-            if (!isAuthenticated || !user) {
-                setIsAdmin(false);
-                setAdminUser(null);
-                setIsLoading(false);
-                return;
-            }
-
-            const response = await fetch('/api/admin/check-status');
-            const data = await response.json();
-
-            if (data.success && data.user) {
-                setIsAdmin(true);
-                setAdminUser(data.user);
-            } else {
-                setIsAdmin(false);
-                setAdminUser(null);
-            }
-        } catch (error) {
-            console.error('Error checking admin status:', error);
-            setIsAdmin(false);
-            setAdminUser(null);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
+    const { user, logout: authLogout, isLoading } = useAuth();
+    const isAdmin = !!user && (user.role === 'admin' || user.role === 'super-admin');
+    const isSuperAdmin = !!user && user.role === 'super-admin';
+    const adminUser = isAdmin ? user : null;
     const logout = async () => {
-        try {
-            await fetch('/api/admin/logout', { method: 'POST' });
-            setIsAdmin(false);
-            setAdminUser(null);
-            router.push('/admin/login');
-        } catch (error) {
-            console.error('Error during logout:', error);
-        }
+        await authLogout();
     };
-
-    // Check admin status when main auth state changes
-    useEffect(() => {
-        checkAdminStatus();
-    }, [isAuthenticated, user]);
-
     return (
-        <AdminContext.Provider value={{ isAdmin, adminUser, checkAdminStatus, logout, isLoading }}>
+        <AdminContext.Provider value={{ isAdmin, isSuperAdmin, adminUser, logout, isLoading }}>
             {children}
         </AdminContext.Provider>
     );

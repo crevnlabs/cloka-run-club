@@ -10,7 +10,7 @@ export interface IUser extends Document {
   emergencyContact?: string;
   instagramUsername?: string;
   joinCrew?: boolean;
-  role: "user" | "admin";
+  role: "user" | "admin" | "super-admin";
   createdAt: Date;
   updatedAt: Date;
 }
@@ -33,7 +33,7 @@ const UserSchema: Schema = new Schema({
   },
   role: {
     type: String,
-    enum: ["user", "admin"],
+    enum: ["user", "admin", "super-admin"],
     default: "user",
   },
   createdAt: { type: Date, default: Date.now },

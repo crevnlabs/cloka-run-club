@@ -134,9 +134,9 @@ const Header = () => {
                                 >
                                     My Events
                                 </Link>
-                                {user!.role === 'admin' && (
+                                {(user!.role === 'admin' || user!.role === 'super-admin') && (
                                     <Link
-                                        href="/admin/event-registrations"
+                                        href="/admin"
                                         className="block px-4 py-2 text-sm hover:bg-zinc-800"
                                         onClick={() => setIsProfileMenuOpen(false)}
                                     >
@@ -203,7 +203,7 @@ const Header = () => {
                                     </Link>
                                     {user.role === 'admin' && (
                                         <Link
-                                            href="/admin/event-registrations"
+                                            href="/admin"
                                             className="block py-2 luxury-text hover:text-accent"
                                             onClick={() => setIsMenuOpen(false)}
                                         >

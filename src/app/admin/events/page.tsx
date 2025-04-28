@@ -69,7 +69,7 @@ export default function AdminEventsPage() {
 
             if (response.status === 401) {
                 // Redirect to login if unauthorized
-                router.push('/admin/login');
+                router.push('/auth?redirect=/admin/events');
                 return;
             }
 
