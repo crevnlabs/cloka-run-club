@@ -93,17 +93,15 @@ export default function AdminEventsPage() {
     }, [fetchEvents]);
 
     const formatDate = (dateString: string) => {
-        // Parse the date string and preserve the exact time by handling timezone properly
         const date = new Date(dateString);
-
-        return date.toLocaleDateString('en-US', {
+        return date.toLocaleString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
-            hour: 'numeric',
-            minute: 'numeric',
-            hour12: true,
-            timeZone: 'UTC' // Use UTC to prevent timezone conversion
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+            // No timeZone option, so it uses the user's local time
         });
     };
 
@@ -158,17 +156,26 @@ export default function AdminEventsPage() {
         }
     };
 
+    // Helper to convert UTC date string to local datetime-local string
+    function toDatetimeLocal(dateString: string) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        const offset = date.getTimezoneOffset();
+        const localDate = new Date(date.getTime() - offset * 60 * 1000);
+        return localDate.toISOString().slice(0, 16);
+    }
+
     const openEventForm = (isEdit: boolean, event?: Event) => {
         setEventForm({
             show: true,
             isEdit,
             event: isEdit && event ? {
                 ...event,
-                date: new Date(event.date).toISOString().slice(0, 16)
+                date: toDatetimeLocal(event.date)
             } : {
                 title: '',
                 description: '',
-                date: new Date().toISOString().slice(0, 16),
+                date: toDatetimeLocal(new Date().toISOString()),
                 location: '',
                 exactLocation: '',
                 postApprovalMessage: '',
@@ -257,12 +264,18 @@ export default function AdminEventsPage() {
             const url = isEdit ? `/api/admin/events/${event._id}` : '/api/admin/events';
             const method = isEdit ? 'PUT' : 'POST';
 
+            // Convert local datetime-local string to UTC ISO string before sending
+            const eventToSend = { ...event };
+            if (event.date) {
+                eventToSend.date = new Date(event.date).toISOString();
+            }
+
             const response = await fetch(url, {
                 method,
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(event),
+                body: JSON.stringify(eventToSend),
             });
 
             const data = await response.json();

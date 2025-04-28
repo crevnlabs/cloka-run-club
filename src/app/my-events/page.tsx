@@ -47,7 +47,7 @@ export default function MyEventsPage() {
 
             if (response.ok) {
                 const data = await response.json();
-                setEvents(data.events || []);
+                setEvents((data.events || []).sort((a: Event, b: Event) => new Date(b.date).getTime() - new Date(a.date).getTime()));
             } else {
                 console.error('Failed to fetch events');
             }

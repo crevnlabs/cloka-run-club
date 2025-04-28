@@ -10,6 +10,25 @@ export type EventCardProps = {
     bannerImageURL?: string | null;
 };
 
+// Format date similar to admin events page
+function formatDate(dateString: string) {
+    // If the string is already formatted (not ISO or timestamp), return as is
+    // Try to parse, if invalid, return original string
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+        // Not a valid date, likely already formatted
+        return dateString;
+    }
+    return date.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+    });
+}
+
 const EventCard = ({ event }: { event: EventCardProps }) => {
     return (
         <motion.div
@@ -20,7 +39,7 @@ const EventCard = ({ event }: { event: EventCardProps }) => {
             className="bg-white text-black p-6 luxury-border"
         >
             <div className="mb-4">
-                <span className="text-sm uppercase tracking-wider text-accent">{event.date}</span>
+                <span className="text-sm uppercase tracking-wider text-accent">{formatDate(event.date)}</span>
             </div>
             <h3 className="text-xl font-bold mb-2">{event.title}</h3>
             <p className="text-sm mb-4">

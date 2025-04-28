@@ -43,7 +43,7 @@ const UpcomingEvents = ({ serverEvents }: UpcomingEventsProps) => {
                     return {
                         id: event._id,
                         title: event.title,
-                        date: eventDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }),
+                        date: eventDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
                         location: event.location,
                         description: event.description,
                         bannerImageURL: event.bannerImageURL,
