@@ -16,6 +16,7 @@ const navItems = [
     { name: 'Registrations', href: '/admin/event-registrations' },
     { name: 'Check-In', href: '/admin/event-check-in' },
     { name: 'Users', href: '/admin/users' },
+    { name: 'Volunteers', href: '/admin/volunteers' },
 ];
 
 function AdminLayoutContent({

@@ -2,24 +2,36 @@
 
 import { useState } from 'react';
 import Button from './Button';
+import EventCard, { EventCardProps } from './EventCard';
 
-type EventProps = {
+type ApiEventProps = {
     _id: string;
     title: string;
     date: Date;
     location: string;
     description: string;
     formattedDate: string;
+    bannerImageURL: string | null;
 };
 
 interface EventsToggleProps {
-    allEvents: EventProps[];
-    upcomingEvents: EventProps[];
+    allEvents: ApiEventProps[];
+    upcomingEvents: ApiEventProps[];
 }
 
 const EventsToggle = ({ allEvents, upcomingEvents }: EventsToggleProps) => {
     const [showUpcomingOnly, setShowUpcomingOnly] = useState(true);
-    const [events, setEvents] = useState<EventProps[]>(upcomingEvents);
+    const [events, setEvents] = useState<ApiEventProps[]>(upcomingEvents);
+
+    // Transform API event to EventCard props
+    const transformEvent = (event: ApiEventProps): EventCardProps => ({
+        id: event._id,
+        title: event.title,
+        date: event.formattedDate,
+        location: event.location,
+        description: event.description,
+        bannerImageURL: event.bannerImageURL,
+    });
 
     // Toggle between all events and upcoming events
     const toggleEvents = (showUpcoming: boolean) => {
@@ -59,28 +71,7 @@ const EventsToggle = ({ allEvents, upcomingEvents }: EventsToggleProps) => {
             {events.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {events.map((event) => (
-                        <div key={event._id} className="bg-white text-black p-6 luxury-border">
-                            <div className="mb-4">
-                                <span className="text-sm uppercase tracking-wider text-accent">
-                                    {event.formattedDate}
-                                </span>
-                            </div>
-                            <h3 className="text-xl font-bold mb-2">{event.title}</h3>
-                            <p className="text-sm mb-4">
-                                <span className="font-medium">Location:</span> {event.location}
-                            </p>
-                            <p className="luxury-text mb-6">{event.description}</p>
-                            <div className="flex flex-wrap gap-3">
-                                <Button
-                                    href={`/events/${event._id}`}
-                                    variant="luxury"
-                                    size="small"
-                                    className="inline-block"
-                                >
-                                    View Details
-                                </Button>
-                            </div>
-                        </div>
+                        <EventCard key={event._id} event={transformEvent(event)} />
                     ))}
                 </div>
             ) : (

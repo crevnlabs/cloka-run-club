@@ -9,6 +9,7 @@ export interface IVolunteerApplication extends Document {
   skills?: string;
   languages?: string;
   additionalInfo?: string;
+  location: string;
   status: "pending" | "approved" | "rejected";
   createdAt: Date;
   updatedAt: Date;
@@ -24,6 +25,7 @@ const VolunteerApplicationSchema: Schema = new Schema({
   interests: { type: String, required: true },
   experience: { type: String, required: true },
   motivation: { type: String, required: true },
+  location: { type: String, required: true },
   skills: { type: String },
   languages: { type: String },
   additionalInfo: { type: String },

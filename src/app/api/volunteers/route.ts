@@ -15,8 +15,7 @@ export async function GET() {
     await dbConnect();
 
     // Check authentication
-    const cookieStore = cookies();
-    const authCookie = cookieStore.get("cloka_auth");
+    const authCookie = (cookies() as any).get("cloka_auth"); // eslint-disable-line @typescript-eslint/no-explicit-any
 
     if (!authCookie?.value) {
       return NextResponse.json(
@@ -50,8 +49,7 @@ export async function POST(request: NextRequest) {
     await dbConnect();
 
     // Check authentication
-    const cookieStore = cookies();
-    const authCookie = cookieStore.get("cloka_auth");
+    const authCookie = (cookies() as any).get("cloka_auth"); // eslint-disable-line @typescript-eslint/no-explicit-any
 
     if (!authCookie?.value) {
       return NextResponse.json(
@@ -96,10 +94,17 @@ export async function POST(request: NextRequest) {
       skills,
       languages,
       additionalInfo,
+      location,
     } = body;
 
     // Validate required fields
-    if (!availability || !interests || !experience || !motivation) {
+    if (
+      !availability ||
+      !interests ||
+      !experience ||
+      !motivation ||
+      !location
+    ) {
       return NextResponse.json(
         { success: false, message: "Required fields are missing" },
         { status: 400 }
@@ -113,6 +118,7 @@ export async function POST(request: NextRequest) {
       interests,
       experience,
       motivation,
+      location,
       skills,
       languages,
       additionalInfo,
@@ -134,6 +140,7 @@ Gender: ${user.gender || "Not specified"}
 Instagram: ${user.instagramUsername || "Not specified"}
 
 Application Details:
+Location: ${location}
 Availability: ${availability}
 Interests: ${interests}
 Experience: ${experience}
@@ -155,6 +162,7 @@ ${additionalInfo ? `Additional Info: ${additionalInfo}` : ""}
           }</p>
 
           <h4>Application Details:</h4>
+          <p><strong>Location:</strong> ${location}</p>
           <p><strong>Availability:</strong> ${availability}</p>
           <p><strong>Interests:</strong> ${interests}</p>
           <p><strong>Experience:</strong> ${experience}</p>

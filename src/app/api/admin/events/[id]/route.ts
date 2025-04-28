@@ -65,6 +65,7 @@ export async function PUT(
       postApprovalMessage,
       postRejectionMessage,
       razorpayButtonId,
+      bannerImageURL,
     } = body;
 
     // Validate required fields
@@ -86,7 +87,8 @@ export async function PUT(
         exactLocation: exactLocation || null,
         postApprovalMessage: postApprovalMessage || null,
         postRejectionMessage: postRejectionMessage || null,
-        razorpayButtonId,
+        razorpayButtonId: razorpayButtonId || null,
+        bannerImageURL: bannerImageURL || null,
       },
       { new: true } // Return the updated document
     );

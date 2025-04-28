@@ -1,17 +1,9 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { fetchApi } from '@/lib/apiUtils';
 import Button from './Button';
-
-type EventProps = {
-    id: string;
-    title: string;
-    date: string;
-    location: string;
-    description: string;
-};
+import EventCard, { EventCardProps } from './EventCard';
 
 // Type for the event data from the API
 type ApiEventData = {
@@ -21,46 +13,16 @@ type ApiEventData = {
     location: string;
     description: string;
     createdAt: string;
+    bannerImageURL?: string | null;
 };
 
 // Props for the UpcomingEvents component
 interface UpcomingEventsProps {
-    serverEvents?: EventProps[];
+    serverEvents?: EventCardProps[];
 }
 
-const EventCard = ({ event }: { event: EventProps }) => {
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-            className="bg-white text-black p-6 luxury-border"
-        >
-            <div className="mb-4">
-                <span className="text-sm uppercase tracking-wider text-accent">{event.date}</span>
-            </div>
-            <h3 className="text-xl font-bold mb-2">{event.title}</h3>
-            <p className="text-sm mb-4">
-                <span className="font-medium">Location:</span> {event.location}
-            </p>
-            <p className="luxury-text mb-6">{event.description}</p>
-            <div className="flex flex-wrap gap-3">
-                <Button
-                    href={`/events/${event.id}`}
-                    variant="luxury"
-                    size="small"
-                    className="inline-block"
-                >
-                    View Details
-                </Button>
-            </div>
-        </motion.div>
-    );
-};
-
 const UpcomingEvents = ({ serverEvents }: UpcomingEventsProps) => {
-    const [events, setEvents] = useState<EventProps[]>(serverEvents || []);
+    const [events, setEvents] = useState<EventCardProps[]>(serverEvents || []);
     const [loading, setLoading] = useState(!serverEvents);
     const [error, setError] = useState('');
 
@@ -84,6 +46,7 @@ const UpcomingEvents = ({ serverEvents }: UpcomingEventsProps) => {
                         date: eventDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }),
                         location: event.location,
                         description: event.description,
+                        bannerImageURL: event.bannerImageURL,
                     };
                 });
 

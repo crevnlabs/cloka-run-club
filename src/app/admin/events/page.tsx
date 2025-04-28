@@ -16,6 +16,7 @@ interface Event {
     postApprovalMessage?: string;
     postRejectionMessage?: string;
     razorpayButtonId?: string;
+    bannerImageURL?: string;
 }
 
 export default function AdminEventsPage() {
@@ -50,7 +51,8 @@ export default function AdminEventsPage() {
             exactLocation: '',
             postApprovalMessage: '',
             postRejectionMessage: '',
-            razorpayButtonId: ''
+            razorpayButtonId: '',
+            bannerImageURL: ''
         }
     });
     const [formError, setFormError] = useState('');
@@ -171,7 +173,8 @@ export default function AdminEventsPage() {
                 exactLocation: '',
                 postApprovalMessage: '',
                 postRejectionMessage: '',
-                razorpayButtonId: ''
+                razorpayButtonId: '',
+                bannerImageURL: ''
             }
         });
         setFormError('');
@@ -189,7 +192,8 @@ export default function AdminEventsPage() {
                 exactLocation: '',
                 postApprovalMessage: '',
                 postRejectionMessage: '',
-                razorpayButtonId: ''
+                razorpayButtonId: '',
+                bannerImageURL: ''
             }
         });
         setFormError('');
@@ -547,6 +551,24 @@ export default function AdminEventsPage() {
                                 />
                                 <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
                                     This message will be displayed to users after their registration is rejected.
+                                </p>
+                            </div>
+
+                            <div>
+                                <label htmlFor="bannerImageURL" className="block text-sm font-medium mb-1 text-black dark:text-white">
+                                    Banner Image URL
+                                </label>
+                                <input
+                                    id="bannerImageURL"
+                                    name="bannerImageURL"
+                                    type="url"
+                                    value={eventForm.event.bannerImageURL || ''}
+                                    onChange={handleFormChange}
+                                    className="w-full p-2 border border-black dark:border-white rounded-md bg-white dark:bg-black text-black dark:text-white"
+                                    placeholder="Enter the URL for the event banner image"
+                                />
+                                <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
+                                    Optional: Add a URL for the event banner image. Use a direct image URL (e.g., .jpg, .png).
                                 </p>
                             </div>
 

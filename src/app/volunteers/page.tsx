@@ -16,6 +16,7 @@ interface FormData {
     skills: string;
     languages: string;
     additionalInfo: string;
+    location: string;
 }
 
 interface VolunteerApplication {
@@ -44,6 +45,7 @@ export default function VolunteersPage() {
         skills: '',
         languages: '',
         additionalInfo: '',
+        location: '',
     });
 
     const [error, setError] = useState('');
@@ -114,6 +116,7 @@ export default function VolunteersPage() {
                 skills: '',
                 languages: '',
                 additionalInfo: '',
+                location: '',
             });
         } catch (err) {
             console.error(err);
@@ -257,6 +260,21 @@ export default function VolunteersPage() {
                                                 value={formData.availability}
                                                 onChange={handleChange}
                                                 placeholder="E.g., Weekends, Weekday evenings"
+                                                className="w-full p-3 border focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
+                                                required
+                                            />
+                                        </div>
+
+                                        {/* Location */}
+                                        <div>
+                                            <label htmlFor="location" className="block text-sm font-medium mb-1">Location (Area, City) *</label>
+                                            <input
+                                                id="location"
+                                                name="location"
+                                                type="text"
+                                                value={formData.location}
+                                                onChange={handleChange}
+                                                placeholder="E.g., Indiranagar, Bangalore"
                                                 className="w-full p-3 border focus:outline-none focus:ring-2 bg-zinc-900 border-zinc-700"
                                                 required
                                             />

@@ -12,6 +12,9 @@ const urbanist = Urbanist({
   subsets: ["latin"],
   display: 'swap',
   variable: '--font-urbanist',
+  weight: ['400', '500', '600', '700'],
+  preload: true,
+  adjustFontFallback: true,
 });
 
 export const metadata: Metadata = {

@@ -112,15 +112,23 @@ export default async function EventDetailPage({
 
                     <div className="bg-black text-white luxury-border">
                         {/* Event Header */}
-                        <div className="relative h-80 w-full">
-                            <video
-                                src="/teaser.MP4"
-                                autoPlay
-                                muted
-                                loop
-                                playsInline
-                                className="absolute inset-0 w-full h-full object-cover"
-                            />
+                        <div className={`relative w-full ${event.bannerImageURL ? 'h-[32rem]' : 'h-96'}`}>
+                            {event.bannerImageURL ? (
+                                <img
+                                    src={event.bannerImageURL}
+                                    alt={event.title}
+                                    className="absolute inset-0 w-full h-full object-cover object-[center_33%]"
+                                />
+                            ) : (
+                                <video
+                                    src="/teaser.MP4"
+                                    autoPlay
+                                    muted
+                                    loop
+                                    playsInline
+                                    className="absolute inset-0 w-full h-full object-cover"
+                                />
+                            )}
                             <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
                             <div className="absolute bottom-0 left-2 p-6">
                                 <h1 className="text-3xl md:text-4xl font-bold text-white">{event.title}</h1>
@@ -168,15 +176,6 @@ export default async function EventDetailPage({
                                                         <p className="text-zinc-300 whitespace-pre-line">{event.postApprovalMessage}</p>
                                                     </div>
                                                 )}
-
-                                                {/* Show payment button if razorpayButtonId exists */}
-                                                {event.razorpayButtonId && (
-                                                    <div className="mt-4 p-4 bg-zinc-900 luxury-border">
-                                                        <h3 className="text-lg font-semibold mb-2">Payment</h3>
-                                                        <p className="text-zinc-300 mb-4">Complete your payment to confirm your spot.</p>
-                                                        <TemporaryPaymentButton paymentButtonId={event.razorpayButtonId} />
-                                                    </div>
-                                                )}
                                             </>
                                         ) : (
                                             <div className="p-4 bg-zinc-900 luxury-border">
@@ -214,12 +213,23 @@ export default async function EventDetailPage({
                                                 This event has already taken place.
                                             </div>
                                         ) : (
-                                            <EventRegistrationButton
-                                                eventId={resolvedParams.id}
-                                                isRegistered={isRegistered}
-                                                isApproved={isApproved}
-                                                isPastEvent={isPastEvent}
-                                            />
+                                            <>
+                                                <EventRegistrationButton
+                                                    eventId={resolvedParams.id}
+                                                    isRegistered={isRegistered}
+                                                    isApproved={isApproved}
+                                                    isPastEvent={isPastEvent}
+                                                />
+
+                                                {/* Show payment button if approved and razorpayButtonId exists */}
+                                                {isApproved && event.razorpayButtonId && (
+                                                    <div className="mt-4 p-4 bg-zinc-800 rounded-md">
+                                                        <h3 className="text-lg font-semibold mb-2">Payment</h3>
+                                                        <p className="text-zinc-300 mb-4">Complete your payment to confirm your spot.</p>
+                                                        <TemporaryPaymentButton paymentButtonId={event.razorpayButtonId} />
+                                                    </div>
+                                                )}
+                                            </>
                                         )}
                                     </div>
                                 </div>

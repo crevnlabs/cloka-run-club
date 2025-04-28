@@ -45,6 +45,8 @@ export async function POST(request: NextRequest) {
       exactLocation,
       postApprovalMessage,
       postRejectionMessage,
+      razorpayButtonId,
+      bannerImageURL,
     } = await request.json();
 
     // Validate required fields
@@ -64,6 +66,8 @@ export async function POST(request: NextRequest) {
       exactLocation: exactLocation || null,
       postApprovalMessage: postApprovalMessage || null,
       postRejectionMessage: postRejectionMessage || null,
+      razorpayButtonId: razorpayButtonId || null,
+      bannerImageURL: bannerImageURL || null,
       createdAt: new Date(),
     });
 
