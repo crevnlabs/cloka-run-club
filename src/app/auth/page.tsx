@@ -24,9 +24,9 @@ export default function AuthPage() {
     // Redirect if user is already authenticated
     useEffect(() => {
         if (isAuthenticated) {
-            router.replace('/profile');
+            router.replace(redirect);
         }
-    }, [isAuthenticated, router]);
+    }, [isAuthenticated, router, redirect]);
 
     // Update mode when URL parameters change
     useEffect(() => {

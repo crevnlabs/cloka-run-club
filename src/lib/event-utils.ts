@@ -12,7 +12,7 @@ export async function checkEventRegistration(eventId: string) {
     await dbConnect();
 
     // Get the auth cookie
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const authCookie = cookieStore.get("cloka_auth");
 
     if (!authCookie || !authCookie.value) {

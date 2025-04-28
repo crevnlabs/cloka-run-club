@@ -24,8 +24,11 @@ export async function generateMetadata({
     // Connect to the database
     await dbConnect();
 
+    // Await the entire params object
+    const resolvedParams = await params;
+
     // Fetch the event
-    const event = await Event.findById(params.id);
+    const event = await Event.findById(resolvedParams.id);
 
     if (!event) {
         return {
@@ -51,20 +54,23 @@ export async function generateMetadata({
 export default async function EventDetailPage({
     params
 }: {
-    params: PageParams
+    params: { id: string }
 }) {
     // Connect to the database
     await dbConnect();
 
+    // Await the entire params object
+    const resolvedParams = await params;
+
     // Fetch the event
-    const event = await Event.findById(params.id);
+    const event = await Event.findById(resolvedParams.id);
 
     if (!event) {
         notFound();
     }
 
     // Check if the user is registered for this event
-    const { isRegistered, isApproved } = await checkEventRegistration(params.id);
+    const { isRegistered, isApproved } = await checkEventRegistration(resolvedParams.id);
 
     // Check if user is logged in
     const cookieStore = await cookies();
@@ -191,7 +197,7 @@ export default async function EventDetailPage({
                                         {!isLoggedIn && event.exactLocation && (
                                             <div className="mt-4 p-4 bg-zinc-900 luxury-border">
                                                 <p className="text-zinc-300">
-                                                    <Link href={`/auth?redirect=/events/${params.id}`} className="text-accent hover:underline">
+                                                    <Link href={`/auth?redirect=/events/${resolvedParams.id}`} className="text-accent hover:underline">
                                                         Log in
                                                     </Link> to see the exact location details.
                                                 </p>
@@ -209,7 +215,7 @@ export default async function EventDetailPage({
                                             </div>
                                         ) : (
                                             <EventRegistrationButton
-                                                eventId={params.id}
+                                                eventId={resolvedParams.id}
                                                 isRegistered={isRegistered}
                                                 isApproved={isApproved}
                                                 isPastEvent={isPastEvent}
