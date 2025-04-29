@@ -201,7 +201,7 @@ const Header = () => {
                                     >
                                         My Events
                                     </Link>
-                                    {user.role === 'admin' && (
+                                    {user.role === 'admin' || user.role === 'super-admin' && (
                                         <Link
                                             href="/admin"
                                             className="block py-2 luxury-text hover:text-accent"
