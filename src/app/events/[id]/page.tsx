@@ -225,7 +225,7 @@ export default async function EventDetailPage({
                                                 {isApproved && event.razorpayButtonId && (
                                                     <div className="mt-4 p-4 bg-zinc-800 rounded-md">
                                                         <h3 className="text-lg font-semibold mb-2">Payment</h3>
-                                                        <p className="text-zinc-300 mb-4">Complete your payment to confirm your spot.</p>
+                                                        <p className="text-zinc-300 mb-4">Complete your payment to confirm your spot. Ignore this if you have already paid.</p>
                                                         <TemporaryPaymentButton paymentButtonId={event.razorpayButtonId} />
                                                     </div>
                                                 )}
