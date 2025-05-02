@@ -35,24 +35,20 @@ const Footer = () => {
                                     Partner with Us
                                 </Link>
                             </li>
+
                             <li>
-                                <a
-                                    href="/contact"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="luxury-text hover:text-accent transition-colors"
-                                >
-                                    Contact Us & Support
-                                </a>
-                            </li>
-                            <li>
-                                <Link href="/shipping" className="luxury-text hover:text-accent transition-colors">
-                                    Shipping Policy
+                                <Link href="/privacy" className="luxury-text hover:text-accent transition-colors">
+                                    Privacy Policy
                                 </Link>
                             </li>
                             <li>
                                 <Link href="/refund" className="luxury-text hover:text-accent transition-colors">
                                     Cancellation & Refund
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/terms" className="luxury-text hover:text-accent transition-colors">
+                                    Terms of Service
                                 </Link>
                             </li>
                         </ul>
@@ -61,6 +57,16 @@ const Footer = () => {
                     <div className="flex flex-col items-center justify-end text-center h-full">
                         <h3 className="text-xl font-bold mb-4 tracking-wider">Contact</h3>
                         <p className="luxury-text mb-2">Email: info@cloka.in</p>
+                        <p>
+                            <a
+                                href="/contact"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="luxury-text hover:text-accent transition-colors"
+                            >
+                                Contact Us & Support Form
+                            </a>
+                        </p>
                         <div className="flex space-x-4 mt-4">
                             <a href="https://instagram.com/cloka.club" target="_blank" rel="noopener noreferrer" className="text-white hover:text-accent">
                                 <span className="sr-only">Instagram</span>

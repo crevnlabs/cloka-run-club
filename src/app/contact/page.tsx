@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Button from '@/components/Button';
+import Image from 'next/image';
 
 export default function ContactPage() {
     const [formData, setFormData] = useState({
@@ -60,9 +61,28 @@ export default function ContactPage() {
 
             <main className="flex-grow container mx-auto px-4 py-8">
                 <div className="max-w-2xl mx-auto">
-                    <h1 className="text-3xl font-bold mb-8">Contact Us</h1>
+                    <h1 className="text-3xl text-center font-bold mb-8">Contact Us</h1>
 
-                    <div className="bg-zinc-800 p-8 rounded-lg shadow-lg">
+                    <div className="bg-zinc-900 text-gray-300 text-md p-4 text-left flex justify-between items-center gap-4">
+
+
+                        <div>
+                            <p className="font-semibold mb-1">Cloka India</p>
+                            <address className="not-italic">
+                                No.27, Aston Ville 4B,<br />
+                                Kumaran Colony 1st Cross Street,<br />
+                                Vadapalani, Chennai - 600026
+                            </address>
+                            <p className="mt-2 font-semibold">
+                                info@cloka.in
+                            </p>
+                        </div>
+
+                        <Image className='filter invert' src="/logo.png" alt="Cloka Logo" width={100} height={100} />
+
+                    </div>
+
+                    <div className="border-2 border-zinc-800 p-8">
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div>
                                 <label htmlFor="issueType" className="block text-sm font-medium mb-1">
@@ -138,6 +158,7 @@ export default function ContactPage() {
                     </div>
                 </div>
             </main>
+
 
             <Footer />
         </div>
