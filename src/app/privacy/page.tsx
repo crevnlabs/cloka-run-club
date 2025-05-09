@@ -111,9 +111,11 @@ export default function PrivacyPage() {
                         <div className="mt-4">
                             <p className="font-semibold mb-1">Cloka India</p>
                             <address className="not-italic">
-                                No.27, Aston Ville 4B,<br />
-                                Kumaran Colony 1st Cross Street,<br />
-                                Vadapalani, Chennai - 600026
+                                White gate house,<br />
+                                (Opposite to Rose of Sharon AG Church)<br />
+                                Zachariah Colony 2nd St,<br />
+                                Minor Trustpuram, Choolaimedu,<br />
+                                Chennai, Tamil Nadu 600094
                             </address>
                             <p className="mt-2 font-semibold">
                                 info@cloka.in
