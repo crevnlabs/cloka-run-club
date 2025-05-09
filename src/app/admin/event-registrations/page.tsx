@@ -224,7 +224,7 @@ export default function EventRegistrationsPage() {
     }, []);
 
     // Handle approval/rejection
-    const handleApproval = async (registrationId: string, approved: boolean) => {
+    const handleApproval = async (registrationId: string, approved: boolean | null) => {
         try {
             const response = await fetch('/api/admin/event-registrations/approve', {
                 method: 'POST',
@@ -261,8 +261,9 @@ export default function EventRegistrationsPage() {
                         else newSummary.pending--;
 
                         // Increment new status count
-                        if (approved) newSummary.approved++;
-                        else newSummary.rejected++;
+                        if (approved === true) newSummary.approved++;
+                        else if (approved === false) newSummary.rejected++;
+                        else newSummary.pending++;
 
                         return newSummary;
                     });
@@ -835,6 +836,14 @@ export default function EventRegistrationsPage() {
                                                                 className="bg-red-700 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
                                                             >
                                                                 Reject
+                                                            </Button>
+                                                        )}
+                                                        {registration.approved !== null && (
+                                                            <Button
+                                                                onClick={() => handleApproval(registration._id, null)}
+                                                                className="bg-yellow-800 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm"
+                                                            >
+                                                                Mark as Pending
                                                             </Button>
                                                         )}
                                                     </div>

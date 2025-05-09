@@ -39,7 +39,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (approved === undefined || approved === null) {
+    // Allow approved to be true, false, or null (pending)
+    if (approved === undefined) {
       return NextResponse.json(
         { success: false, message: "Approval status is required" },
         { status: 400 }
@@ -60,12 +61,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const statusMsg =
+      approved === true
+        ? "approved"
+        : approved === false
+        ? "rejected"
+        : "set to pending";
+
     return NextResponse.json(
       {
         success: true,
-        message: `Event registration ${
-          approved ? "approved" : "rejected"
-        } successfully`,
+        message: `Event registration ${statusMsg} successfully`,
         userEvent,
       },
       { status: 200 }
