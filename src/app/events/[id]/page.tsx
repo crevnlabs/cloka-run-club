@@ -9,6 +9,7 @@ import dbConnect from '@/lib/mongodb';
 import Event from '@/models/Event';
 import { checkEventRegistration } from '@/lib/event-utils';
 import { cookies } from 'next/headers';
+import EventLocalDate from '@/components/EventLocalDate';
 
 // Define the params type for this page
 type PageParams = {
@@ -80,12 +81,6 @@ export default async function EventDetailPage({
     // Check if event is in the past
     const isPastEvent = new Date(event.date) < new Date();
 
-
-    // Format time
-    const formatTime = (date: Date) => {
-        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-    };
-
     return (
         <>
             <Header />
@@ -121,7 +116,7 @@ export default async function EventDetailPage({
                             <div className="absolute bottom-0 left-2 p-6">
                                 <h1 className="text-3xl md:text-4xl font-bold text-white">{event.title}</h1>
                                 <p className="text-zinc-300 mt-2">
-                                    {formatTime(event.date)}
+                                    <EventLocalDate date={event.date} />
                                 </p>
                             </div>
                         </div>
