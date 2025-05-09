@@ -321,6 +321,45 @@ export default function EventRegistrationsPage() {
         }
     };
 
+    // Handle revoke check-in
+    const handleRevokeCheckIn = async (registrationId: string) => {
+        try {
+            const response = await fetch('/api/admin/event-registrations/revoke-check-in', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    registrationId,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Update the registration in the state
+                setEventRegistrations(prevRegistrations =>
+                    prevRegistrations.map(reg =>
+                        reg._id === registrationId
+                            ? { ...reg, checkedIn: false, checkedInAt: null }
+                            : reg
+                    )
+                );
+
+                // Update summary counts
+                setSummary(prev => ({
+                    ...prev,
+                    checkedIn: Math.max(prev.checkedIn - 1, 0)
+                }));
+            } else {
+                setError(data.message || 'Failed to revoke check-in');
+            }
+        } catch (err) {
+            setError('An error occurred while revoking check-in');
+            console.error(err);
+        }
+    };
+
     // Handle page change
     const handlePageChange = (newPage: number) => {
         setPagination(prev => ({ ...prev, page: newPage }));
@@ -808,6 +847,12 @@ export default function EventRegistrationsPage() {
                                                                     {new Date(registration.checkedInAt).toLocaleString()}
                                                                 </div>
                                                             )}
+                                                            <Button
+                                                                onClick={() => handleRevokeCheckIn(registration._id)}
+                                                                className="mt-2 bg-fuchsia-700 hover:bg-fuchsia-600 text-white px-3 py-1 rounded text-xs"
+                                                            >
+                                                                Revoke Check-In
+                                                            </Button>
                                                         </div>
                                                     ) : registration.approved === true ? (
                                                         <Button
