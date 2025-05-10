@@ -89,7 +89,7 @@ function AdminLayoutContent({
         <div className="min-h-screen bg-black">
             {/* Header Navigation */}
             <header className="relative">
-                <div className="bg-black text-white p-4">
+                <div className="backdrop-blur-md text-white p-4">
                     <div className="container mx-auto flex justify-between items-center relative">
                         <div className="flex items-center space-x-2">
                             <Link href="/admin" className="flex items-center space-x-2">

@@ -38,7 +38,7 @@ const Header = () => {
     };
 
     return (
-        <header className="bg-black text-white py-4 sticky top-0 z-50">
+        <header className="bg-black/50 text-white py-4 sticky top-0 z-50 backdrop-blur-md">
             <div className="luxury-container flex flex-col md:flex-row items-center">
                 {/* Left Side with Text-Mark Logo */}
                 <div className="w-full md:w-1/3 flex items-center">
