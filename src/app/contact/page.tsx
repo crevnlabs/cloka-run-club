@@ -69,7 +69,7 @@ export default function ContactPage() {
                         <div>
                             <p className="font-semibold mb-1">Cloka India</p>
                             <address className="not-italic">
-                                White gate house,<br />
+                                17/1, White gate house,<br />
                                 (Opposite to Rose of Sharon AG Church)<br />
                                 Zachariah Colony 2nd St,<br />
                                 Minor Trustpuram, Choolaimedu,<br />
